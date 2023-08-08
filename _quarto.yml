@@ -2,38 +2,41 @@ project:
   type: website
   output-dir: docs
   resources:
-    - info526-f23-syllabus.pdf
+    - info523-f23-syllabus.pdf
 
 website:
   page-navigation: true
-  title: "INFO 526"
-  description: "Homepage for INFO 526 - Data Visualization and Analysis at The University of Arizona, Fall 2023."
-  site-url: "http://datavizaz.org/"
+  title: "INFO 523"
+  description: "Homepage for INFO 523 - Data Mining and Discovery at The University of Arizona, Fall 2023."
+  site-url: ""
   favicon: /images/logo.png
 
-  repo-url: https://github.com/INFO526-DataViz
+  repo-url: https://github.com/Gchism94/INFO523-F23
   repo-actions: [edit, issue]
 
   open-graph: true
 
   sidebar:
-    background: "#378DBD" # Oasis
+    background: "#EF4056" # Bloom
     logo: "images/logo.png"
     pinned: true
     align: center
     tools:
       - icon: github
-        href: https://github.com/INFO526-DataViz
+        href: https://github.com/INFO523DM
         text: "GitHub organization"
       - icon: code-square
         href: https://posit.cloud/
         text: "Posit Cloud"
       - icon: person-fill
+        href: https://d2l.arizona.edu/d2l/home/1334579
         text: "D2L"
         menu:
           - text: Announcements
+            href: https://d2l.arizona.edu/d2l/home/1334579
           - text: Zoom meetings
           - text: Gradebook
+            href: https://d2l.arizona.edu/d2l/lms/grades/admin/manage/gradeslist.d2l?ou=1334579
 
     style: docked
     search: true
@@ -65,7 +68,7 @@ website:
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."
     left: "&copy; Copyright 2023, Greg Chism"
-    background: "#378DBD" # Oasis
+    background: "#EF4056" # Bloom
 
 format:
   html:

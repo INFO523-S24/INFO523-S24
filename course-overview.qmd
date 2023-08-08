@@ -2,15 +2,15 @@
 title: "Course overview"
 ---
 
-This is the homepage for INFO 526 - Data Analysis and Visualization taught by [Dr. Greg Chism](https://gregtchism.com) in Fall 2023 at The University of Arizona. All course materials will be posted on this site.
+This is the homepage for INFO 523 - Data Mining and Discovery taught by [Dr. Greg Chism](https://gregtchism.com) in Fall 2023 at The University of Arizona. All course materials will be posted on this site.
 
 You can find the course syllabus [here](/course-syllabus.html) and the course schedule [here](/).
 
 ## Class meetings
 
-| Meeting | Location              | Time                     |
-|---------|-----------------------|--------------------------|
-| Lecture | M Pacheco ILC, RM 130 | Mon & Wed 3:30 - 4:45 pm |
+| Meeting | Location                 | Time               |
+|---------|--------------------------|--------------------|
+| Lecture | Modern Languages, RM 413 | Wed 1:00 - 3:30 pm |
 
 <br>
 
