@@ -43,6 +43,8 @@ Readings for the course will come from the following textbooks. All of them are 
 ### Recommended textbook:
 
 -   `[Intro to Data Mining in R]` Michael Hahsler. [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/). Online Book, 2021.
+-   `[ggplot2-book]` Hadley Wickham, Danielle Navarro, and Thomas Lin Pedersen. [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/). (in progress) 3rd edition. Springer, 2022.
+-   `[r4ds]` Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund. [R for Data Science](https://r4ds.hadley.nz/). 2nd edition. O'Reilly, 2022.
 
 ## Course Requirements
 
@@ -156,7 +158,7 @@ Students in courses at the UArizona iSchool are expected to maintain rigor in th
 
 In any cases in which this course requires or permits students to use practices in the list above, clear written instructions will specify the tools allowed or required, so students can be certain they are working as instructed. See the [UArizona iSchool Academic Integrity Policy](https://ischool.arizona.edu/node/519), the [UArizona Code of Academic Integrity](https://deanofstudents.arizona.edu/policies/code-academic-integrity) and [Syllabus policy](https://catalog.arizona.edu/syllabus-policies) for more information.
 
-### **LLMs and ChatGPT**
+### **LLMs and ChatGPT**
 
 Large language models (LLMs) like ChatGPT are a type of artificial intelligence (AI) engine that can look like it generates the code you need for R labs and short answer questions. You are encouraged to use ChatGPT to debug code and experiment. However, abuse of ChatGPT can be traced (e.g., failing to give credit or cite ChatGPT when it is used) which could result in your suspension or termination from the course and even your program of study. Keep in mind, too, that while the code may appear legitimate, early studies have shown ChatGPT is not all that accurate with sophisticated coding. Exercise your scholarly discretion and maintain a sense of integrity in your statistical learning journey.
 
@@ -175,6 +177,6 @@ Information contained in this course syllabus, may be subject to change, as deem
 -   **Sunday, October 29**: Last day to withdraw from a class online through UAccess
 -   **Friday, November 10**: Veteran's Day, limited support available
 -   **Thursday - Sunday, November 23 - 26**: Thanksgiving recess, no support available
--   **Tuesday, December 12**: Project 2 presentations
+-   **Thursday, December 14**: Project presentations
 
 For more important dates, see the full [UArizona Academic Calendar](https://catalog.arizona.edu/2023-2024-academic-calendar).

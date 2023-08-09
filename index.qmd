@@ -1,5 +1,5 @@
 ---
-title: "INFO 526: Data Analysis & Visualization"
+title: "INFO 523: Data Minind & Discovery"
 subtitle: "Dr. Greg Chism"
 execute:
   freeze: false
@@ -18,7 +18,7 @@ library(googlesheets4)
 library(gt)
 library(tidyverse)
 gs4_deauth()
-d <- read_sheet("https://docs.google.com/spreadsheets/d/1tXrWNd7kucBNZwHm5wRXel7j09Lf8pKPtWvIgz2OmVo/edit?usp=sharing")
+d <- read_sheet("https://docs.google.com/spreadsheets/d/11tb2jW7HlPdS2nSWaUBaJrUZQ-7ljlqasDmHtXBSwqM/edit?usp=sharing")
 ```
 
 ```{r}

@@ -17,7 +17,7 @@ website:
   open-graph: true
 
   sidebar:
-    background: "#EF4056" # Bloom
+    background: "#EF4056" # AZ Red
     logo: "images/logo.png"
     pinned: true
     align: center
@@ -68,7 +68,7 @@ website:
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."
     left: "&copy; Copyright 2023, Greg Chism"
-    background: "#EF4056" # Bloom
+    background: "#AB0520" # AZ Red
 
 format:
   html:
