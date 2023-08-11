@@ -8,7 +8,6 @@ website:
   page-navigation: true
   title: "INFO 523"
   description: "Homepage for INFO 523 - Data Mining and Discovery at The University of Arizona, Fall 2023."
-  site-url: ""
   favicon: /images/logo.png
 
   repo-url: https://github.com/Gchism94/INFO523-F23

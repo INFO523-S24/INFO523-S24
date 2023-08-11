@@ -37,9 +37,9 @@ Readings for the course will come from the following textbooks. All of them are 
 
 ### Required textbooks:
 
--   `[Data mining conceptual]` Jiawei Han, Jian Pei, Hanghang Tong. [Data Mining Concepts and Techniques](Data_Mining_Concepts_and_Techniques_4th_Edition_-_Jiawei_Han). 4th edition. Morgan Kaufmann, 2023.
--   `[Data mining Algorithms]` Pawel Cichosz. [Data Mining Algorithms: Explained Using R](https://d2l.arizona.edu/d2l/le/content/1334579/viewContent/15116609/View). Wiley, 2015.
--   `[Data mining case studies]` Luis Torgo. [Data Mining with R: Learning with Case Studies](Data Mining with R_ Learning with Case Studies, Second Edition-Taylor & Francis_Chapman and Hall_CRC (2017).pdf). Chapman and Hall/CRC, 2016.
+-   `[Data mining conceptual]` Jiawei Han, Jian Pei, Hanghang Tong. [Data Mining Concepts and Techniques](./hanDataMiningConceptual.pdf). 4th edition. Morgan Kaufmann, 2023.
+-   `[Data mining algorithms]` Pawel Cichosz. [Data Mining Algorithms: Explained Using R](./cichoszDataMiningAlgorithms.pdf). Wiley, 2015.
+-   `[Data mining case studies]` Luis Torgo. [Data Mining with R: Learning with Case Studies](./torgoDataMiningR.pdf). Chapman and Hall/CRC, 2016.
 
 ### Recommended textbook:
 
