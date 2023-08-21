@@ -32,10 +32,11 @@ website:
         text: "D2L"
         menu:
           - text: Announcements
-            href: https://d2l.arizona.edu/d2l/home/1334579
+            href: https://datamineaz.slack.com
           - text: Zoom meetings
+            href: https://arizona.zoom.us/my/gregchism
           - text: Gradebook
-            href: https://d2l.arizona.edu/d2l/lms/grades/admin/manage/gradeslist.d2l?ou=1334579
+            href: https://d2l.arizona.edu/d2l/home/1334579
 
     style: docked
     search: true

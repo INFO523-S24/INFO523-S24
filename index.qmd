@@ -1,5 +1,5 @@
 ---
-title: "INFO 523: Data Minind & Discovery"
+title: "INFO 523: Data Mining & Discovery"
 subtitle: "Dr. Greg Chism"
 execute:
   freeze: false

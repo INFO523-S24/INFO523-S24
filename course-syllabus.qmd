@@ -1,5 +1,5 @@
 ---
-title: "Syllabus"
+title: "INFO 523 Syllabus Fall 2023"
 format: 
   html: default
   pdf: default
@@ -7,15 +7,39 @@ format:
 
 ## Course description
 
-INFO 523 - This course will introduce students to the concepts and techniques of data mining for knowledge discovery.  It includes methods developed in the fields of statistics, large-scale data analytics, machine learning, pattern recognition, database technology and artificial intelligence for automatic or semi-automatic analysis of large quantities of data to extract previously unknown patterns.  Topics include understanding varieties of data, data preprocessing, classification, association and correlation rule analysis, cluster analysis, outlier detection, and data mining trends and research frontiers. We will use software packages for data mining, explaining the underlying algorithms and their use and limitations.  The course include laboratory exercises, with data mining case studies using data from many different resources.
+INFO 523 Data Mining and Discovery- This course will introduce students to the concepts and techniques of data mining for knowledge discovery.  It includes methods developed in the fields of statistics, large-scale data analytics, machine learning, pattern recognition, database technology and artificial intelligence for automatic or semi-automatic analysis of large quantities of data to extract previously unknown patterns.  Topics include understanding varieties of data, data preprocessing, classification, association and correlation rule analysis, cluster analysis, outlier detection, and data mining trends and research frontiers. We will use software packages for data mining, explaining the underlying algorithms and their use and limitations.  The course include laboratory exercises, with data mining case studies using data from many different resources.
+
+## Course Offering
+
+909-2234-1 INFO 523 002 - Data Mining and Discovery
+
+## Instructor Information
+
+Dr. Greg Chism,
+
+Assistant Professor of Practice,
+
+School of Information
+
+[gchism\@arizona.edu](mailto:gchism@arizona.edu)
+
+**Office**: Harvill 420
+
+**Office Hour**s: Mondays, 2-3pm, Harvill 420
 
 ## Prerequisites
 
 Students are assumed to know the basics in computer programming (e.g., variables, arrays, loops, if-then conditions), statistics (e.g., normal distribution, significance tests), and relational database (e.g., ER-diagram, SQL statements). 
 
-## Learning goals
+## Course Format
 
-INFO 523 is an elective in the iSchool's M.S. program.  As a multidisciplinary field, the course introduce concepts and work from many areas critical to information studies including statistics, machine learning, pattern recognition, database technology, and data visualization.  
+Live in-person lectures, W 1:00-3:30pm, Modern Languages, RM 413. Attendance is mandatory.
+
+## Course Objective
+
+INFO 523 is an elective in the iSchool's M.S. program. As a multidisciplinary field, the course introduce concepts and work from many areas critical to information studies including statistics, machine learning, pattern recognition, database technology, and data visualization.  
+
+## Learning Outcomes
 
 By the end of this course, students will: 
 
@@ -25,13 +49,15 @@ By the end of this course, students will: 
 
 -   Explain and interpret results from data mining analyses.
 
+## Course Competencies
+
 The course addresses the MS Competencies: C1 \[A, B, C, D\], C2, and C3
 
 ## Course Workload
 
 For each lecture hour, students are expected to spend 3-5 hours, completing the required reading and course work. Students finding themselves spending excessively more time should definitely take advantage of office hours. **The instructor welcomes students' inputs on needed workload adjustment. If students need individual workload adjustments, please also contact the instructor.**
 
-## Textbooks
+## Course Materials
 
 Readings for the course will come from the following textbooks. All of them are **freely available online** and you do not need to purchase a physical copy of either book to succeed in this class.
 
@@ -41,11 +67,15 @@ Readings for the course will come from the following textbooks. All of them are 
 -   `[Data mining algorithms]` Pawel Cichosz. [Data Mining Algorithms: Explained Using R](./cichoszDataMiningAlgorithms.pdf). Wiley, 2015.
 -   `[Data mining case studies]` Luis Torgo. [Data Mining with R: Learning with Case Studies](./torgoDataMiningR.pdf). Chapman and Hall/CRC, 2016.
 
-### Recommended textbook:
+### Recommended textbooks:
 
 -   `[Intro to Data Mining in R]` Michael Hahsler. [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/). Online Book, 2021.
 -   `[ggplot2-book]` Hadley Wickham, Danielle Navarro, and Thomas Lin Pedersen. [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/). (in progress) 3rd edition. Springer, 2022.
 -   `[r4ds]` Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund. [R for Data Science](https://r4ds.hadley.nz/). 2nd edition. O'Reilly, 2022.
+
+## Course Schedule
+
+An up-to-date schedule, assignments, and due dates can be found on the course website: [datamineaz.org](https://datamineaz.org/).
 
 ## Course Requirements
 
@@ -55,25 +85,22 @@ The four components that go into the final course grade are described below. The
 
 -   R Exercises (35%): These are R code provided for you to review and practice. If you are new to R, type and run the R code in R Studio and turn in your .R file. If you know R already, skim through the R code and then apply them to a different data set of your choice (you need to include at least half of the provided code to earn credit for an exercise) and return your .R file.
 
--   Final project (15%): A final data mining project of your choice or using open datasets.
+-   Final project (25%): A final data mining project of your choice or using open datasets.
 
--   Class Participation (attending class, post and answer questions) (15%)
+-   Class Participation (attending class, post and answer questions) (5%)
 
 **The work and course requirements are subject to change at the discretion of the instructor with proper notice to the students.**
 
 #### **Grading:**
 
-A=90+ (Superior Work)
-
-B=80-89 (Very Good)
-
-C=70-79 (Marginally Satisfactory)
-
-D=60-69 (Failed to meet requirements)
-
-E=50-59 (Failed to meet requirements)
-
-F=0-49 (Failed to meet requirements)
+| Letter Grade | Final Course Grade |
+|--------------|--------------------|
+| A            | \>= 90             |
+| B            | 80 - 89.99         |
+| C            | 70 - 79.99         |
+| D            | 60 - 69.99         |
+| E            | 50-59.99           |
+| F            | \< 60              |
 
 ## **Group Work Policy**
 
@@ -105,7 +132,21 @@ Do not subject yourself to the late penalty: please do not make the instructor t
 
 -   All work may be checked by **Turnitin.com** or other tools made available to the Instructor. Students may find answers to homework questions on the Web. Yes, students are allowed to check out and learn from those answers, but to avoid an plagiarism charge, students must (1) cite the source URL and (2) present their work in their own words. **Please** do not impose the difficult and time consuming task of reporting plagiarism to your Instructor, but know that the Instructor **will** report any such case if you give the opportunity. Similarly, acknowledge help received from classmates or others. These acknowledgement will not hurt your grade, instead they reveal the academic integrity in you as a young scholar/researcher.
 
-## **COURSE, SCHOOL, AND UNIVERSITY POLICIES:**
+## Final Projects
+
+Your task for this project is to showcase your knowledge of any topic related to data mining.
+
+This is intentionally vague \-- part of the challenge is to design a project that showcases best your interests and strengths.
+
+One requirement is that your project should feature some element that you had to learn on your own. This could be a package you use that we didn't teach in class (e.g., a package for 3D visualizations) or a workflow (e.g., making a package) or anything else. If you're not sure if your "new" thing counts, just ask!
+
+More information will be provided throughout the semester.
+
+### Final Project Date
+
+**Tuesday, December 14**
+
+## Course policies
 
 ## **Inclusive Excellence**
 
@@ -113,27 +154,23 @@ Inclusive Excellence is a fundamental part of the University of Arizona\'s strat
 
 This course supports elective gender pronoun use and self-identification; rosters indicating such choices will be updated throughout the semester, upon student request.  As the course includes group work and in-class discussion, it is vitally important for us to create an educational environment of inclusion and mutual respect. 
 
-## **Academic Code of Integrity**
+## Academic honesty
 
-Students are expected to abide by The University of Arizona Code of Academic Integrity. 'The guiding principle of academic integrity is that a student's submitted work must be the student's own.' If you have any questions regarding what is acceptable practice under this Code, please ask an Instructor.
+**TL;DR: Don't cheat!**
 
-Policies Against Disruptive and Threatening Behavior
+Students are expected to abide by The University of Arizona Code of Academic Integrity. 'The guiding principle of academic integrity is that a student's submitted work must be the student's own.' If you have any questions regarding what acceptable practice under this Code is, please ask an Instructor.
 
-Students are also bound by the University's policies related to disruptive behavior and threatening behavior.
+Please abide by the following as you work on assignments in this course:
 
-## **Accessibility and Accommodations**
+-   **Collaboration:** Only work that is clearly assigned as team work should be completed collaboratively.
 
-At the University of Arizona, we strive to make learning experiences as accessible as possible. If you anticipate or experience barriers based on disability or pregnancy, please contact the Disability Resource Center (520-621-3268, [https://drc.arizona.edu](https://drc.arizona.edu/)) to establish reasonable accommodations.  
+-   The homework assignments must also be completed individually and you are welcomed to discuss the assignment with classmates at a high level (e.g., discuss what's the best way for approaching a problem, what functions are useful for accomplishing a particular task, etc.). However you may not directly share answers to homework questions (including any code) with anyone other than myself and the teaching assistants.
 
-## **"Incomplete" grade**
+-   For the projects, collaboration within teams is not only allowed, but expected. Communication between teams at a high level is also allowed however you may not share code or components of the project across teams.
 
-The grade of I may be awarded only at the end of a term, when all but a minor portion of the course work has been satisfactorily completed. The grade of I is not to be awarded in place of a failing grade or when the student is expected to repeat the course; in such a case, a grade other than I must be assigned. Students should make arrangements with the instructor to receive an incomplete grade before the end of the term. If the incomplete is not removed by the instructor within one year the I grade will revert to a failing grade.
+-   **Sharing and reusing code:** I am well aware that a huge volume of code is available on the web to solve any number of problems. Unless I explicitly tell you not to use something, the course's policy is that you may make use of any online resources (e.g. RStudio Community, StackOverflow) but you must explicitly cite where you obtained any code you directly use (or use as inspiration). Any recycled code that is discovered and is not explicitly cited will be treated as plagiarism. On individual assignments you may not directly share code with another student in this class, and on team assignments you may not directly share code with another team in this class.
 
-## **Additional Policies**
-
-The Arizona Board of Regents\' Student Code of Conduct, ABOR Policy 5-308, prohibits threats of physical harm to any member of the University community, including to one\'s self. See: <http://policy.web.arizona.edu/threatening-behavior-students>
-
-All student records will be managed and held confidentially. See: <http://www.registrar.arizona.edu/ferpa/default.html>
+-   **Generative AI (e.g., ChatGPT):** I am additionally aware of the potential code AI for coding (I taught a workshop on it...). While these tools are amazing, learners should be aware of the impacts that using such tools can have on core competency. David Humphrey, a computer science professor, [**wrote about ChatGPT and its potentially negative impacts on core learning.**](https://blog.humphd.org/cheatgpt/) It is a good read about the pitfalls of using generative AI in an educational context. By using a generative AI, learners may miss the opportunity to discover how something works and why things are done that way. It is also important to note that the iSchool generally bans utilizing ChatGPT and generative AI in our [Academic Integrity Policy](https://ischool.arizona.edu/sites/ischool.arizona.edu/files/iSchool%20Policy%20on%20Academic%20Integrity%20in%20Computing%202023%20-%20approved%20by%20faculty%20vote%20April%202023.pdf#:~:text=UArizona%20iSchool%20Instructors%20are%20expected%20to%20help%20students,prohibited%20in%20some%20courses%20are%20allowed%20in%20others.).
 
 ## **iSchool Academic Integrity Policy**
 
@@ -163,13 +200,23 @@ In any cases in which this course requires or permits students to use practices 
 
 Large language models (LLMs) like ChatGPT are a type of artificial intelligence (AI) engine that can look like it generates the code you need for R labs and short answer questions. You are encouraged to use ChatGPT to debug code and experiment. However, abuse of ChatGPT can be traced (e.g., failing to give credit or cite ChatGPT when it is used) which could result in your suspension or termination from the course and even your program of study. Keep in mind, too, that while the code may appear legitimate, early studies have shown ChatGPT is not all that accurate with sophisticated coding. Exercise your scholarly discretion and maintain a sense of integrity in your statistical learning journey.
 
-### **Tutoring**
+*See my policies on this subject above.*
 
-We have been developing additional support for students in our ISTA programs. One of these is the [**iSchool Peer Tutoring Center**](https://ischool.arizona.edu/undergraduate-peer-tutoring "https://ischool.arizona.edu/undergraduate-peer-tutoring"), which our colleague Dan Charbonneau has been developing to help students in ISTA courses including ISTA 116, 130, 131, 331, and 350. If you are teaching one of these courses, please include the attached flyer on your syllabus to tell your students about this important resource! For other courses and programs, please let students know tutoring is available through [Think Tank](https://thinktank.arizona.edu/ "https://thinktank.arizona.edu/").
+## **"Incomplete" grade**
+
+The grade of I may be awarded only at the end of a term, when all but a minor portion of the course work has been satisfactorily completed. The grade of I is not to be awarded in place of a failing grade or when the student is expected to repeat the course; in such a case, a grade other than I must be assigned. Students should make arrangements with the instructor to receive an incomplete grade before the end of the term. If the incomplete is not removed by the instructor within one year the I grade will revert to a failing grade.
+
+## **Tutoring**
+
+Tutoring can be found through the UArizona [Think Tank](#0 "https://thinktank.arizona.edu/").
+
+## Additional university policies
+
+Additional policies can be found at this link (please read through them): <https://catalog.arizona.edu/syllabus-policies>
 
 ## Important Dates
 
-Information contained in this course syllabus, may be subject to change, as deemed appropriate by the instructor.Important dates
+Information contained in this course syllabus, may be subject to change, as deemed appropriate by the instructor.
 
 -   **Monday, August 21:** Classes begin, Monday schedule
 -   **Monday, August 28:** Drop/add ends
@@ -181,3 +228,7 @@ Information contained in this course syllabus, may be subject to change, as deem
 -   **Thursday, December 14**: Project presentations
 
 For more important dates, see the full [UArizona Academic Calendar](https://catalog.arizona.edu/2023-2024-academic-calendar).
+
+## Graduate Student Resources
+
+University of Arizona's Basic Needs Resources page for graduate students: <http://basicneeds.arizona.edu/index.html>
