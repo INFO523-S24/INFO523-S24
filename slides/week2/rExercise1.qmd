@@ -1,0 +1,528 @@
+---
+title: "Getting to know your Data with R"
+---
+
+# Goal
+
+Practice basic R commands/methods for descriptive data analysis. If you are already familiar with some of the commands/methods, practice the ones new to you.
+
+**Note**: copying and pasting early in learning will not produce the results you are looking for, and will catch up to you eventually.
+
+## Submission
+
+Please submit `.r`, `.rmd`, or `.qmd` files ONLY.
+
+## Additional resources
+
+I wrote a Quarto book on [Exploratory Data Analysis in R](https://gchism94.github.io/Data7_EDA_In_R_Workshops/) using the `dlookr` package. I won't be showing this package here, but you can use the functions within my book below as well.
+
+# Installing required packages
+
+```{r, eval=FALSE}
+# First run this
+install.packages("pacman")
+```
+
+```{r, message=FALSE}
+library(pacman)
+
+p_load(dlookr,
+       DMwR2, # Data Mining with R functions
+       GGally, # Pair-wise plots using ggplot2
+       Hmisc, # Data analysis 
+       palmerpenguins, # Alternative to the Iris dataset
+       tidyverse) # Data wrangling, manipulation, visualization
+```
+
+# Loading data
+
+```{r}
+data(algae, package = "DMwR2")
+
+algae |> glimpse()
+```
+
+The `|>` is the Base R pipe as opposed to the `magrittr` pipe `%>%`. The `|>` pipe can be utilized for most functions in R, while the `%>%` pipe is more restricted towards the `tidyverse`.
+
+# Central tendency: mean, median, mode
+
+## Mean
+
+```{r}
+algae$a1 |>
+  mean()
+```
+
+## Median
+
+```{r}
+algae$a1 |>
+  median()
+```
+
+## Mode
+
+Base R doesn't have a function for mode, create a simple one to illustrate how to create a function.\
+(this method works only for unimodal data.)
+
+```{r}
+Mode <- function(x, na.rm=FALSE){
+if(na.rm) x<-x[!is.na(x)]
+ux <- unique (x)
+return (ux[which.max(tabulate(match(x, ux)))])
+}
+
+algae$a2 |> Mode()
+```
+
+## `DMwR` `centralValue()` function:
+
+returns the median for numerical variable, or the mode for nominal variables.
+
+```{r}
+# Numerical variable
+algae$a1 |> centralValue()
+```
+
+```{r}
+# Nominal variable
+algae$speed |> centralValue()
+```
+
+# Statistics of spread (variation)
+
+## Variance
+
+```{r}
+algae$a1 |> var()
+```
+
+## Standard deviation
+
+```{r}
+algae$a1 |> sd()
+```
+
+## Range
+
+Note that this gives you both maximum and minimum values.
+
+```{r}
+algae$a1 |> range()
+```
+
+## Maximum value
+
+```{r}
+algae$a1 |> max()
+```
+
+## Minimum value
+
+```{r}
+algae$a1 |> min()
+```
+
+## Interquartile range
+
+3rd quartile (75%) - 1st quartile (25%)
+
+```{r}
+algae$a1 |> IQR()
+```
+
+## Quantiles
+
+```{r}
+algae$a1 |> quantile()
+```
+
+Specifying specific quantiles:
+
+```{r}
+algae$a1 |> quantile(probs = c(0.2, 0.8))
+```
+
+# Missing values
+
+```{r}
+library(purrr)
+# Compute the total number of NA values in the dataset
+nas <- algae %>% 
+  purrr::map_dbl(~sum(is.na(.))) %>% 
+  sum()
+
+cat("The dataset contains ", nas, "NA values. \n")
+
+# Compute the number of incomplete rows in the dataset
+incomplete_rows <- algae %>% 
+  summarise_all(~!complete.cases(.)) %>%
+  nrow()
+
+cat("The dataset contains ", incomplete_rows, "(out of ", nrow(algae),") incomplete rows. \n")
+```
+
+# Summaries of a dataset
+
+## Base R's `summary()`
+
+```{r}
+algae |> summary()
+```
+
+## `Hmisc`'s `describe()`
+
+```{r}
+data("penguins")
+penguins |> Hmisc::describe()
+```
+
+GMD is the mean absolute difference between any pairs of observations. A robust dispersion measure, especially for non-normally distributed data.
+
+## `dlookr`'s `describe()`
+
+```{r}
+penguins |> dlookr::describe()
+```
+
+# Summaries on a subset of data
+
+`dplyr`'s `summarise()` and `summarise_all()`, or use them with `select()` and `group_by()` to create summaries on\
+subset of data. Note: `summarise()` = `summarize()`
+
+```{r}
+algae |>
+  summarise(avgNO3 = mean(NO3, na.rm=TRUE),
+            medA1 = median(a1))
+```
+
+`summarise_all()` can be used to apply any function that produces a scalar value to any column of a data\
+frame table.
+
+```{r}
+algae |>
+  select(mxPH:Cl) |>
+  summarise_all(list(mean, median), na.rm = TRUE)
+```
+
+```{r}
+algae |>
+  select(a1:a7) |>
+  summarise_all(funs(var))
+```
+
+```{r}
+algae |>
+  select(a1:a7) |>
+  summarise_all(c("min", "max"))
+```
+
+## Use `summarise()` with `group_by()`
+
+```{r}
+algae |>
+  group_by(season, size) |>
+  summarise(nObs = n(), mA7 = median(a7))
+```
+
+```{r}
+penguins |> 
+  group_by(species) |>
+  summarise(var = var(bill_length_mm, na.rm = TRUE))
+```
+
+## Aggregating data
+
+Can be helpful for summary functions that don't return a scalar
+
+```{r}
+penguins |>
+  group_by(species) |>
+  reframe(var = quantile(bill_length_mm, na.rm = TRUE))
+```
+
+`reframe()` expects a scalar result returned by the function, but quantile returns a vector.
+
+**Note**: Aggregating data with summarize was deprecated in `dplyr 1.1.0`, `reframe()` should be used instead.
+
+I recommend just using `dlookr`...
+
+```{r}
+penguins |>
+  group_by(species) |>
+  dlookr::describe(bill_length_mm)
+```
+
+#### [Grouping functions](https://dplyr.tidyverse.org/reference/index.html#:~:text=This%20%28mostly%29%20experimental%20family%20of%20functions%20are%20used,Apply%20a%20function%20to%20each%20group%20group_trim%20%28%29)
+
+# Data visualization: plotting in R
+
+base R provides graphics and grid packages for statistical plotting powerful plotting packages, e.g., `ggplot2`, are build upon 'graphics' or 'grid' packages\
+10.
+
+To be very frank, I am strongly biased towards `ggplot2` and the `tidyverse` in general. `ggplot2` has a much more extensive arsenal of extensions, plot types, and customization. In future exercises, I will be solely using `ggplot2`.
+
+```{r}
+plot(sin(seq(0, 10, by=0.1)), type="l") # base R plot(), type "l" is a line drawing
+```
+
+`ggplot2` allows the user to customize their plots in very flexible ways.
+
+To ggplot2, a plot is a mapping from data properties into aesthetic attributes (color, shape, size, etc) of geometric objects (points, lines, bars, etc.)\
+
+## Use ggplot2 to visualize nominal variables
+
+## Base R barplot
+
+```{r}
+freqOcc <- table(algae$season)
+barplot(freqOcc, main="Frequency of the Seasons")
+```
+
+## `ggplot2` barplot
+
+**ggplot2**: notice how commands are layered using `+`
+
+```{r}
+algae |>
+  ggplot(aes(x = season)) +
+  geom_bar() +
+  ggtitle("Frequency of the Seasons")
+
+```
+
+Note that I always pipe the dataset with `ggplot()` because you can add other `tidyverse` functions before the plot argument (e.g., `select()`, `filter()`).
+
+To center the title, run this command first, then all the plots drawn after will have titles
+
+```{r}
+theme_update(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+algae |>
+  ggplot(aes(x = season)) +
+  geom_bar() +
+  ggtitle("Frequency of the Seasons")
+```
+
+Color different bars: bars of different seasons get different color outline
+
+```{r}
+algae |>
+  ggplot(aes(x = season, color = season)) +
+  geom_bar() +
+  ggtitle("Frequency of the Seasons")
+```
+
+Use fill to make the entire bars colored
+
+```{r}
+algae |>
+  ggplot(aes(x = season, fill = season)) +
+  geom_bar() +
+  ggtitle("Frequency of the Seasons")
+```
+
+## Continuous variables: histograms
+
+### Base R
+
+```{r}
+hist(algae$mxPH, xlab = "Maximal pH")
+```
+
+### `ggplot2`
+
+```{r}
+algae |>
+ggplot(aes(x=mxPH)) +
+  geom_histogram() + xlab("Maximal pH")
+```
+
+## Continuous variables: boxplots
+
+### Base R
+
+```{r}
+boxplot(algae$mxPH, ylab="Maximal pH")
+```
+
+### `ggplot2`
+
+```{r}
+algae |>
+ggplot(aes(y=mxPH)) +
+  geom_boxplot() + 
+  ylab("Maximal pH") + 
+  theme(axis.text.x = element_blank())
+```
+
+#### A [guide](http://www.sthda.com/english/wiki/ggplot2-axis-ticks-a-guide-to-customize-tick-marks-and-labels) to customize tick marks and labels
+
+## Plotting sub-groups of a dataset
+
+This is not easy with base R (except for boxplot), but facets in `ggplot2` make this more streamline.
+
+### Base R
+
+```{r}
+boxplot(mxPH ~ season, algae, ylab="Maximal pH", xlab="Seasons")
+```
+
+### `ggplot2`
+
+```{r}
+algae |>
+  ggplot(aes(x = season, y = mxPH)) +
+  geom_boxplot() +
+  ylab("Maximal pH") +
+  xlab("Seaons")
+```
+
+## Facets
+
+Facets are variations of the same plot that are obtained with different subsets of a dataset. Subsetting are obtained often by using categorical variables.
+
+```{r}
+algae |> 
+ggplot(aes(x = a1)) +
+  geom_histogram() + 
+  facet_grid(size ~ speed)
+```
+
+```{r}
+algae |>
+ggplot(aes(x = a1)) + 
+  geom_histogram() + 
+  facet_grid(. ~ speed)
+```
+
+```{r}
+algae |> 
+ggplot(aes(x = speed, y = a1)) + 
+  geom_boxplot() + 
+  facet_grid(size ~ season)
+```
+
+## Continuous variables: scatter plots
+
+Useful to visualize the correlations between two numerical variables.
+
+### Base R
+
+```{r}
+plot(algae$a1, algae$a2, main = "Relationships between a1 and a2")
+```
+
+### `ggplot2`
+
+```{r}
+algae |>
+ggplot(aes(x = a1, y = a2)) + 
+  geom_point() +
+  ggtitle("Relationship between a1 and a2")
+```
+
+#### [Curve fitting](https://davetang.org/muse/2013/05/09/on-curve-fitting/)
+
+## Groups in a scatter plot
+
+### Base R
+
+```{r}
+plot(algae$a1, algae$a2, col = algae$season, main = "Relationships between a1 and a2")
+```
+
+### `ggplot2`
+
+```{r}
+algae |>
+ggplot(aes(x = a1, y = a2, color = season)) + 
+  geom_point() + 
+  ggtitle("Relationship between a1 and a2")
+```
+
+### Scatter plot facets
+
+```{r}
+algae |>
+ggplot(aes(x = a1, y = a2)) +
+  geom_point() + 
+  ggtitle("Relationship between a1 and a2") + 
+  facet_wrap(~season)
+```
+
+## Scatter plot matrix to compare pairs of variables
+
+### Base R
+
+```{r}
+pairs(algae[, 12:16])
+```
+
+### Using the `ggplot2` extension `GGally`
+
+Pair-wise scatter plots in the lower triangle. On the diagonal, continuous approximation of the distribution of the respective variable is plotted. Upper triangle shows the correlation between two respective variables.
+
+```{r, message=FALSE}
+ggpairs(algae, columns = 12:16)
+```
+
+If variables paired up contains nominal and continuous variable, you will get different types of plots that make sense for respective variable types.
+
+```{r, message=FALSE, warning=FALSE}
+ggpairs(algae, columns = 2:5)
+```
+
+## `qqplot` compare two distributions: two vectors with values sorted from small to large
+
+\
+Different from scatter plots -- value pairs in scatter plots belong to one observation.
+
+```{r}
+h <- c(3.5, 2.6, 4.0, 3.2, 4.5, 3.3 ) # height values 
+
+length(h) 
+
+w <- c(13.5, 12.6, 14.0, 13.2, 14.5, 13.3) # weight values 
+
+length(w) 
+
+qqplot(h, w) # h and w values are sorted, paired, and then plotted 
+
+abline(lsfit(h, w)) # fit a line using the least square24
+```
+
+## Or... use `ggplot2`
+
+```{r}
+library(ggplot2)
+
+# create a data frame from the data
+df <- data.frame(h = c(3.5, 2.6, 4.0, 3.2, 4.5, 3.3),
+                 w = c(13.5, 12.6, 14.0, 13.2, 14.5, 13.3))
+
+# sort and rank the data
+df <- df %>% mutate(rank = rank(h),
+                    h = sort(h),
+                    w = sort(w))
+
+# plot the data
+ggplot(df, aes(x = h, y = w)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Height", y = "Weight")
+```
+
+# \[Advanced\]
+
+## Getting to know your dataset:
+
+1.  List data types of the attributes in your tidy dataset
+
+2.  Check for skewness in data distribution in the attributes
+
+3.  Check for correlations among attributes
+
+4.  Examine the extent of missing data. What would be the best way to deal with the missing data in this case?

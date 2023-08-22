@@ -1,10 +1,10 @@
-# Data Analysis and Visualization
+# Data Mining and Discovery
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/b3d28610-25b7-4d03-a3dd-bb87d7690b2c/deploy-status)](https://app.netlify.com/sites/datavizaz/deploys)
 
-Course website for INFO 526 F23- Data Analysis and Visualization at The University of Arizona, taught by Dr. Greg Chism.
+Course website for INFO 523 F23- Data Mining and Discovery at The University of Arizona, taught by Dr. Greg Chism.
 
-The website is live at [datavizaz.org](http://datavizaz.org/).
+The website is live at [datamineaz.org](http://datamineaz.org/).
 
 ## Colors
 
@@ -19,7 +19,7 @@ The website is live at [datavizaz.org](http://datavizaz.org/).
 
 ### Disclosure
 
-This content is derived from the course website for STA 313 - Advanced Data Visualization at Duke University, taught by Dr. Mine Çetinkaya-Rundel. I changed duke centric examples to Tucson centric, and created lecture activities past ae-01. The website has a new logo, color scheme, fonts, etc.
+This content is derived from the course website for STA 313 - Advanced Data Visualization at Duke University, taught by Dr. Mine Çetinkaya-Rundel. The website has a new logo, color scheme, fonts, etc.
 
 [![](https://licensebuttons.net/l/by-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-sa/4.0/)
 

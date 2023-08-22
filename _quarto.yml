@@ -3,6 +3,7 @@ project:
   output-dir: docs
   resources:
     - info523-f23-syllabus.pdf
+    - ./slides
 
 website:
   page-navigation: true
@@ -64,6 +65,49 @@ website:
             text: Troubleshooting
           - href: computing/computing-cheatsheets.qmd
             text: Cheatsheets
+      - section: "Slides"
+        contents: 
+          - href: slides/week1/Lec0Intro523.pdf
+            text: Week 1 - Course Introduction
+          - href: slides/week2/Lec1Intro523.pdf
+            text: Week 2 - Intro to Data Mining
+          - href: slides/week2/Lec1.2AdvancedRGitHubMarkdown.pdf
+            text: Week 2 - Advanced R and GitHub
+      - section: "Readings"
+        contents:
+          - href: slides/week2/ch1DataMiningConceptual.pdf
+            text: Chapter 1 - Data Mining Conceptual
+          - href: slides/week3/ch2DataMiningConceptual.pdf
+            text: Chapter 2 - Data Mining Conceptual
+          - href: slides/week6/ch6.7_7.1_7.5DataMiningConceptual.pdf
+            text: Chapter 6.7, 7.1-7.5 - Data Mining Conceptual
+          - href: slides/week8/Ch1.4_8_10DataMiningAlgorithms.pdf
+            text: Chapter 1.4, 8, 10 - Data Mining Algorithms
+          - href: slides/week10/ch4DataMiningConceptual.pdf
+            text: Chapter 4 - Data Mining Conceptual
+          - href: slides/week12/ch8.1_8.3DataMiningConceptual.pdf
+            text: Chapter 8.1-8.3 Data Mining Conceptual
+          - href: slides/week16/Ch4_8IntroData MiningR.pdf
+            text: Chapter 4-8 Intro Data Mining in R
+      - section: "R Exercises"
+        contents:
+          - href: slides/week1/week1-2-R-tutorial.qmd
+          - href: slides/week2/rExercise1.qmd
+          - href: slides/week4/rExercise2.qmd
+          - href: slides/week6/rExercise3.qmd
+          - href: slides/week8/rExercise4.qmd
+          - href: slides/week10/rExercise5.qmd
+          - href: slides/week13/rExercise6.qmd
+      - section: "Python Exercises"
+        contents: 
+          - href: python/pythonTutorial.ipynb
+          - href: python/introPandasNumpy.ipynb
+          - href: python/dataExplorationPython.ipynb
+          - href: python/dataPreprocessingPython.ipynb
+          - href: python/regressionPython.ipynb
+          - href: python/classificationPython.ipynb
+          - href: python/associationPython.ipynb
+          
 
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."

@@ -128,7 +128,7 @@ Do not subject yourself to the late penalty: please do not make the instructor t
 
 -   In case of a D2L or GitHub malfunction, email your assignment (so your assignment will not be marked as late) and then resubmit your assignment to D2L dropbox. Only assignments in D2L dropbox will be graded. Email submissions only establish a timestamp on an assignment.
 
--   Be sure to check your submissions are successful. \"I am not sure what had happened, but I honestly thought I had submitted my assignment on time\" is not an acceptable excuse for waiving the late penalties. 
+-   Be sure to check your submissions are successful. "I am not sure what had happened, but I honestly thought I had submitted my assignment on time" is not an acceptable excuse for waiving the late penalties. 
 
 -   All work may be checked by **Turnitin.com** or other tools made available to the Instructor. Students may find answers to homework questions on the Web. Yes, students are allowed to check out and learn from those answers, but to avoid an plagiarism charge, students must (1) cite the source URL and (2) present their work in their own words. **Please** do not impose the difficult and time consuming task of reporting plagiarism to your Instructor, but know that the Instructor **will** report any such case if you give the opportunity. Similarly, acknowledge help received from classmates or others. These acknowledgement will not hurt your grade, instead they reveal the academic integrity in you as a young scholar/researcher.
 
@@ -150,7 +150,7 @@ More information will be provided throughout the semester.
 
 ## **Inclusive Excellence**
 
-Inclusive Excellence is a fundamental part of the University of Arizona\'s strategic plan and culture. As part of this initiative, the institution embraces and practices diversity and inclusiveness.  These values are expected, respected and welcomed in this course.
+Inclusive Excellence is a fundamental part of the University of Arizona's strategic plan and culture. As part of this initiative, the institution embraces and practices diversity and inclusiveness.  These values are expected, respected and welcomed in this course.
 
 This course supports elective gender pronoun use and self-identification; rosters indicating such choices will be updated throughout the semester, upon student request.  As the course includes group work and in-class discussion, it is vitally important for us to create an educational environment of inclusion and mutual respect. 
 
@@ -174,7 +174,7 @@ Please abide by the following as you work on assignments in this course:
 
 ## **iSchool Academic Integrity Policy**
 
-This policy agreed upon by faculty in the UArizona iSchool applies in addition to the Dean of Students\' [Code of Academic Integrity](https://deanofstudents.arizona.edu/policies/code-academic-integrity).
+This policy agreed upon by faculty in the UArizona iSchool applies in addition to the Dean of Students' [Code of Academic Integrity](https://deanofstudents.arizona.edu/policies/code-academic-integrity).
 
 Students in courses at the UArizona iSchool are expected to maintain rigor in their academic performance with intent to learn, practice, and overcome challenges toward personal growth and enrichment. As future professionals in digital environments, iSchool students are also expected to exercise transparency and integrity in collaborations and in the use of tools and resources that may aid completion in assignments for our courses.
 
