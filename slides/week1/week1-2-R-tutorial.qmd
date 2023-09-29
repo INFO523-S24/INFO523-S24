@@ -274,29 +274,25 @@ max(4, 5, 6, 12, -4)
 
 mean(4, 5, 6, 12, -4)
 
-set.seed(1) #the seed determines the starting point used in generating a sequence of pseudo random numbers #set.seed() has global scope, meaning it affects all random number generators used/called in your program.
-#there is a function to remove the seed:rm(.Random.seed, envir=.GlobalEnv)
-
 max(sample(1:100, 30))
 
 mean(sample(1:100, 30))
 ```
 
-Why the same function with same argument gave different results above? Use `help(sample)` to find out what function sample does.
+Why does the same function with the same argument give different results above? Use `help(sample)` to find out what function sample does.
 
 What do you expect?
 
 ```{r}
-set.seed(1)
+
+set.seed(1) #the seed determines the starting point used in generating a sequence of pseudo random numbers #set.seed() has global scope, meaning it affects all random number generators used/called in your program.
+#there is a function to remove the seed:rm(.Random.seed, envir=.GlobalEnv)
+
 rnorm(1) #give me one number from a normal distribution
 rnorm(1)
 
 set.seed(2)
 rnorm(1)
-rnorm(1)
-
-set.seed(1)
-rnorm(1) #give me one number from a normal distribution
 rnorm(1)
 
 ```

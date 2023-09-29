@@ -69,7 +69,7 @@ Readings for the course will come from the following textbooks. All of them are 
 
 ### Recommended textbooks:
 
--   `[Intro to Data Mining in R]` Michael Hahsler. [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/). Online Book, 2021.
+-   `[Intro to Data Mining in R]` Michael Hahsler. [Introduction to Data Mining R Examples](https://mhahsler.github.io/Introduction_to_Data_Mining_R_Examples/). Online Book, 2021.
 -   `[ggplot2-book]` Hadley Wickham, Danielle Navarro, and Thomas Lin Pedersen. [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/). (in progress) 3rd edition. Springer, 2022.
 -   `[r4ds]` Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund. [R for Data Science](https://r4ds.hadley.nz/). 2nd edition. O'Reilly, 2022.
 

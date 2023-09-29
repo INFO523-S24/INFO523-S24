@@ -995,18 +995,20 @@ cluster(ageframe, clustername = "condition", size = 2) # select 2 clusters out o
 
 # Handling Text Datasets
 
-```{r, eval=FALSE}
-install.packages("tm")
-library(tm)
-install.packages("SnowballC") #tm uses SnowballC for stemming
+```{r, eval = F}
+pacman::p_load(tm,
+               SnowballC)#tm uses SnowballC for stemming
 # read corpus
-# Documents is a folder in current working directory, holding some of Hillary's emails
-docs <- Corpus(DirSource("Documents"))
+# Emails.csv,  holding some of Hillary's emails
+data <- read.csv(here::here("data", "Emails.csv"), stringsAsFactors = FALSE)
+
+docs <- Corpus(VectorSource(data$RawText))
 mode(docs)
 ```
 
-```{r, echo=FALSE}
-library(tm)
+```{r, echo = F}
+pacman::p_load(tm,
+               SnowballC)#tm uses SnowballC for stemming
 # read corpus
 # Emails.csv,  holding some of Hillary's emails
 data <- read.csv(here::here("slides", "week4", "data", "Emails.csv"), stringsAsFactors = FALSE)

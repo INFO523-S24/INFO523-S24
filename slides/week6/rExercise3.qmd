@@ -1,5 +1,5 @@
 ---
-title: Classification Basic Concepts and Techniques
+title: "Classification: Basic Concepts and Techniques"
 ---
 
 ## Install packages
@@ -7,9 +7,10 @@ title: Classification Basic Concepts and Techniques
 Install the packages used in this chapter:
 
 ```{r setup_03, message=FALSE}
-library(pacman)
+if(!require(pacman))
+  install.packages("pacman")
 
-p_load(tidyverse, rpart, rpart.plot, caret, 
+pacman::p_load(tidyverse, rpart, rpart.plot, caret, 
   lattice, FSelector, sampling, pROC, mlbench)
 ```
 

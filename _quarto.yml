@@ -65,6 +65,8 @@ website:
             text: Troubleshooting
           - href: computing/computing-cheatsheets.qmd
             text: Cheatsheets
+          - href: computing/computing-git.qmd
+            text: Setting up Git
       - section: "Slides"
         contents: 
           - href: slides/week1/Lec0Intro523.pdf
@@ -73,6 +75,14 @@ website:
             text: Week 2 - Intro to Data Mining
           - href: slides/week2/Lec1.2AdvancedRGitHubMarkdown.pdf
             text: Week 2 - Advanced R and GitHub
+          - href: slides/week3/Lec2Data.pdf
+            text: Week 3 - Intro to Data + Preprocessing
+          - href: slides/week4/Lec3Exploration.pdf
+            text: Week 4 - Preprocessing II + Data Viz I
+          - href: slides/week6/Lec4BasicClassification.pdf
+            text: Week 6 - Classification I
+          - href: slides/week7/Lec5AlternativeClassification.pdf
+            text: Week 7 - Classification II
       - section: "Readings"
         contents:
           - href: slides/week2/ch1DataMiningConceptual.pdf
@@ -95,6 +105,7 @@ website:
           - href: slides/week2/rExercise1.qmd
           - href: slides/week4/rExercise2.qmd
           - href: slides/week6/rExercise3.qmd
+          - href: slides/week6/rExercise3_1.qmd
           - href: slides/week8/rExercise4.qmd
           - href: slides/week10/rExercise5.qmd
           - href: slides/week13/rExercise6.qmd
@@ -104,10 +115,15 @@ website:
           - href: python/introPandasNumpy.ipynb
           - href: python/dataExplorationPython.ipynb
           - href: python/dataPreprocessingPython.ipynb
-          - href: python/regressionPython.ipynb
           - href: python/classificationPython.ipynb
+          - href: python/regressionPython.ipynb
           - href: python/associationPython.ipynb
-          
+      - section: "Homework"
+        contents:
+          - href: https://github.com/INFO-523-Exercises/r-python-exercise1
+            text: HW 01
+          - href: https://github.com/INFO-523-Exercises/hw-02
+            text: HW 02
 
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."
