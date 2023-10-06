@@ -1,0 +1,251 @@
+---
+title: "Summary table of models"
+---
+
+## Introduction
+
+Throughout the course, we will go over several supervised and unsupervised machine learning models. This page summarizes the models.
+
+```{r, echo=FALSE, message=FALSE}
+# Load the necessary libraries
+if(!require(pacman))
+  install.packages("pacman")
+
+pacman::p_load(gt,
+               gtExtras,
+               tidyverse)
+```
+
+::: panel-tabset
+## Classification
+
+```{r, echo=FALSE, message=FALSE}
+# Create the tibble
+ml_models <- tibble(
+  `Model Type` = c(
+    "[Logistic Regression](https://en.wikipedia.org/wiki/Logistic_regression)",
+    "[Decision Trees](https://en.wikipedia.org/wiki/Decision_tree_learning)",
+    "[Random Forest](https://en.wikipedia.org/wiki/Random_forest)",
+    "[Support Vector Machines (SVM)](https://en.wikipedia.org/wiki/Support_vector_machine)",
+    "[K-Nearest Neighbors (KNN)](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm)",
+    "[Neural Networks](https://en.wikipedia.org/wiki/Artificial_neural_network)",
+    "[Deep Learning](https://en.wikipedia.org/wiki/Deep_learning)",
+    "[Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)",
+    "[Gradient Boosting Machines (GBM)](https://en.wikipedia.org/wiki/Gradient_boosting)",
+    "[Rule-Based Classification](https://en.wikipedia.org/wiki/Rule-based_machine_learning)",
+    "[Bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating)",
+    "[Boosting](https://en.wikipedia.org/wiki/Boosting_(machine_learning))",
+    "[XGBoost](https://en.wikipedia.org/wiki/Xgboost)",
+    "[Linear Discriminant Analysis (LDA)](https://en.wikipedia.org/wiki/Linear_discriminant_analysis)",
+    "[Regularized Models (Shrinking)](https://en.wikipedia.org/wiki/Regularization_(mathematics))",
+    "[Stacking](https://en.wikipedia.org/wiki/Ensemble_learning#Stacking)"),
+  Strengths = c("- Simple and interpretable\n- Fast to train",
+                "- Intuitive\n- Can model non-linear relationships",
+                "- Handles overfitting\n- Can model complex relationships",
+                "- Effective in high dimensional spaces\n- Works well with clear margin of separation",
+                "- Simple and intuitive\n- No training phase",
+                "- Capable of approximating complex functions\n- Flexible architecture\nTrainable with backpropagation",
+                "- Can model highly complex relationships\n- Excels with vast amounts of data\nState-of-the-art results in many domains",
+                "- Fast\n- Works well with large feature sets",
+                "- High performance\n- Handles non-linear relationships",
+                "- Transparent and explainable\n- Easily updated and modified",
+                "- Reduces variance\n- Parallelizable",
+                "- Reduces bias\n- Combines weak learners",
+                "- Scalable and efficient\n- Regularization",
+                "- Dimensionality reduction\n- Simple and interpretable",
+                "- Prevents overfitting\n- Handles collinearity",
+                "- Combines multiple models\n- Can improve accuracy"),
+  Limitations = c("- Assumes linear boundaries\n- Not suitable for complex relationships",
+                 "- Prone to overfitting\n- Sensitive to small changes in data",
+                 "- Slower to train and predict\n- Black box model",
+                 "- Sensitive to kernel choice\n- Slow on large datasets",
+                 "- Slow during query phase\n- Sensitive to irrelevant features and scale",
+                 "- Can require a large number of parameters\n- Prone to overfitting on small data\nTraining can be slow",
+                 "- Requires a lot of data\nComputationally intensive\n- Interpretability challenges",
+                 "- Assumes feature independence\n- Not suitable for numerical input features",
+                 "- Prone to overfitting if not tuned\n- Slow to train",
+                 "- Manual rule creation can be tedious\n- May not capture complex relationships",
+                 "- May not handle bias well",
+                 "- Sensitive to noisy data and outliers",
+                 "- Requires careful tuning\n- Can overfit if not used correctly",
+                 "- Assumes Gaussian distributed data and equal class covariances",
+                 "- Requires parameter tuning\n- May result in loss of interpretability",
+                 "- Increases model complexity\n- Risk of overfitting if base models are correlated"),
+  `Example Use Cases` = c("- Credit approval\n- Medical diagnosis",
+                          "- Customer segmentation\n- Loan default prediction",
+                          "- Fraud detection\n- Stock price movement prediction",
+                          "- Image classification\n- Handwriting recognition",
+                          "- Product recommendation\n- Document classification",
+                          "- Pattern recognition\n- Basic image classification\n- Function approximation",
+                          "- Advanced image and speech recognition\n- Machine translation\n- Game playing (like AlphaGo)",
+                          "- Spam detection\n- Sentiment analysis",
+                          "- Web search ranking\n- Ecology predictions",
+                          "- Expert systems\n- Business rule enforcement",
+                          "- Random Forest is a popular example",
+                          "- AdaBoost\n- Gradient Boosting",
+                          "- Competitions on Kaggle\n- Retail prediction",
+                          "- Face recognition\n- Marketing segmentation",
+                          "- Ridge and Lasso regression",
+                          "- Meta-modeling\n- Kaggle competitions"),
+  Implementation = c(
+    "[R](https://parsnip.tidymodels.org/reference/details_logistic_reg_glm.html) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)",
+    "[R](https://parsnip.tidymodels.org/reference/details_decision_tree_spark.html?q=decision#null) / [Python](https://scikit-learn.org/stable/modules/tree.html)",
+    "[R](https://parsnip.tidymodels.org/reference/details_rand_forest_randomForest.html?q=random#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
+    "[R](https://parsnip.tidymodels.org/reference/details_svm_linear_LiblineaR.html?q=support#null) / [Python](https://scikit-learn.org/stable/modules/svm.html)",
+    "[R](https://parsnip.tidymodels.org/reference/details_nearest_neighbor_kknn.html?q=k-#null) / [Python](https://scikit-learn.org/stable/modules/neighbors.html)",
+    "[R](https://parsnip.tidymodels.org/reference/mlp.html?q=neural%20net#null) / [Python](https://pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html)",
+    "[R](https://cran.r-project.org/web/packages/keras/vignettes/index.html) / [Python](https://pytorch.org/tutorials/beginner/nlp/deep_learning_tutorial.html)",
+    "[R](https://parsnip.tidymodels.org/reference/details_naive_Bayes_h2o.html?q=naive#null) / [Python](https://scikit-learn.org/stable/modules/naive_bayes.html)",
+    "[R](https://parsnip.tidymodels.org/reference/details_boost_tree_lightgbm.html?q=gradien) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-tree-boosting)",
+    "[R](https://parsnip.tidymodels.org/reference/details_rule_fit_xrf.html?q=rule%20) / [Python](https://www.geeksforgeeks.org/rule-based-classifier-machine-learning/)",
+    "[R](https://parsnip.tidymodels.org/reference/bag_tree.html?q=ensem#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#bagging-meta-estimator)",
+    "[R](https://parsnip.tidymodels.org/reference/boost_tree.html?q=boos#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#boosting)",
+    "[R](https://parsnip.tidymodels.org/reference/xgb_train.html?q=boos#null) / [Python](https://xgboost.readthedocs.io/en/latest/)",
+    "[R](https://parsnip.tidymodels.org/reference/details_discrim_linear_sparsediscrim.html?q=linear%20di#null) / [Python](https://scikit-learn.org/stable/modules/lda_qda.html)",
+    "[R](https://parsnip.tidymodels.org/reference/details_discrim_linear_sparsediscrim.html?q=regular#null) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
+    "[R](https://stacks.tidymodels.org/index.html) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#stacked-generalization)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+ml_models %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = c(`Model Type`, "Strengths", "Limitations", "Example Use Cases", "Implementation")) 
+```
+
+## Regression
+
+```{r, echo=FALSE}
+# Create the tibble with Markdown hyperlinks for regression models
+regression_models <- tibble(
+  `Model Type` = c(
+    "[Linear Regression](https://en.wikipedia.org/wiki/Linear_regression)",
+    "[Polynomial Regression](https://en.wikipedia.org/wiki/Polynomial_regression)",
+    "[Ridge Regression](https://en.wikipedia.org/wiki/Tikhonov_regularization)",
+    "[Lasso Regression](https://en.wikipedia.org/wiki/Lasso_(statistics))",
+    "[Elastic Net Regression](https://en.wikipedia.org/wiki/Elastic_net_regularization)",
+    "[Quantile Regression](https://en.wikipedia.org/wiki/Quantile_regression)",
+    "[Support Vector Regression (SVR)](https://en.wikipedia.org/wiki/Support_vector_machine#Regression)",
+    "[Decision Tree Regression](https://en.wikipedia.org/wiki/Decision_tree_learning)",
+    "[Random Forest Regression](https://en.wikipedia.org/wiki/Random_forest)",
+    "[Gradient Boosting Regression](https://en.wikipedia.org/wiki/Gradient_boosting)"
+  ),
+  Strengths = c(
+    "- Simple and interpretable",
+    "- Can model non-linear relationships",
+    "- Prevents overfitting\n- Regularizes the model",
+    "- Feature selection\n- Regularizes the model",
+    "- Balance between Ridge and Lasso",
+    "- Models the median or other quantiles",
+    "- Flexible\n- Can handle non-linear relationships",
+    "- Handles non-linear data\n- Interpretable",
+    "- Handles large datasets\n- Reduces overfitting",
+    "- High performance\n- Can handle non-linear relationships"
+  ),
+  Limitations = c(
+    "- Assumes linear relationship\n- Sensitive to outliers",
+    "- Can overfit with high degrees",
+    "- Does not perform feature selection",
+    "- May exclude useful variables",
+    "- Requires tuning for mixing parameter",
+    "- Less interpretable than ordinary regression",
+    "- Sensitive to kernel and hyperparameters",
+    "- Can overfit on noisy data",
+    "- Requires more computational resources",
+    "- Prone to overfitting if not tuned"
+  ),
+  `Example Use Cases` = c(
+    "- Sales forecasting\n- Risk assessment",
+    "- Growth prediction\n- Non-linear trend modeling",
+    "- High-dimensional data\n- Preventing overfitting",
+    "- Feature selection\n- High-dimensional datasets",
+    "- High-dimensional datasets with correlated features",
+    "- Median house price prediction\n- Financial quantiles modeling",
+    "- Stock price prediction\n- Non-linear trend modeling",
+    "- Price prediction\n- Quality assessment",
+    "- Large datasets\n- Environmental modeling",
+    "- Web search ranking\n- Price prediction"
+  ),
+  `Implementation` = c(
+    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_gls.html?q=linear%20#null) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ordinary-least-squares)",
+    "[R](https://parsnip.tidymodels.org/reference/svm_poly.html?q=polynomial%20re#arguments) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#polynomial-regression)",
+    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_keras.html?q=ridge%20regressuon) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
+    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html?q=lasso%20#tuning-parameters) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#lasso)",
+    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_spark.html?q=elastic%20net#tuning-parameters) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#elastic-net)",
+    "[R](https://www.tidymodels.org/learn/models/conformal-regression/index.html) / [Python](https://www.statsmodels.org/stable/quantile_regression.html)",
+    "[R](https://parsnip.tidymodels.org/reference/svm_rbf.html?q=svm%20regression#ref-examples) / [Python](https://scikit-learn.org/stable/modules/svm.html#regression)",
+    "[R](https://parsnip.tidymodels.org/reference/decision_tree.html) / [Python](https://scikit-learn.org/stable/modules/tree.html#regression)",
+    "[R](https://parsnip.tidymodels.org/reference/rand_forest.html?q=random%20forest%20re#ref-examples) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
+    "[R](https://parsnip.tidymodels.org/reference/boost_tree.html) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+regression_models %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = c(`Model Type`, "Strengths", "Limitations", "Example Use Cases", "Implementation"))
+
+```
+
+## Clustering
+
+```{r, echo=FALSE}
+# Create the tibble with Markdown hyperlinks for clustering models
+clustering_models <- tibble(
+  `Model Type` = c(
+    "[K-Means Clustering](https://en.wikipedia.org/wiki/K-means_clustering)",
+    "[Hierarchical Clustering](https://en.wikipedia.org/wiki/Hierarchical_clustering)",
+    "[DBSCAN (Density-Based Clustering)](https://en.wikipedia.org/wiki/DBSCAN)",
+    "[Agglomerative Clustering](https://en.wikipedia.org/wiki/Hierarchical_clustering#Agglomerative_clustering_example)",
+    "[Mean Shift Clustering](https://en.wikipedia.org/wiki/Mean_shift)",
+    "[Affinity Propagation](https://en.wikipedia.org/wiki/Affinity_propagation)",
+    "[Spectral Clustering](https://en.wikipedia.org/wiki/Spectral_clustering)"
+  ),
+  Strengths = c(
+    "- Simple and widely used\n- Fast for large datasets",
+    "- Doesn't require specifying the number of clusters\n- Produces a dendrogram",
+    "- Can find arbitrarily shaped clusters\n- Doesn’t require specifying the number of clusters",
+    "- Variety of linkage criteria\n- Produces a hierarchy of clusters",
+    "- No need to specify number of clusters\n- Can find arbitrarily shaped clusters",
+    "- Automatically determines the number of clusters\n- Good for data with lots of exemplars",
+    "- Can capture complex cluster structures\n- Can be used with various affinity matrices"
+  ),
+  Limitations = c(
+    "- Sensitive to initial conditions\n- Requires specifying the number of clusters",
+    "- May be computationally expensive for large datasets",
+    "- Sensitive to scale\n- Requires density parameters to be set",
+    "- Not scalable for very large datasets",
+    "- Computationally expensive\n- Bandwidth parameter selection is crucial",
+    "- High computational complexity\n- Preference parameter can be difficult to choose",
+    "- Choice of affinity matrix is crucial\n- Can be computationally expensive"
+  ),
+  `Example Use Cases` = c(
+    "- Market segmentation\n- Image compression",
+    "- Taxonomies\n- Determining evolutionary relationships",
+    "- Noise detection and anomaly detection",
+    "- Sociological hierarchies\n- Taxonomies",
+    "- Image analysis\n- Computer vision tasks",
+    "- Image recognition\n- Data with many similar exemplars",
+    "- Image and speech processing\n- Graph-based clustering"
+  ),
+  `Implementation` = c(
+    "[R](https://tidyclust.tidymodels.org/articles/k_means.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#k-means)",
+    "[R](https://tidyclust.tidymodels.org/articles/hier_clust.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
+    "[R](https://www.rdocumentation.org/packages/dbscan/versions/1.1-11/topics/dbscan) / [Python](https://scikit-learn.org/stable/modules/clustering.html#dbscan)",
+    "[R](https://www.datanovia.com/en/lessons/agglomerative-hierarchical-clustering/) / [Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
+    "[R](http://meanmean.me/meanshift/r/cran/2016/08/28/meanShiftR.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#mean-shift)",
+    "[R](https://tnaake.github.io/affinity_propagation/) / [Python](https://scikit-learn.org/stable/modules/clustering.html#affinity-propagation)",
+    "[R](https://rdrr.io/cran/RclusTool/man/spectralClustering.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+clustering_models %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = c(`Model Type`, "Strengths", "Limitations", "Example Use Cases", "Implementation"))
+
+```
+:::
