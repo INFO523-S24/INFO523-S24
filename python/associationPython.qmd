@@ -1,0 +1,114 @@
+---
+title: Association in Python
+description: This is a short tutorial with my simple understanding of association analysis for marketing applications in python
+---
+
+```{r setup}
+#| echo: false
+#| message: false
+if (!require(pacman))
+  install.packages("pacman")
+
+pacman::p_load(reticulate)
+```
+
+## **Read in a sample retail dataset available from Kaggle**
+
+The dataset contains mock retail orders of products that we can use as our template for association analysis
+
+<https://www.kaggle.com/datasets/knightbearr/sales-product-data>. The order ID contains a unique transaction or order while the product column contains typical items that are frequently bought together
+
+```{python}
+import pandas as pd 
+import numpy as np
+sales_april = pd.read_csv('../python/data/Sales_April_2019.csv')
+
+sales_april.head()
+```
+
+```{python}
+print('Total item sales (ignoring quanitities)')
+print(len(sales_april))
+print('Total orders')
+print(len(sales_april['Order ID'].value_counts()))
+print('Total unique products')
+print(len(sales_april['Product'].value_counts()))
+```
+
+There were 18,383 items sold in April 2019, with 17538 unique orders and 20 unique products. How do we figure out which pairs of products to market together to lift sales the next month? The unique products (electronics) available in the dataset are shown below:
+
+```{python}
+sales_april['Product'].value_counts()
+```
+
+## **Restructure the dataset into an order ID, product list format** 
+
+This is so it's easier to figure out which items sold together in orders.
+
+One way to do this is to create a pivot table of orders and quantity using the pandas pivot method <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.pivot.html>
+
+```{python}
+sales_filter = sales_april[['Order ID', 'Product']] #Ignore date and purchase address for now
+sales_filter = sales_filter.reset_index()
+```
+
+```{python}
+df_orders = sales_filter.pivot_table(index = 'Order ID', columns = 'Product', aggfunc = 'count')
+```
+
+```{python}
+df_orders.head()
+```
+
+```{python}
+#Fill null values in the dataframe
+df_orders = df_orders.fillna(0)
+df_orders.head()
+```
+
+## Print the support of each item
+
+i.e. how frequently the item occurs over the total number of orders
+
+We only count each item once in an order for simplicity.
+
+Based on the summary below it looks like lightning charging cables, USBC, AA Batteries, Wired headphones and airpods are more frequent selling items. However, note that low support items are more expensive so it's a good idea to cross sell them alongside a high frequency selling item
+
+```{python}
+#Convert df orders to boolean
+col_names = df_orders.columns
+df_orders = df_orders[col_names].astype('bool')
+df_orders.head()
+```
+
+```{python}
+df_orders.mean().sort_values(ascending=False).plot(kind='bar')
+```
+
+## **Use the apriori algorithm to identify a set of meaningful rules**
+
+These rules will help cross sell products that go well together to boost sales. For example, if we want to increase the sales of headsets - would it make more sense to cross sell the mackbook pro with the airpods or with the bose headphones? We will only consider cross selling pairs of items together so this will consider 2 rule combinations only
+
+```{python}
+from mlxtend.frequent_patterns import association_rules
+from mlxtend.frequent_patterns import apriori
+```
+
+```{python}
+#Compute items that sell at minimum in 0.001% of all orders placed in the month (min_support)
+frequent_itemsets = apriori(df_orders, min_support = 0.00000001,max_len = 2, use_colnames = True)
+```
+
+```{python}
+#Compute pairs of orders that have a meaningful lift of more than 1 in their sales when marketed together
+frequent_itemsets_rules = association_rules(frequent_itemsets,metric = "lift", min_threshold = 1.0)
+
+```
+
+```{python}
+frequent_itemsets_rules
+```
+
+## Conclusion
+
+Though more close inspection of all individual pairs of items is needed, this dataset shows that marketing USB sales with google phones can lift the sales of individual items. However, we should also consider other metrics such as the support of individual items. For example, USB cables and lightning charging cables also sell well on their own. However, retailers may get a slight boost in the sales of their phones if they pair them up with the cables as well

@@ -63,10 +63,11 @@ Readings for the course will come from the following textbooks. All of them are 
 
 ### Required textbooks:
 
--   `[Data mining conceptual]` Jiawei Han, Jian Pei, Hanghang Tong. [Data Mining Concepts and Techniques](./hanDataMiningConceptual.pdf). 4th edition. Morgan Kaufmann, 2023.
--   `[Data mining algorithms]` Pawel Cichosz. [Data Mining Algorithms: Explained Using R](./cichoszDataMiningAlgorithms.pdf). Wiley, 2015.
--   `[Data mining case studies]` Luis Torgo. [Data Mining with R: Learning with Case Studies](./torgoDataMiningR.pdf). Chapman and Hall/CRC, 2016.
--   `ISRL` James Garth, Witten Daniela, Hastie Trevor, Tibshirani Robert. [An Introduction to Statistical Learning](https://www.statlearning.com/). Springer, 2021/2023.
+-   `[Data mining conceptual]` Jiawei Han, Jian Pei, Hanghang Tong. [Data Mining Concepts and Techniques](./textbooks/hanDataMiningConceptual.pdf). 4th edition. Morgan Kaufmann, 2023.
+-   `[Data mining algorithms]` Pawel Cichosz. [Data Mining Algorithms: Explained Using R](./textbooks/cichoszDataMiningAlgorithms.pdf). Wiley, 2015.
+-   `[Data mining case studies]` Luis Torgo. [Data Mining with R: Learning with Case Studies](./textbooks/torgoDataMiningR.pdf). Chapman and Hall/CRC, 2016.
+-   `[ISRL]` James Garth, Witten Daniela, Hastie Trevor, Tibshirani Robert. [An Introduction to Statistical Learning](https://www.statlearning.com/). Springer, 2021/2023.
+-   `[Pract Time Series]` Nielsen Aileen. [Practical Time Series Analysis](./textbooks/nielsenPracticalTimeSeries.pdf). O'Rielly, 2020.
 
 ### Recommended textbooks:
 

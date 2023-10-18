@@ -2,7 +2,7 @@
 title: "Project tips + resources"
 ---
 
-The project is very open ended. For instance, in creating a compelling visualization(s) of your data in R, there is no limit on what tools or packages you may use. You do not need to visualize all of the data at once. A single high quality visualization will receive a much higher grade than a large number of poor quality visualizations.
+The project is very open ended. For instance, in creating a compelling stories(s) of your data in R, there is no limit on what tools or packages you may use. You do not need to mine all of the data at once. A single high quality analysis will receive a much higher grade than a large number of poor quality analyses.
 
 Before you finalize your write up, make sure the printing of code chunks is turned off with the option `echo: false`. In addition to code chunks, ensure all messages are turned off with the options `warning: false` and `message: false`.
 
@@ -12,7 +12,7 @@ Finally, pay attention to details in your write-up and presentation. Neatness, c
 
 -   Ask questions if any of the expectations are unclear.
 
--   *Code*: In your write up your code should be hidden (`echo: false`) so that your document is neat and easy to read. However your document should include all your code such that if I re-render your .qmd file I should be able to obtain the results you presented.
+-   *Code*: In your write up your code should be hidden (`echo: false`) so that your document is neat and easy to read. However your document should include all your code such that if I re-render your `.qmd` file I should be able to obtain the results you presented.
 
     -   **Exception:** If you want to highlight something specific about a piece of code, you're welcome to show that portion.
 
@@ -73,4 +73,4 @@ Replace the height and width values with values appropriate for your write up.
 
 Arrange plots in a grid, instead of one after the other. This is especially useful when displaying plots for exploratory data analysis and to check assumptions.
 
-If you're using ggplot2 functions, the [patchwork package](https://patchwork.data-imaginist.com/) makes it easy to arrange plots in a grid.
+If you're using `ggplot2` functions, the [patchwork package](https://patchwork.data-imaginist.com/) makes it easy to arrange plots in a grid.

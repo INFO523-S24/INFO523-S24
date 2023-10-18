@@ -87,6 +87,8 @@ website:
             text: Week 7 - Classification II
           - href: slides/week8/Lect8_Regression.pdf
             text: Week 8 - Intro to Regression Models
+          - href: slides/week9/Lec9Association.pdf
+            text: Week 9 - Association Rules
       - section: "Readings"
         contents:
           - href: slides/week2/ch1DataMiningConceptual.pdf
@@ -105,6 +107,10 @@ website:
             text: Chps 8.1-8.3 - Data Mining Conceptual
           - href: slides/week12/ch11_DataMiningConceptual.pdf
             text: Chp 11 - Data Mining Conceptual
+          - href: slides/week13/ch1-2_practTimeSeries.pdf
+            text: Chps 1-2 - Pract Time Series
+          - href: slides/week15/ch3_practTimeSeries.pdf
+            text: Chp 3 - Pract Time Series
           - href: slides/week16/Ch4_8IntroData MiningR.pdf
             text: Chapter 4-8 Intro Data Mining in R
       - section: "R Exercises"
@@ -114,8 +120,8 @@ website:
           - href: slides/week4/rExercise2.qmd
           - href: slides/week6/rExercise3.qmd
           - href: slides/week6/rExercise3_1.qmd
-          - href: slides/week8/rExercise4.qmd
-          - href: slides/week10/rExercise5.qmd
+          - href: slides/week8/rExercise4.2.qmd
+          - href: slides/week9/rExercise5.qmd
           - href: slides/week13/rExercise6.qmd
       - section: "Python Exercises"
         contents: 
@@ -123,16 +129,24 @@ website:
           - href: python/introPandasNumpy.ipynb
           - href: python/dataExplorationPython.ipynb
           - href: python/dataPreprocessingPython.ipynb
-          - href: python/classificationPython.ipynb
-          - href: python/regressionPython.ipynb
-          - href: python/associationPython.ipynb
+          - href: python/classificationPython.qmd
+          - href: python/regressionPython.qmd
+          - href: python/associationPython.qmd
       - section: "Homework"
         contents:
           - href: https://github.com/INFO-523-Exercises/r-python-exercise1
             text: HW 01
           - href: https://github.com/INFO-523-Exercises/hw-02
             text: HW 02
-
+          - href: https://github.com/INFO-523-Exercises/hw-03
+            text: HW 03
+      - section: "Final Project"
+        contents: 
+          - href: project/project-2.qmd
+            text: Final Project
+          - href: project/project-tips-resources.qmd
+            text: Tips & resources
+            
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."
     left: "&copy; Copyright 2023, Greg Chism"
