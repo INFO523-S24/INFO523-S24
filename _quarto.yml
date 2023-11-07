@@ -23,7 +23,7 @@ website:
     align: center
     tools:
       - icon: github
-        href: https://github.com/INFO523DM
+        href: https://github.com/INFO-523-Exercises
         text: "GitHub organization"
       - icon: code-square
         href: https://posit.cloud/
@@ -89,6 +89,10 @@ website:
             text: Week 8 - Intro to Regression Models
           - href: slides/week9/Lec9Association.pdf
             text: Week 9 - Association Rules
+          - href: slides/week10/Lect10Clustering.pdf
+            text: Week 10 - Clustering
+          - href: slides/week11/Lect11AnomalyDetection.pdf
+            text: Week 11 - Anomaly Detection
       - section: "Readings"
         contents:
           - href: slides/week2/ch1DataMiningConceptual.pdf
@@ -105,7 +109,7 @@ website:
             text: Chp 4 - Data Mining Conceptual
           - href: slides/week10/ch8.1_8.3DataMiningConceptual.pdf
             text: Chps 8.1-8.3 - Data Mining Conceptual
-          - href: slides/week12/ch11_DataMiningConceptual.pdf
+          - href: slides/week11/ch11_DataMiningConceptual.pdf
             text: Chp 11 - Data Mining Conceptual
           - href: slides/week13/ch1-2_practTimeSeries.pdf
             text: Chps 1-2 - Pract Time Series

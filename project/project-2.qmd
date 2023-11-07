@@ -84,7 +84,7 @@ Above all, engage in extensive brainstorming, sifting through various ideas unti
 -   Peer review of proposals: Wed, Nov 1 in class
 -   Revised proposals for instructor review: due Fri, Nov 3 at 5pm.
 -   Peer review of code: Wed, Dec 04 in class
--   Write-up and presentation: due Mon, Dec 13, 1pm (scheduled final date)
+-   Write-up and presentation: due Mon, Dec 11, 1pm (scheduled final date)
 
 ## Deliverables
 

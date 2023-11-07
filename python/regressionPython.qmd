@@ -12,7 +12,7 @@ pacman::p_load(reticulate)
 
 ```
 
-The following tutorial contains Python examples for solving regression problems. You should refer to the Appendix chapter on regression of the \"Introduction to Data Mining\" book to understand some of the concepts introduced in this tutorial. The notebook can be downloaded from <http://www.cse.msu.edu/~ptan/dmbook/tutorials/tutorial5/tutorial5.ipynb>.
+The following tutorial contains Python examples for solving regression problems. You should refer to the Appendix chapter on regression of the "Introduction to Data Mining" book to understand some of the concepts introduced in this tutorial. The notebook can be downloaded from <http://www.cse.msu.edu/~ptan/dmbook/tutorials/tutorial5/tutorial5.ipynb>.
 
 Regression is a modeling technique for predicting quantitative-valued target attributes. The goals for this tutorial are as follows: 1. To provide examples of using different regression methods from the scikit-learn library package. 2. To demonstrate the problem of model overfitting due to correlated attributes in the data. 3. To illustrate how regularization can be used to avoid model overfitting.
 

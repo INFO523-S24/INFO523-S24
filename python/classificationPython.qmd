@@ -138,7 +138,7 @@ In this example, we reserve 80% of the labeled data for training and the remaini
 #########################################
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.8, random_state=1)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=1)
 
 from sklearn import tree
 from sklearn.metrics import accuracy_score
