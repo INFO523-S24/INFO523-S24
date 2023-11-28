@@ -4,7 +4,7 @@ title: "Regression two ways in R"
 
 ```{r}
 #| label: "load"
-#| include: false
+#| include: true
 library(tidymodels)
 library(ranger)
 library(randomForest)

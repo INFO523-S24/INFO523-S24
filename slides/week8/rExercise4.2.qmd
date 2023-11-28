@@ -3,7 +3,7 @@ title: Regression in R
 ---
 
 ```{r setup}
-#| echo: false
+#| echo: true
 #| message: false
 
 # Required packages

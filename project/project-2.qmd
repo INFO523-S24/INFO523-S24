@@ -122,11 +122,11 @@ Once you receive feedback from your peers, you should address them. You should d
 
 #### Peer review assignments
 
-The peer review assignments for **proposal peer reviews** are TBD
+The peer review assignments for **proposal peer reviews** are here:
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 #| message: false
 
 p2_pr <- read_csv("project-2-peer-review.csv")

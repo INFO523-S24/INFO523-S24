@@ -93,6 +93,8 @@ website:
             text: Week 10 - Clustering
           - href: slides/week11/Lect11AnomalyDetection.pdf
             text: Week 11 - Anomaly Detection
+          - href: slides/week13/Lect11TimeSeriesI.pdf
+            text: Week 13 - Time Series Analysis I
       - section: "Readings"
         contents:
           - href: slides/week2/ch1DataMiningConceptual.pdf
@@ -144,6 +146,10 @@ website:
             text: HW 02
           - href: https://github.com/INFO-523-Exercises/hw-03
             text: HW 03
+          - href: https://github.com/INFO-523-Exercises/hw-04
+            text: HW 04
+          - href: https://github.com/INFO-523-Exercises/hw-05
+            text: HW 05
       - section: "Final Project"
         contents: 
           - href: project/project-2.qmd
