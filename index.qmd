@@ -18,7 +18,7 @@ library(googlesheets4)
 library(gt)
 library(tidyverse)
 gs4_deauth()
-d <- read_sheet("https://docs.google.com/spreadsheets/d/11tb2jW7HlPdS2nSWaUBaJrUZQ-7ljlqasDmHtXBSwqM/edit?usp=sharing")
+d <- read_sheet("https://docs.google.com/spreadsheets/d/1QOKW_cODBJYroJMqXKDjQgJz_A705t3euAW8kqpFY_I/edit?usp=sharing")
 ```
 
 ```{r}
@@ -57,12 +57,11 @@ d |>
     columns = c(topic, prepare, due)
   ) |>
   cols_width(
-    week ~ px(30),
-    date ~ px(200), 
-    due ~ px(150),
-    topic ~ px(400),
-    topic ~ px(300),
-    due ~ px(200)
+    week ~ px(10),
+    date ~ px(150), 
+    topic ~ px(350),
+    prepare ~ px(150),
+    due ~ px(150)
   ) |>
   cols_label(
     what = "",

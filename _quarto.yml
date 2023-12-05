@@ -69,93 +69,15 @@ website:
             text: Cheatsheets
           - href: computing/computing-git.qmd
             text: Setting up Git
-      - section: "Slides"
-        contents: 
-          - href: slides/week1/Lec0Intro523.pdf
-            text: Week 1 - Course Introduction
-          - href: slides/week2/Lec1Intro523.pdf
-            text: Week 2 - Intro to Data Mining
-          - href: slides/week2/Lec1.2AdvancedRGitHubMarkdown.pdf
-            text: Week 2 - Advanced R and GitHub
-          - href: slides/week3/Lec2Data.pdf
-            text: Week 3 - Intro to Data + Preprocessing
-          - href: slides/week4/Lec3Exploration.pdf
-            text: Week 4 - Preprocessing II + Data Viz I
-          - href: slides/week6/Lec4BasicClassification.pdf
-            text: Week 6 - Classification I
-          - href: slides/week7/Lec5AlternativeClassification.pdf
-            text: Week 7 - Classification II
-          - href: slides/week8/Lect8_Regression.pdf
-            text: Week 8 - Intro to Regression Models
-          - href: slides/week9/Lec9Association.pdf
-            text: Week 9 - Association Rules
-          - href: slides/week10/Lect10Clustering.pdf
-            text: Week 10 - Clustering
-          - href: slides/week11/Lect11AnomalyDetection.pdf
-            text: Week 11 - Anomaly Detection
-          - href: slides/week13/Lect11TimeSeriesI.pdf
-            text: Week 13 - Time Series Analysis I
-      - section: "Readings"
+      - section: "Projects"
         contents:
-          - href: slides/week2/ch1DataMiningConceptual.pdf
-            text: Chp 1 - Data Mining Conceptual
-          - href: slides/week3/ch2DataMiningConceptual.pdf
-            text: Chp 2 - Data Mining Conceptual
-          - href: slides/week6/ch6.1_6.2_6.4-6.6_DataMiningConceptual.pdf
-            text: Chps 6.2-6.2, 6.4-6.6 - Data Mining Conceptual
-          - href: slides/week6/ch6.7_7.1_7.5DataMiningConceptual.pdf
-            text: Chps 6.7, 7.1-7.5 - Data Mining Conceptual
-          - href: slides/week8/ch3.1-3.5_6.1-6.2_7.1-7.3_8.2_ISLR.pdf
-            text: Chps 3.1-3.5, 6.1-6.2, 7.1-7.3, 8.2 - ISRL
-          - href: slides/week9/ch4DataMiningConceptual.pdf
-            text: Chp 4 - Data Mining Conceptual
-          - href: slides/week10/ch8.1_8.3DataMiningConceptual.pdf
-            text: Chps 8.1-8.3 - Data Mining Conceptual
-          - href: slides/week11/ch11_DataMiningConceptual.pdf
-            text: Chp 11 - Data Mining Conceptual
-          - href: slides/week13/ch1-2_practTimeSeries.pdf
-            text: Chps 1-2 - Pract Time Series
-          - href: slides/week15/ch3_practTimeSeries.pdf
-            text: Chp 3 - Pract Time Series
-          - href: slides/week16/Ch4_8IntroData MiningR.pdf
-            text: Chapter 4-8 Intro Data Mining in R
-      - section: "R Exercises"
-        contents:
-          - href: slides/week1/week1-2-R-tutorial.qmd
-          - href: slides/week2/rExercise1.qmd
-          - href: slides/week4/rExercise2.qmd
-          - href: slides/week6/rExercise3.qmd
-          - href: slides/week6/rExercise3_1.qmd
-          - href: slides/week8/rExercise4.2.qmd
-          - href: slides/week9/rExercise5.qmd
-          - href: slides/week13/rExercise6.qmd
-      - section: "Python Exercises"
-        contents: 
-          - href: python/pythonTutorial.ipynb
-          - href: python/introPandasNumpy.ipynb
-          - href: python/dataExplorationPython.ipynb
-          - href: python/dataPreprocessingPython.ipynb
-          - href: python/classificationPython.qmd
-          - href: python/regressionPython.qmd
-          - href: python/associationPython.qmd
+          - href: project/project-1.qmd
+            text: Project 1
       - section: "Homework"
         contents:
           - href: https://github.com/INFO-523-Exercises/r-python-exercise1
             text: HW 01
-          - href: https://github.com/INFO-523-Exercises/hw-02
-            text: HW 02
-          - href: https://github.com/INFO-523-Exercises/hw-03
-            text: HW 03
-          - href: https://github.com/INFO-523-Exercises/hw-04
-            text: HW 04
-          - href: https://github.com/INFO-523-Exercises/hw-05
-            text: HW 05
-      - section: "Final Project"
-        contents: 
-          - href: project/project-2.qmd
-            text: Final Project
-          - href: project/project-tips-resources.qmd
-            text: Tips & resources
+      - section: "Student work"
             
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."

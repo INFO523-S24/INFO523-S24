@@ -14,7 +14,7 @@ The teaching team is here to help you be successful in the course. You are encou
 
 ## Slack
 
-Have a question that can't wait for office hours? Prefer to write out your question in detail rather than asking in person? The course Slack is the best venue for these! There is a chance another student has already asked a similar question, so please check the other posts on Slack before asking a new question. If you know the answer to a question that is posted, I encourage you to respond!
+Have a question that can't wait for office hours? Prefer to write out your question in detail rather than asking in person? The course Slack is the best venue for these! There is a chance another student has already asked a similar question, so please check the other posts on Slack before asking a new question. If you know the answer to a question that is posted, I encourage you to respond! I rarely respond to Slack messages sent Friday evening - Sunday, nor would I expect you to.
 
 ## Email
 
@@ -53,7 +53,7 @@ If you are having difficulty with costs associated with this course, here are so
 
 ## **Assistance with Zoom or D2L**
 
-For technical help with D2L or Zoom, contact the Duke OIT Service Desk at [it.arizona.edu/get-support](https://it.arizona.edu/get-support). You can also access the self-service help documentation for Zoom [here](https://oit.duke.edu/help/articles/kb0029318) and for D2L [here](https://help.d2l.arizona.edu/).
+For technical help with D2L or Zoom, contact the UArizona OIT Service Desk at [it.arizona.edu/get-support](https://it.arizona.edu/get-support). You can also access the self-service help documentation for Zoom [here](https://studenthelp.intech.arizona.edu/article/499-zoom-student-faq) and for D2L [here](https://help.d2l.arizona.edu/).
 
 Note that we will be making minimal use of D2L in this course (primarily for announcements and grade book). All assignment submission will take place on GitHub and conversation on Slack.
 
