@@ -11,7 +11,7 @@ website:
   description: "Homepage for INFO 523 - Data Mining and Discovery at The University of Arizona, Fall 2023."
   favicon: /images/logo.png
 
-  repo-url: https://github.com/Gchism94/INFO523-F23
+  repo-url: https://github.com/INFO523-S24/INFO523-S24
   repo-actions: [edit, issue]
 
   open-graph: true
@@ -23,21 +23,21 @@ website:
     align: center
     tools:
       - icon: github
-        href: https://github.com/INFO-523-Exercises
+        href: https://github.com/INFO523-S24
         text: "GitHub organization"
       - icon: code-square
-        href: https://posit.cloud/
-        text: "Posit Cloud"
+        href: https://jupyter.org/try
+        text: "Jupyter Lab"
       - icon: person-fill
-        href: https://d2l.arizona.edu/d2l/home/1334579
+        href: https://d2l.arizona.edu/d2l/home/1396832
         text: "D2L"
         menu:
           - text: Announcements
-            href: https://datamineaz.slack.com
+            href: https://datamineaz-spring2024.slack.com
           - text: Zoom meetings
             href: https://arizona.zoom.us/my/gregchism
           - text: Gradebook
-            href: https://d2l.arizona.edu/d2l/home/1334579
+            href: https://d2l.arizona.edu/d2l/home/1396832
 
     style: docked
     search: true
@@ -70,18 +70,15 @@ website:
           - href: computing/computing-git.qmd
             text: Setting up Git
       - section: "Projects"
-        contents:
-          - href: project/project-1.qmd
-            text: Project 1
       - section: "Homework"
         contents:
-          - href: https://github.com/INFO-523-Exercises/r-python-exercise1
+          - href: https://github.com/INFO523-S24/hw-01
             text: HW 01
       - section: "Student work"
             
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."
-    left: "&copy; Copyright 2023, Greg Chism"
+    left: "&copy; Copyright 2023-2024, Greg Chism"
     background: "#AB0520" # AZ Red
 
 format:

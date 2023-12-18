@@ -5,7 +5,6 @@ title: "R cheatsheets"
 The following cheatsheets come from [tsinghua-gongjing.github.io/posts/cheatsheet_collections](https://tsinghua-gongjing.github.io/posts/cheatsheet_collections.html){.uri}. We haven't covered every function and functionality listed on them, but you might still find them useful as references.
 
 ::: columns
-
 ::: {.column width="50%"}
 [![](cheatsheets/pandas1.png){fig-alt="ggplot2 cheat sheet" fig-align="left" width="300"}](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)
 

@@ -11,7 +11,7 @@ INFO 523 Data Mining and Discovery- This course will introduce students to the c
 
 ## Course Offering
 
-\_\_\_ INFO 523 001 - Data Mining and Discovery
+979-2241-1 INFO 523 001 - Data Mining and Discovery
 
 ## Instructor Information
 
@@ -33,11 +33,11 @@ Students are assumed to know the basics in computer programming (e.g., variables
 
 ## Course Format
 
-Live in-person lectures, W 1:00-3:30pm,Henry Koffler, RM 216. Attendance is mandatory.
+Live in-person lectures, W 1:00-3:30pm, Henry Koffler, RM 216. Attendance is mandatory.
 
 ## Course Objective
 
-INFO 523 is an elective in the iSchool's M.S. program. As a multidisciplinary field, the course introduce concepts and work from many areas critical to information studies including statistics, machine learning, pattern recognition, database technology, and data visualization.  
+INFO 523 is a required course in the iSchool's M.S. program. As a multidisciplinary field, the course introduce concepts and work from many areas critical to information studies including statistics, machine learning, pattern recognition, database technology, and data visualization.  
 
 ## Learning Outcomes
 
