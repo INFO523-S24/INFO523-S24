@@ -54,7 +54,7 @@ By the end of this course, students will: 
 -   `[Data mining conceptual]` Jiawei Han, Jian Pei, Hanghang Tong. [Data Mining Concepts and Techniques](./textbooks/hanDataMiningConceptual.pdf). 4th edition. Morgan Kaufmann, 2023.
 -   `[Python Data Analysis]` Wes McKinneyz. [Python for Data Analysis, 3E](https://wesmckinney.com/book/). O'Reilly, 2023.
 -   `[Prac Stats for DS]` Peter Bruce, Andrew Bruce, Peter Gedeck. [Practical Statistics for Data Scientists](./textbooks/brucePracStatsForDS.pdf). O'Rielly, 2016.
--   `[ISRL]` James Garth, Witten Daniela, Hastie Trevor, Tibshirani Robert. [An Introduction to Statistical Learning](https://www.statlearning.com/). Springer, 2021/2023.
+-   `[ISL]` James Garth, Witten Daniela, Hastie Trevor, Tibshirani Robert. [An Introduction to Statistical Learning](https://www.statlearning.com/). Springer, 2021/2023.
 -   `[Pract Time Series]` Nielsen Aileen. [Practical Time Series Analysis](./textbooks/nielsenPracticalTimeSeries.pdf). O'Rielly, 2020.
 
 ## Course Schedule
@@ -243,9 +243,9 @@ Policy on late work depends on the particular course component:
 
     -   Write up: GitHub repositories will be closed to contributions at the deadline. If you need to submit your work late, Slack/email me to reopen your repository.
 
-        -   Late, but same day (before midnight): -10% of available points
+        -   Late, but next day (before noon): -10% of available points
 
-        -   Late, but next day: -20% of available points
+        -   Late, but next day (after noon): -20% of available points
 
         -   Two days late or later: No credit, and we will not provide written feedback
 

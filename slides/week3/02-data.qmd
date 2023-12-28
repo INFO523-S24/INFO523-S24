@@ -1,0 +1,481 @@
+---
+title: Introduction to Data
+subtitle: Lecture 2
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Hello data
+
+## Setup
+
+```{python}
+# Import libraries
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from scipy.stats import chi2_contingency
+```
+
+## Case study: using stents to prevent strokes {.smaller}
+
+![](images/stents.jpeg){fig-align="center" width="500"}
+
+> **Does the use of stents reduce the risk of strokes?**
+
+::: aside
+Source: [Chimowitz MI, Lynn MJ, Derdeyn CP, et al. 2011.](https://www.nejm.org/doi/full/10.1056/NEJMoa1105335)
+:::
+
+## Read in and view data {.smaller}
+
+```{python}
+stent30 = pd.read_csv("data/stent30.csv")
+stent30.head()
+```
+
+::: incremental
+-   **Treatment group (N = 224):** received stent and medical management (medications, management of risk factors, lifestyle modification)
+
+-   **Control group(N = 227):** same medical management as the treatment group, but no stent
+
+-   Status 30 days after enrollment
+:::
+
+## What are the hypothes[es]{.underline}?
+
+::: incremental
+1.  Stents alone prevent strokes
+
+2.  Medical management alone prevents strokes
+
+3.  Both stents and medical management prevent strokes
+:::
+
+::: fragment
+> Why [multiple hypotheses]{.underline}?
+:::
+
+## Table {.smaller}
+
+::: panel-tabset
+## Frequency
+
+```{python}
+# Create a frequency table for the 'group' and 'outcome' columns
+frequency_table = pd.crosstab(index = stent30['group'], columns = stent30['outcome'])
+
+frequency_table
+```
+
+## Proportion
+
+```{python}
+# Convert frequency table to a proportional table
+proportional_table = frequency_table / frequency_table.sum().sum()
+
+proportional_table.round(2)
+```
+:::
+
+::: fragment
+So... does the control affect the occurrence of strokes after 30 days?
+:::
+
+## Chi-squared test
+
+We need to test the relationship statistically:
+
+```{python}
+#| code-line-numbers: "1-9|2|4,5,6,7"
+
+# Performing the Chi-Squared Test
+chi2, p, dof, expected = chi2_contingency(frequency_table)
+
+print(f"Chi-squared statistic: {chi2.round(2)}")
+print(f"P-value: {p.round(3)}")
+print(f"Degrees of freedom: {dof}")
+print(f"Expected frequencies:\n{expected.round(2)}")
+```
+
+## Conclusions
+
+::: incremental
+1.  There was a \>2.5x increase in strokes from the treatment!
+
+2.  There is a statistical difference between no event and strokes when comparing control and treatment groups
+:::
+
+::: fragment
+BUT! We cannot generalize the results to all patience and all stents.
+:::
+
+# Data basics
+
+## Observations, variables, data matrices {.smaller}
+
+```{python}
+loan50 = pd.read_csv("data/loan50.csv")
+loan50.head()
+```
+
+::: incremental
+-   Each row is a **case**
+
+-   Each column is a **variable**
+
+-   The output is part of a **data frame**
+:::
+
+::: aside
+Source: [Lending Club](https://www.lendingclub.com/info/statistics.action)
+:::
+
+## Metadata {.smaller}
+
+| Variable        | Description                                                                                                             |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------|
+| `loan_amount`   | Amount of the loan received, in US dollars.                                                                             |
+| `interest_rate` | Interest rate on the loan, in an annual percentage.                                                                     |
+| `term`          | The length of the loan, which is always set as a whole number of months.                                                |
+| `grade`         | Loan grade, which takes a values A through G and represents the quality of the loan and its likelihood of being repaid. |
+| `state`         | US state where the borrower resides.                                                                                    |
+| `total_income`  | Borrower's total income, including any second income, in US dollars.                                                    |
+| `homeownership` | Indicates whether the person owns, owns but has a mortgage, or rents.                                                   |
+
+## Types of variables
+
+![](images/variables-1.png){fig-align="center" width="3000"}
+
+## Types of variables
+
+```{python}
+county = pd.read_csv("data/county.csv")
+
+county.dtypes
+```
+
+::: aside
+Source: US Census via the [usdata R package](https://github.com/OpenIntroStat/usdata)
+:::
+
+## Relationships between variables {.smaller}
+
+::: panel-tabset
+## Plot
+
+```{python}
+#| label: county-scatter-1
+#| echo: false
+
+# Filtering data for Chattahoochee County
+chattahoochee = county[county['name'] == 'Chattahoochee County']
+
+# Setting up the plot size
+plt.figure(figsize = (7, 4))
+
+# Setting up the plot font scale
+sns.set_theme(font_scale=1.25)
+
+# Setting seaborn style
+sns.set_style("whitegrid")
+
+# Main scatter plot for all data
+sns.scatterplot(data = county, x = 'multi_unit', y = 'homeownership', alpha = 0.3, color = 'black', edgecolor = 'black')
+
+# Highlighting Chattahoochee County
+sns.scatterplot(data = chattahoochee, x = 'multi_unit', y = 'homeownership', 
+                color = 'red', s = 100, edgecolor = 'black', zorder = 5)
+
+# Adding annotation for Chattahoochee County
+for _, row in chattahoochee.iterrows():
+    plt.text(row['multi_unit'] + 21, row['homeownership'] - 5, 'Chattahoochee County', 
+             color = 'red', fontstyle = 'italic')
+
+# Drawing dashed lines for Chattahoochee County
+for _, row in chattahoochee.iterrows():
+    plt.axhline(y = row['homeownership'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+    plt.axvline(x = row['multi_unit'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+
+# Setting labels and formats
+plt.xlabel("Percent of housing units that are multi-unit structures")
+plt.ylabel("Homeownership rate")
+plt.title("Scatter Plot with Highlighted Data (Seaborn)")
+
+# Setting the scale to percentage
+plt.gca().set_xticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_xticks()])
+plt.gca().set_yticklabels(['{:.0f}%'.format(y) for y in plt.gca().get_yticks()])
+
+plt.show()
+```
+
+## Code
+
+```{python}
+#| ref.label: county-scatter-1
+#| fig-show: hide
+```
+:::
+
+::: fragment
+`homeownership` (y) and `multi_unit` (x) have a hypothesized **association**
+:::
+
+## Associations {.smaller}
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+
+# Filtering data for Chattahoochee County
+chattahoochee = county[county['name'] == 'Chattahoochee County']
+
+# Setting up the plot size
+plt.figure(figsize = (5, 3))
+
+# Setting up the plot font scale
+sns.set_theme(font_scale = 1)
+
+# Setting seaborn style
+sns.set_style("whitegrid")
+
+# Main scatter plot for all data
+sns.scatterplot(data = county, x = 'multi_unit', y = 'homeownership', alpha = 0.3, color = 'black', edgecolor = 'black')
+
+# Highlighting Chattahoochee County
+sns.scatterplot(data = chattahoochee, x = 'multi_unit', y = 'homeownership', 
+                color = 'red', s = 100, edgecolor = 'black', zorder = 5)
+
+# Adding annotation for Chattahoochee County
+for _, row in chattahoochee.iterrows():
+    plt.text(row['multi_unit'] + 21, row['homeownership'] - 5, 'Chattahoochee County', 
+             color = 'red', fontstyle = 'italic')
+
+# Drawing dashed lines for Chattahoochee County
+for _, row in chattahoochee.iterrows():
+    plt.axhline(y = row['homeownership'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+    plt.axvline(x = row['multi_unit'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+
+# Setting labels and formats
+plt.xlabel("Percent of housing units that are multi-unit structures")
+plt.ylabel("Homeownership rate")
+plt.title("Scatter Plot with Highlighted Data (Seaborn)")
+
+# Setting the scale to percentage
+plt.gca().set_xticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_xticks()])
+plt.gca().set_yticklabels(['{:.0f}%'.format(y) for y in plt.gca().get_yticks()])
+
+plt.show()
+```
+
+::: fragment
+Associations can be **negative**...
+:::
+:::
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+
+# Filtering data for Owsley County
+owsley_county = county[county['name'] == 'Owsley County']
+
+# Setting up the plot
+plt.figure(figsize = (5, 3))
+
+# Setting up the plot font scale
+sns.set_theme(font_scale = 1)
+
+# Setting seaborn style
+sns.set_style("whitegrid")
+
+# Main scatter plot for all data
+sns.scatterplot(data = county, x = 'median_hh_income', y = 'pop_change', alpha = 0.3, color = 'black')
+
+# Highlighting Owsley County
+sns.scatterplot(data = owsley_county, x = 'median_hh_income', y = 'pop_change', 
+                color = 'red', s = 100, edgecolor = 'black', zorder = 5)
+
+# Adding annotation for Owsley County
+for _, row in owsley_county.iterrows():
+    plt.text(row['median_hh_income'] - 2000, row['pop_change'] + 10, 'Owsley\nCounty', 
+             color = 'red', fontstyle = 'italic', horizontalalignment = 'right')
+
+# Drawing dashed lines for Owsley County
+for _, row in owsley_county.iterrows():
+    plt.axhline(y = row['pop_change'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+    plt.axvline(x = row['median_hh_income'], color = 'red', linestyle = 'dashed', alpha = 0.7)
+
+# Setting labels and formats
+plt.xlabel("Median household income (in thousands)")
+plt.ylabel("Population change over 7 years")
+plt.title("Scatter Plot with Highlighted Data (Seaborn)")
+
+# Formatting the x-axis as thousands (K)
+plt.gca().set_xticklabels(['{:.0f}K'.format(x/1000) for x in plt.gca().get_xticks()])
+# Limiting y-axis to -40 to 40
+plt.ylim(-40, 40)
+
+plt.show()
+```
+
+::: fragment
+...or **positive**
+:::
+:::
+:::
+
+::: fragment
+Two variables can also not be associated (**independent**)
+:::
+
+::: fragment
+::: incremental
+-   *Median household income* is the explanatory variable
+
+-   *Population change* is the **response variable**
+
+-   explanatory variable → *might affect* → response variable
+:::
+:::
+
+## Conclusions
+
+::: incremental
+1.  Data should be initially assessed to determine the types of variables
+
+2.  Variables and descriptions are **metadata** (essential)
+
+3.  Hypothesized associations between the **predictor variable** and the **response variable** can be **positive**, **negative**, or **independent**
+:::
+
+# Study design
+
+## Study design
+
+::: incremental
+-   Understanding data provenance, including who or what the data represent, is crucial for making comprehensive conclusions.
+
+-   Sampling is a key aspect of data provenance; knowing how observational units were selected helps generalize findings to the larger population.
+
+-   Understanding the structure of the study helps distinguish between causal relationships and mere associations.
+
+-   Before analyzing data, it's important to ask, "How were these observations collected?" to gain insights about the data's source and quality.
+:::
+
+# Sampling principles
+
+## Populations and samples {.smaller}
+
+#### Consider the following:
+
+::: incremental
+1.  What is the average mercury content in swordfish in the Atlantic Ocean?
+
+2.  Over the last five years, what is the average time to complete a degree for Duke undergrads?
+
+3.  Does a new drug reduce the number of deaths in patients with severe heart disease?
+:::
+
+::: fragment
+#### What does each question have?
+:::
+
+::: fragment
+::: incremental
+1.  Each refers to a target **population**
+2.  Likely not feasible to collect a **census** of the population
+3.  We then collect a **sample**
+:::
+:::
+
+## Parameters and statistics
+
+::: incremental
+-   Numerical summaries are calculated in each **sample** or for the entire **population**
+
+-   **Sample** level is a **statistic**
+
+-   **Population** level is a **parameter**
+:::
+
+## Anecdotal evidence {.smaller}
+
+#### Consider the following:
+
+::: incremental
+1.  A man on the news got mercury poisoning from eating swordfish, so the average mercury concentration in swordfish must be dangerously high.
+
+2.  I met two students who took more than 7 years to graduate from UArizona, so it must take longer to graduate at UArizona than at many other colleges.
+
+3.  My friend's dad had a heart attack and died after they gave him a new heart disease drug, so the drug must not work.
+:::
+
+::: fragment
+> This is **anecdotal evidence**
+:::
+
+## Sampling from a population {.smaller}
+
+![](images/pop-to-sample-1.png){fig-align="center" width="3000"}
+
+::: fragment
+Here we randomly sample 10 graduates from the population
+:::
+
+## Sampling from a population {.smaller}
+
+![](images/pop-to-sub-sample-graduates-1.png){fig-align="center" width="3000"}
+
+::: fragment
+But... a nutrition major might disproportionately pick health-related majors.
+:::
+
+## Simple random sampling {.smaller}
+
+![](images/pop-to-sample-1.png){fig-align="center" width="3000"}
+
+::: fragment
+> Equivalent to drawing nmes from a hat
+:::
+
+## Non-response bias {.smaller}
+
+![](images/survey-sample-1.png){fig-align="center" width="3000"}
+
+::: fragment
+> Also beware of the convenience sample
+:::
+
+## Stratified sampling
+
+![](images/simple-stratified-1.png){fig-align="center" width="2427"}
+
+## Cluster + multistage sampling
+
+![](images/cluster-multistage-1.png){fig-align="center" width="2427"}
+
+## Lastly: correlation $\neq$ causation!
+
+```{=html}
+<iframe width="1000" height="400" src="https://tylervigen.com/spurious-correlations" frameborder="1" style="background:white;"></iframe
+```
+<br>
+
+## Conclusions
+
+::: incremental
+-   Conclusions from data mining need to be rigorously tested
+
+-   Sampling exists when we cannot collect a population
+
+-   Sampling methods help control bias
+
+-   Correlation does not equal causation!
+:::

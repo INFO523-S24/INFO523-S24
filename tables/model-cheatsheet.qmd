@@ -1,5 +1,5 @@
 ---
-title: "Summary table of models"
+title: "Summary table of models + methods"
 ---
 
 ## Introduction
@@ -17,6 +17,71 @@ pacman::p_load(gt,
 ```
 
 ::: panel-tabset
+## Imputation
+
+```{r, echo=FALSE, message=FALSE}
+# Create the tibble
+imputation_methods <- tibble(
+  `Method` = c(
+    "[Simple Fill](https://en.wikipedia.org/wiki/Imputation_(statistics)#Mean_and_median_imputation)",
+    "[KNN Imputation](https://machinelearningmastery.com/knn-imputation-for-missing-values-in-machine-learning/)",
+    "[Soft Impute](https://en.wikipedia.org/wiki/Matrix_completion)",
+    "[Iterative Imputer](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3074241/)",
+    "[Iterative SVD](https://pubmed.ncbi.nlm.nih.gov/11395428/)",
+    "[Matrix Factorization](https://en.wikipedia.org/wiki/Matrix_decomposition)",
+    "[Nuclear Norm Minimization](https://arxiv.org/abs/0805.4471)",
+    "[BiScaler](https://arxiv.org/abs/1410.2596)"
+  ),
+  Strengths = c(
+    "- Simple and fast\n- Works well with small datasets",
+    "- Can capture the relationships between features\n- Works well with moderately missing data",
+    "- Effective for matrix completion in large datasets\n- Works well with low-rank data",
+    "- Can model complex relationships\n- Suitable for multiple imputation",
+    "- Good for matrix completion with low-rank assumption\n- Handles larger datasets",
+    "- Useful for recommendation systems\n- Can handle large-scale problems",
+    "- Theoretically strong for matrix completion\n- Finds the lowest rank solution",
+    "- Normalizes data effectively\n- Often used as a preprocessing step"
+  ),
+  Limitations = c(
+    "- May not handle complex data relationships\n- Sensitive to outliers",
+    "- Computationally intensive for large datasets\n- Sensitive to the choice of k",
+    "- Assumes low-rank data structure\n- Can be sensitive to hyperparameters",
+    "- Computationally expensive\n- Depends on the choice of model",
+    "- Sensitive to rank selection\n- Computationally demanding",
+    "- Requires careful tuning\n- Not suitable for all types of data",
+    "- Very computationally intensive\n- Impractical for very large datasets",
+    "- Not an imputation method itself\n- Doesn't always converge"
+  ),
+  `Example Use Cases` = c(
+    "- Basic data analysis\n- Quick data cleaning",
+    "- Medical data analysis\n- Market research",
+    "- Recommender systems\n- Large-scale data projects",
+    "- Complex datasets with multiple types of missing data",
+    "- Image and video data processing\n- Large datasets with structure",
+    "- Recommendation engines\n- User preference analysis",
+    "- Research in theoretical data completion\n- Small to medium datasets",
+    "- Preprocessing for other imputation methods\n- Data normalization"
+  ),
+  `Implementation` = c(
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html#sklearn.impute.SimpleImputer)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html)",
+    "[Python](https://github.com/iskandr/fancyimpute)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.impute.IterativeImputer.html)",
+    "[Python](https://github.com/iskandr/fancyimpute)",
+    "[Python](https://github.com/iskandr/fancyimpute)",
+    "[Python](https://github.com/iskandr/fancyimpute)",
+    "[Python](https://github.com/iskandr/fancyimpute)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+imputation_methods %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = everything())
+
+```
+
 ## Classification
 
 ```{r, echo=FALSE, message=FALSE}
@@ -88,22 +153,22 @@ ml_models <- tibble(
                           "- Ridge and Lasso regression",
                           "- Meta-modeling\n- Kaggle competitions"),
   Implementation = c(
-    "[R](https://parsnip.tidymodels.org/reference/details_logistic_reg_glm.html) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)",
-    "[R](https://parsnip.tidymodels.org/reference/details_decision_tree_spark.html?q=decision#null) / [Python](https://scikit-learn.org/stable/modules/tree.html)",
-    "[R](https://parsnip.tidymodels.org/reference/details_rand_forest_randomForest.html?q=random#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
-    "[R](https://parsnip.tidymodels.org/reference/details_svm_linear_LiblineaR.html?q=support#null) / [Python](https://scikit-learn.org/stable/modules/svm.html)",
-    "[R](https://parsnip.tidymodels.org/reference/details_nearest_neighbor_kknn.html?q=k-#null) / [Python](https://scikit-learn.org/stable/modules/neighbors.html)",
-    "[R](https://parsnip.tidymodels.org/reference/mlp.html?q=neural%20net#null) / [Python](https://pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html)",
-    "[R](https://cran.r-project.org/web/packages/keras/vignettes/index.html) / [Python](https://pytorch.org/tutorials/beginner/nlp/deep_learning_tutorial.html)",
-    "[R](https://parsnip.tidymodels.org/reference/details_naive_Bayes_h2o.html?q=naive#null) / [Python](https://scikit-learn.org/stable/modules/naive_bayes.html)",
-    "[R](https://parsnip.tidymodels.org/reference/details_boost_tree_lightgbm.html?q=gradien) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-tree-boosting)",
-    "[R](https://parsnip.tidymodels.org/reference/details_rule_fit_xrf.html?q=rule%20) / [Python](https://www.geeksforgeeks.org/rule-based-classifier-machine-learning/)",
-    "[R](https://parsnip.tidymodels.org/reference/bag_tree.html?q=ensem#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#bagging-meta-estimator)",
-    "[R](https://parsnip.tidymodels.org/reference/boost_tree.html?q=boos#null) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#boosting)",
-    "[R](https://parsnip.tidymodels.org/reference/xgb_train.html?q=boos#null) / [Python](https://xgboost.readthedocs.io/en/latest/)",
-    "[R](https://parsnip.tidymodels.org/reference/details_discrim_linear_sparsediscrim.html?q=linear%20di#null) / [Python](https://scikit-learn.org/stable/modules/lda_qda.html)",
-    "[R](https://parsnip.tidymodels.org/reference/details_discrim_linear_sparsediscrim.html?q=regular#null) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
-    "[R](https://stacks.tidymodels.org/index.html) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#stacked-generalization)"
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)",
+    "[Python](https://scikit-learn.org/stable/modules/tree.html)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
+    "[Python](https://scikit-learn.org/stable/modules/svm.html)",
+    "[Python](https://scikit-learn.org/stable/modules/neighbors.html)",
+    "[Python](https://pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html)",
+    "[Python](https://pytorch.org/tutorials/beginner/nlp/deep_learning_tutorial.html)",
+    "[Python](https://scikit-learn.org/stable/modules/naive_bayes.html)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-tree-boosting)",
+    "[Python](https://www.geeksforgeeks.org/rule-based-classifier-machine-learning/)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#bagging-meta-estimator)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#boosting)",
+    "[Python](https://xgboost.readthedocs.io/en/latest/)",
+    "[Python](https://scikit-learn.org/stable/modules/lda_qda.html)",
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#stacked-generalization)"
   )
 )
 
@@ -168,16 +233,16 @@ regression_models <- tibble(
     "- Web search ranking\n- Price prediction"
   ),
   `Implementation` = c(
-    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_gls.html?q=linear%20#null) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ordinary-least-squares)",
-    "[R](https://parsnip.tidymodels.org/reference/svm_poly.html?q=polynomial%20re#arguments) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#polynomial-regression)",
-    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_keras.html?q=ridge%20regressuon) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
-    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html?q=lasso%20#tuning-parameters) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#lasso)",
-    "[R](https://parsnip.tidymodels.org/reference/details_linear_reg_spark.html?q=elastic%20net#tuning-parameters) / [Python](https://scikit-learn.org/stable/modules/linear_model.html#elastic-net)",
-    "[R](https://www.tidymodels.org/learn/models/conformal-regression/index.html) / [Python](https://www.statsmodels.org/stable/quantile_regression.html)",
-    "[R](https://parsnip.tidymodels.org/reference/svm_rbf.html?q=svm%20regression#ref-examples) / [Python](https://scikit-learn.org/stable/modules/svm.html#regression)",
-    "[R](https://parsnip.tidymodels.org/reference/decision_tree.html) / [Python](https://scikit-learn.org/stable/modules/tree.html#regression)",
-    "[R](https://parsnip.tidymodels.org/reference/rand_forest.html?q=random%20forest%20re#ref-examples) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
-    "[R](https://parsnip.tidymodels.org/reference/boost_tree.html) / [Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting)"
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#ordinary-least-squares)",
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#polynomial-regression)",
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification)",
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#lasso)",
+    "[Python](https://scikit-learn.org/stable/modules/linear_model.html#elastic-net)",
+    "[Python](https://www.statsmodels.org/stable/quantile_regression.html)",
+    "[Python](https://scikit-learn.org/stable/modules/svm.html#regression)",
+    "[Python](https://scikit-learn.org/stable/modules/tree.html#regression)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#forest)",
+    "[Python](https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting)"
   )
 )
 
@@ -231,13 +296,13 @@ clustering_models <- tibble(
     "- Image and speech processing\n- Graph-based clustering"
   ),
   `Implementation` = c(
-    "[R](https://tidyclust.tidymodels.org/articles/k_means.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#k-means)",
-    "[R](https://tidyclust.tidymodels.org/articles/hier_clust.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
-    "[R](https://www.rdocumentation.org/packages/dbscan/versions/1.1-11/topics/dbscan) / [Python](https://scikit-learn.org/stable/modules/clustering.html#dbscan)",
-    "[R](https://www.datanovia.com/en/lessons/agglomerative-hierarchical-clustering/) / [Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
-    "[R](http://meanmean.me/meanshift/r/cran/2016/08/28/meanShiftR.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#mean-shift)",
-    "[R](https://tnaake.github.io/affinity_propagation/) / [Python](https://scikit-learn.org/stable/modules/clustering.html#affinity-propagation)",
-    "[R](https://rdrr.io/cran/RclusTool/man/spectralClustering.html) / [Python](https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)"
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#k-means)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#dbscan)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#mean-shift)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#affinity-propagation)",
+    "[Python](https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)"
   )
 )
 
@@ -246,6 +311,111 @@ clustering_models %>%
   gt() %>%
   gt_theme_538()  %>%
   fmt_markdown(columns = c(`Model Type`, "Strengths", "Limitations", "Example Use Cases", "Implementation"))
+
+```
+
+## Unsupervised Learning
+
+```{r, echo=FALSE}
+# Create the tibble
+unsupervised_methods <- tibble(
+  `Method` = c(
+    "[PCA](https://en.wikipedia.org/wiki/Principal_component_analysis)",
+    "[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding)",
+    "[Autoencoders](https://en.wikipedia.org/wiki/Autoencoder)",
+    "[Isolation Forest](https://en.wikipedia.org/wiki/Isolation_forest)",
+    "[SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition)",
+    "[ICA](https://en.wikipedia.org/wiki/Independent_component_analysis)"
+  ),
+  Strengths = c(
+    "- Dimensionality reduction\n- Preserves variance",
+    "- Captures non-linear structures\n- Good for visualization",
+    "- Dimensionality reduction\n- Non-linear relationships",
+    "- Effective for high-dimensional data\n- Fast and scalable",
+    "- Matrix factorization\n- Efficient for large datasets",
+    "- Identifies independent components\n- Signal separation"
+  ),
+  Limitations = c(
+    "- Linear method\n- Not for categorical data",
+    "- Computationally expensive\n- Not for high-dimensional data",
+    "- Neural network knowledge\n- Computationally intensive",
+    "- Randomized\n- May miss some anomalies",
+    "- Assumes linear relationships\n- Sensitive to scaling",
+    "- Non-Gaussian components\n- Sensitive to noise"
+  ),
+  `Example Use Cases` = c(
+    "- Feature extraction\n- Data compression",
+    "- Data visualization\n- Exploratory analysis",
+    "- Feature learning\n- Noise reduction",
+    "- Fraud detection\n- Network security",
+    "- Recommender systems\n- Latent semantic analysis",
+    "- Blind signal separation\n- Feature extraction"
+  ),
+  `Implementation` = c(
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)",
+    "[Python](https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+unsupervised_methods %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = everything())
+
+```
+
+## Association
+
+```{r, echo=FALSE}
+# Create the tibble
+association_methods <- tibble(
+  `Method` = c(
+    "[Apriori Algorithm](https://en.wikipedia.org/wiki/Apriori_algorithm)",
+    "[FP-Growth Algorithm](https://en.wikipedia.org/wiki/Association_rule_learning#FP-growth_algorithm)",
+    "[Eclat Algorithm](https://en.wikipedia.org/wiki/Eclat_algorithm)",
+    "[GSP (Generalized Sequential Pattern)](https://en.wikipedia.org/wiki/Sequential_Pattern_Mining#GSP_(Generalized_Sequential_Pattern)_Algorithm)",
+    "[RuleGrowth Algorithm](https://www.philippe-fournier-viger.com/spmf/rulegrowth.pdf)"
+  ),
+  Strengths = c(
+    "- Well-known and widely used\n- Easy to understand and implement",
+    "- Faster than Apriori\n- Efficient for large datasets",
+    "- Faster than Apriori\n- Scalable and easy to parallelize",
+    "- Identifies sequential patterns\n- Flexible for various datasets",
+    "- Efficient for mining sequential rules\n- Works well with sparse datasets"
+  ),
+  Limitations = c(
+    "- Can be slow on large datasets\n- Generates a large number of candidate sets",
+    "- Memory intensive\n- Can be complex to implement",
+    "- Limited to binary attributes\n- Generates many candidate itemsets",
+    "- Can be computationally expensive\n- Not as efficient for very large databases",
+    "- Requires careful parameter setting\n- Less known and used than Apriori or FP-Growth"
+  ),
+  `Example Use Cases` = c(
+    "- Market basket analysis\n- Cross-marketing strategies",
+    "- Frequent itemset mining in large databases\n- Customer purchase patterns",
+    "- Market basket analysis\n- Binary classification tasks",
+    "- Customer purchase sequence analysis\n- Event sequence analysis",
+    "- Analyzing customer shopping sequences\n- Detecting patterns in web browsing data"
+  ),
+  `Implementation` = c(
+    "[Python](http://rasbt.github.io/mlxtend/user_guide/frequent_patterns/apriori/)",
+    "[Python](http://rasbt.github.io/mlxtend/user_guide/frequent_patterns/fpgrowth/)",
+    "[Python](https://github.com/tommyod/Efficient-Apriori)",
+    "[Python](https://github.com/jacksonpradolima/gsp-py)",
+    "[Python](https://pypi.org/project/spmf/)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+association_methods %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = everything())
 
 ```
 :::

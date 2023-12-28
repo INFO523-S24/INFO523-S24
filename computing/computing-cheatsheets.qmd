@@ -1,8 +1,8 @@
 ---
-title: "R cheatsheets"
+title: "Python cheatsheets"
 ---
 
-The following cheatsheets come from [tsinghua-gongjing.github.io/posts/cheatsheet_collections](https://tsinghua-gongjing.github.io/posts/cheatsheet_collections.html){.uri}. We haven't covered every function and functionality listed on them, but you might still find them useful as references.
+The following cheatsheets come from [tsinghua-gongjing.github.io/posts/cheatsheet_collections](https://tsinghua-gongjing.github.io/posts/cheatsheet_collections.html){.uri}. We will not covered every function and functionality listed on them, but you might still find them useful as references.
 
 ::: columns
 ::: {.column width="50%"}

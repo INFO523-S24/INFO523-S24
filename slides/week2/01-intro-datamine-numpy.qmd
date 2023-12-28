@@ -1,0 +1,833 @@
+---
+title: Introduction to Data Mining
+subtitle: Lecture 1
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   Reading Quiz #1 is due Friday, Jan 19th, 11:59pm
+
+-   Project 1 overview next week
+
+    -   Teams will be announced as well
+
+## What is data mining?
+
+One of many definitions:
+
+> "Data mining is the science of extracting useful knowledge from huge data repositories." - ACM SIGKDD, [Data Mining Curriculum: A Proposal](http://www.kdd.org/curriculum)
+
+## What is data mining?
+
+**Convergence of several fields**
+
+::: incremental
+-   Statistics
+
+-   Computer science (machine learning, AI)
+
+-   Data science
+
+-   Optimization
+:::
+
+## Why data mining?<br>Commercial viewpoint {.smaller}
+
+::: columns
+::: {.column width="50%"}
+::: fragment
+**Businesses collect + store tons of data**
+
+::: incremental
+-   Purchases at department/grocery stores
+-   Bank/credit card transactions
+-   Web and social media data
+-   Mobile and IOT
+:::
+:::
+
+::: fragment
+**Computers are cheaper + more powerful**
+:::
+
+::: fragment
+**Competition to provide better services**
+
+::: incremental
+-   Mass customization and recommendation systems
+-   Targeted advertising
+-   Improved logistics
+:::
+:::
+:::
+
+::: {.column width="50%"}
+![](images/commercial1.png){fig-align="center" width="201"}
+
+![](images/socialmed.png){fig-align="center" width="247"}
+
+![](images/iot.png){fig-align="center" width="354"}
+:::
+:::
+
+## Knowledge discovery in databases (KDD) {.smaller}
+
+![](images/dm-wf.png){fig-align="center" width="1712"}
+
+::: aside
+Usama M. Fayyad et al., 1996.
+:::
+
+## Data mining tasks
+
+::: fragment
+#### Descriptive
+
+::: incremental
+Find human-interpretable patterns that describes the data
+:::
+:::
+
+<br>
+
+::: fragment
+#### Predictive Methods
+
+::: incremental
+Use features to predict unknown or future values of another feature
+:::
+:::
+
+## Predictive modeling {.smaller}
+
+::: columns
+::: {.column width="50%"}
+#### Classification
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+
+# Generating a simulated dataset for classification
+X, y = make_classification(n_samples=100, n_features=2, n_informative=2, n_redundant=0, 
+                           n_clusters_per_class=1, random_state=1)
+
+# Splitting the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Applying a classification model (Support Vector Machine)
+model = SVC(kernel='linear')
+model.fit(X_train, y_train)
+
+# Predicting on the test set
+y_pred = model.predict(X_test)
+
+# Plotting the classification result
+plt.figure(figsize=(5, 3))
+plt.scatter(X_test[:, 0], X_test[:, 1], c=y_pred, s=50, cmap='viridis')
+plt.title("Classification Visualization on a Simulated Dataset")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+```
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_classification
+import pandas as pd
+
+# Simulating a dataset
+X, y = make_classification(n_samples=1000, n_features=4, n_informative=3, n_redundant=0, 
+                           n_classes=2, random_state=42)
+
+# Creating a DataFrame
+df = pd.DataFrame(X, columns=['Budget', 'Duration', 'Channel', 'Target_Audience_Size'])
+df['Channel'] = df['Channel'].apply(lambda x: round(abs(x) % 4))  # Converting to categorical channel
+df['Season'] = df['Duration'].apply(lambda x: round(abs(x) % 4))  # Adding a 'Season' column
+df['Campaign_Success'] = y
+
+df.head(5)
+```
+:::
+
+::: {.column width="50%"}
+#### Regression
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_regression
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Generating a simulated dataset for linear regression
+X, y = make_regression(n_samples=100, n_features=1, noise=10, random_state=42)
+
+# Fitting a linear regression model to the data
+model = LinearRegression()
+model.fit(X, y)
+y_pred = model.predict(X)
+
+# Plotting the dataset with the linear fit
+plt.figure(figsize=(5, 3))
+plt.scatter(X, y, color='blue', label='Data Points')
+plt.plot(X, y_pred, color='red', label='Linear Fit')
+plt.title("Simulated Dataset for Linear Regression with Linear Fit")
+plt.xlabel("Feature")
+plt.ylabel("Target")
+plt.legend()
+plt.show()
+
+# Converting the regression data into a DataFrame
+regression_df = pd.DataFrame({'Feature': X.flatten(), 'Target': y})
+
+# Displaying the first few rows of the DataFrame
+regression_df.head()
+```
+:::
+:::
+
+## Classification {.smaller}
+
+Find a **model** for the class attribute as a function of the other attributes
+
+**Goal**: assign new records to a class as accurately as possible.
+
+E.g., Customer Attrition, Directed Marketing
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+
+# Generating a simulated dataset for classification
+X, y = make_classification(n_samples=100, n_features=2, n_informative=2, n_redundant=0, 
+                           n_clusters_per_class=1, random_state=1)
+
+# Splitting the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Applying a classification model (Support Vector Machine)
+model = SVC(kernel='linear')
+model.fit(X_train, y_train)
+
+# Predicting on the test set
+y_pred = model.predict(X_test)
+
+# Plotting the classification result
+plt.figure(figsize=(5, 5))
+plt.scatter(X_test[:, 0], X_test[:, 1], c=y_pred, s=50, cmap='viridis')
+plt.title("Classification Visualization on a Simulated Dataset")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+from sklearn.datasets import make_classification
+import pandas as pd
+
+# Simulating a dataset
+X, y = make_classification(n_samples=1000, n_features=4, n_informative=3, n_redundant=0, 
+                           n_classes=2, random_state=42)
+
+# Creating a DataFrame
+df = pd.DataFrame(X, columns=['Budget', 'Duration', 'Channel', 'Target_Audience_Size'])
+df['Channel'] = df['Channel'].apply(lambda x: round(abs(x) % 4))  # Converting to categorical channel
+df['Season'] = df['Duration'].apply(lambda x: round(abs(x) % 4))  # Adding a 'Season' column
+df['Campaign_Success'] = y
+
+df.head(10)
+```
+:::
+:::
+
+## Regression {.smaller}
+
+Find a **model** that predicts a variable (Y) from another variable (X)
+
+Both are continuous variables (floats)
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+from sklearn.datasets import make_regression
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Generating a simulated dataset for linear regression
+X, y = make_regression(n_samples=100, n_features=1, noise=10, random_state=42)
+
+# Fitting a linear regression model to the data
+model = LinearRegression()
+model.fit(X, y)
+y_pred = model.predict(X)
+
+# Plotting the dataset with the linear fit
+plt.figure(figsize=(6, 6))
+plt.scatter(X, y, color='blue', label='Data Points')
+plt.plot(X, y_pred, color='red', label='Linear Fit')
+plt.title("Simulated Dataset for Linear Regression with Linear Fit")
+plt.xlabel("Feature")
+plt.ylabel("Target")
+plt.legend()
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+# Converting the regression data into a DataFrame
+regression_df = pd.DataFrame({'Feature': X.flatten(), 'Target': y})
+
+# Displaying the first few rows of the DataFrame
+regression_df.head(10)
+```
+:::
+:::
+
+## Association mining
+
+Given a set of transactions, produce rules of association
+
+```{python}
+#| echo: false
+import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Simulating a dataset
+transactions = [
+    ["Bread", "Milk"],
+    ["Bread", "Diapers", "Beer", "Eggs"],
+    ["Milk", "Diapers", "Beer", "Cola"],
+    ["Bread", "Milk", "Diapers", "Beer"],
+    ["Bread", "Milk", "Diapers", "Cola"],
+]
+
+# Instantiating the encoder and transforming the dataset
+te = TransactionEncoder()
+te_ary = te.fit(transactions).transform(transactions)
+df = pd.DataFrame(te_ary, columns=te.columns_)
+
+# Applying the Apriori algorithm to find frequent itemsets
+frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
+
+# Generating association rules
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+
+# Displaying the association rules
+print(rules)
+```
+
+## Association mining {.smaller}
+
+::: columns
+::: {.column width="50%"}
+::: incremental
+-   Let the rule discovered be: `{Potato Chips, …} → {Soft drink}`
+
+-   **Soft drink as RHS**: what can boost sales? Discount Potato Chips?
+
+-   **Potato Chips as LHS**: which products are affected if Potato Chips are discontinued
+
+-   **Potato Chips in LHS** and Soft drink in RHS: What products should be sold with Potato Chips to promote sales of Soft drinks!
+:::
+:::
+
+::: {.column width="50%"}
+![](images/shopping.webp){fig-align="center" width="500"}
+:::
+:::
+
+## Association mining goals {.smaller}
+
+![](images/repairs.png){fig-align="center"}
+
+::: incremental
+-   **Goal**: Anticipate the nature of repairs to keep the service vehicles equipped with right parts to speed up repair time.
+-   **Approach**: Process the data on tools and parts required in previous repairs at different consumer locations and discover co-occurrence patterns.
+:::
+
+## Clustering
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Generating a simulated dataset
+X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=0)
+
+# Applying K-Means clustering
+kmeans = KMeans(n_clusters=4)
+kmeans.fit(X)
+y_kmeans = kmeans.predict(X)
+
+# Plotting the clusters
+plt.figure(figsize=(6, 6))
+plt.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
+centers = kmeans.cluster_centers_
+plt.scatter(centers[:, 0], centers[:, 1], c='red', s=200, alpha=0.5)
+plt.title("Cluster Visualization of a Simulated Dataset")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+::: incremental
+-   Group points that are similar to one another
+
+-   Separate dissimilar points
+
+-   Groups are not known → Unsupervised Learning
+
+-   E.g., Market Segmentation, Document Types
+:::
+:::
+:::
+
+## Anomaly detection
+
+Detect significant deviations from normal behavior.
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.ensemble import IsolationForest
+
+# Generating a dataset with outliers
+X, _ = make_blobs(n_samples=200, centers=1, cluster_std=1, random_state=42)
+X[-20:] = np.random.uniform(low=-6, high=6, size=(20, 2))  # Adding outliers
+
+# Applying Isolation Forest for anomaly detection
+clf = IsolationForest(random_state=42)
+pred = clf.fit_predict(X)
+
+# Plotting the data
+plt.figure(figsize=(6, 6))
+plt.scatter(X[:, 0], X[:, 1], c=pred, cmap='coolwarm', edgecolor='k', s=50)
+plt.title("Anomaly Detection using Isolation Forest")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+![](images/credit-cards.jpeg){fig-align="center" width="242"}
+
+![](images/ips.jpeg){fig-align="center" width="400"}
+:::
+:::
+
+## Other data mining tasks
+
+![](images/others.png){fig-align="center"}
+
+## Challenges of data mining
+
+![](images/challenges.png){fig-align="center"}
+
+## Legal, privacy, and security issues
+
+**Problem**: Internet is global, legislation is local!
+
+![](images/ethics.png){fig-align="center"}
+
+## Legal, privacy, and security issues {.smaller}
+
+![](images/angry-birds.png){fig-align="center" width="1925"}
+
+::: incremental
+-   **Top Mobile App**: Angry Birds is the highest-selling paid app on iPhone in the US and Europe.
+
+-   **Downloads**: Surpassed a billion downloads globally.
+
+-   **Player Engagement**: Users often engage for hours playing the game.
+
+-   **Privacy Concerns**: A study by Jason Hong of Carnegie Mellon University found that out of 40 users, 38 were unaware that their location data was being stored.
+
+-   **Ad Targeting**: The location data was used for targeting ads to the users.
+:::
+
+## Legal, privacy, and security issues {.smaller}
+
+![](images/pokemon-go.png){fig-align="center" width="683"}
+
+::: incremental
+-   **Location & Camera Access**: Pokémon Go tracks location and requires camera access.
+
+-   **Data Collection Potential**: Its popularity may lead to significant data gathering.
+
+-   **Privacy Policy Issues**: Criticized for being deliberately vague.
+
+-   **User Data as Asset**: User data classified as a business asset in the privacy agreement.
+
+-   **Data Transfer Clause**: User data can be transferred if Niantic is sold.
+:::
+
+## Conclusions
+
+::: columns
+::: {.column width="50%"}
+**Data Mining is interdisciplinary**
+
+::: incremental
+-   Statistics
+
+-   CS (machine learning, AI)
+
+-   Data science
+
+-   Optimization
+:::
+:::
+
+::: {.column width="50%"}
+**Data mining is a team effort**
+
+::: incremental
+-   Data management
+
+-   Statistics
+
+-   Programming
+
+-   Communication
+
+-   Application domain
+:::
+:::
+:::
+
+# Intro to NumPy {style="text-align: center;"}
+
+![](images/numpy.png){fig-align="center" width="300"}
+
+## What is NumPy?
+
+::: incremental
+-   NumPy = Numerical Python
+
+-   Foundational package for scientific computing
+
+-   High-performance multidimensional arrays
+
+-   Tools for working with arrays
+:::
+
+## Why NumPy for data mining?
+
+::: incremental
+-   Essential for data processing, manipulation, and analysis.
+
+-   Underpins advanced data mining algorithms implemented in Python.
+
+-   Fast and memory-efficient with powerful data structures.
+:::
+
+# NumPy Arrays
+
+## Creating arrays
+
+::: panel-tabset
+## Code
+
+```{python}
+import numpy as np
+
+# Creating a simple NumPy array
+arr = np.array([1, 2, 3, 4])
+
+# Multidimensional array
+multi_arr = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Range of values
+range_arr = np.arange(10)
+
+# Array of zeros
+zeros_arr = np.zeros((3, 3))
+
+# Array of ones
+ones_arr = np.ones((2, 2))
+
+# Identity matrix
+identity_matrix = np.eye(3)
+```
+
+## Output
+
+```{python}
+#| echo: false
+print("arr:", arr, "\n")
+
+print("multi_arr:", multi_arr, "\n")
+
+print("range_arr:", range_arr, "\n")
+
+print("zeros_arr:", zeros_arr, "\n")
+
+print("ones_arr:", ones_arr, "\n")
+
+print("identity_matrix:", identity_matrix)
+```
+:::
+
+## Array attributes
+
+```{python}
+# Array dimensions
+print("Dimensions:", multi_arr.ndim)
+
+# Shape of array
+print("Shape:", multi_arr.shape)
+
+# Size of array
+print("Size:", multi_arr.size)
+
+# Data type of array elements
+print("Data Type:", multi_arr.dtype)
+```
+
+# Array operations
+
+## Arithmetic operations
+
+```{python}
+# Element-wise addition
+addition = arr + 2
+
+# Element-wise subtraction
+subtraction = arr - 2
+
+# Element-wise multiplication
+multiplication = arr * 2
+
+# Element-wise division
+division = arr / 2
+```
+
+```{python}
+#| echo: false
+
+print("addition:", addition, "\n")
+
+print("subtraction:", subtraction, "\n")
+
+print("multiplication:", multiplication, "\n")
+
+print("division:", division, "\n")
+```
+
+## Aside
+
+Why do my outputs look than different than Python?
+
+::: panel-tabset
+## Python
+
+```{python}
+print(addition)
+print(subtraction)
+print(multiplication)
+print(division)
+```
+
+## My slides
+
+```{python}
+print("addition:", addition, "\n")
+
+print("subtraction:", subtraction, "\n")
+
+print("multiplication:", multiplication, "\n")
+
+print("division:", division, "\n")
+```
+:::
+
+## Statistical operations
+
+```{python}
+# Sum of elements
+total = arr.sum()
+
+# Mean of elements
+mean_value = arr.mean()
+
+# Standard deviation
+std_dev = arr.std()
+
+# Correlation coefficient
+corr = np.corrcoef(multi_arr)
+```
+
+```{python}
+#| echo: false
+print("total:", total, "\n")
+
+print("mean_value:", mean_value, "\n")
+
+print("std_dev:", std_dev, "\n")
+
+print("corr:", corr, "\n")
+```
+
+# Advanced operations
+
+## Reshaping and transposing
+
+```{python}
+# Reshaping an array
+reshaped = np.reshape(range_arr, (2, 5))
+
+# Transpose of an array
+transposed = multi_arr.T
+```
+
+```{python}
+#| echo: false
+
+print("range_arr:", range_arr, "\n")
+
+print("reshaped:", reshaped, "\n")
+
+print("multi_arr:", multi_arr, "\n")
+
+print("transposed:", transposed, "\n")
+```
+
+## Indexing and slicing
+
+```{python}
+# Accessing a specific element
+element = multi_arr[0, 1]
+
+# Slicing a row
+row = multi_arr[1, :]
+
+# Slicing a column
+column = multi_arr[:, 2]
+```
+
+```{python}
+#| echo: false
+
+print("multi_arr:", multi_arr, "\n")
+
+print("row:", row, "\n")
+
+print("column:", column, "\n")
+```
+
+## Broadcasting
+
+```{python}
+# Broadcasting allows arithmetic operations on arrays of different sizes
+broadcasted_addition = multi_arr + np.array([1, 0, 1])
+```
+
+```{python}
+#| echo: false
+
+print("multi_arr:", multi_arr, "\n")
+
+print("broadcasted_addition:", broadcasted_addition, "\n")
+```
+
+# Linear algebra in NumPy
+
+## Matrix operations
+
+**Dot product**: take two equal-length sequences and return a single number
+
+`2 • (1, 2, 3) = 2x1 = 2; 2x2 = 0; 2x3 = 6`
+
+**Matrix multiplication**:
+
+`(1, 2, 3) • (7, 9, 11) = (1×7 + 2×9 + 3×11) = 58`
+
+```{python}
+# Dot product
+dot_product = np.dot(arr, arr)
+
+# Matrix multiplication
+matrix_mul = np.dot(multi_arr, identity_matrix)
+```
+
+```{python}
+#| echo: false
+
+print("dot_product:", dot_product, "\n")
+
+print("matrix_mul:", matrix_mul, "\n")
+```
+
+## Eigenvalues and Eigenvectors
+
+```{python}
+# Eigenvalues and eigenvectors
+eigenvalues, eigenvectors = np.linalg.eig(identity_matrix)
+```
+
+```{python}
+#| echo: false
+
+print("eigenvalues:", eigenvalues, "\n")
+
+print("eigenvectors:", eigenvectors, "\n")
+```
+
+## NumPy for data mining
+
+::: fragment
+**Application in Algorithms**
+
+-   NumPy arrays are used in various data mining algorithms like clustering, classification, and neural networks.
+:::
+
+::: fragment
+**Performance**
+
+-   NumPy operations are implemented in C, which makes them much faster than standard Python.
+:::
+
+## Conclusion
+
+::: incremental
+-   NumPy is integral to data mining and analysis in Python.
+
+-   It provides efficient and fast operations for array and matrix manipulation.
+
+-   Understanding NumPy is crucial for implementing and customizing data mining algorithms.
+:::

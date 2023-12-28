@@ -1,0 +1,622 @@
+---
+title: Welcome to INFO 523
+subtitle: Data Mining and Discovery
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Course Details
+
+## Teaching team
+
+::: columns
+::: {.column width="50%"}
+### Instructor
+
+Dr. Greg Chism
+
+Office: Harvill 420,
+
+[gchism\@arizona.edu](mailto:gchism@arizona.edu)
+:::
+:::
+
+## Timetable
+
+-   Lectures (weekly)
+    -   Wednesdays, 1:00 - 2:30 pm - Henry Koffler, RM 216
+-   Meeting dates
+    -   01/10/2023 - 05/05/2023
+
+## Themes: what, why, and how {.smaller}
+
+-   **What:** the techniques
+    -   Specific Types of Mining Techniques like clustering for pattern discovery, decision trees for classification, and association rules for finding relationships.
+    -   Tooling to produce them (e.g., specific Python libraries)
+
+. . .
+
+-   **How:** the process
+    -   Planning and understanding (workflow + pseudo code)
+    -   Pre-process data (e.g., cleaning, transforming, normalizing, etc.)
+    -   Applying Mining Algorithms (e.g., K-means clustering, decision trees, etc.)
+    -   Evaluating and tuning based on model performance
+    -   Interpretation and reporting
+
+. . .
+
+-   **Why:** the theory
+    -   Tie together "how" and "what" through Python
+    -   Understanding data patterns and predictions
+    -   Ethics and best practices
+
+# But first...
+
+## Show and tell {.smaller}
+
+::: task
+-   Form a small group (2-4 people) with people sitting around you
+
+-   First, introduce yourselves to each other -- name (and proper pronunciation of name), year, major, where are you from, etc.
+
+-   Start what you think makes an effective data mining workflow.
+
+-   Then, discuss what makes an ineffective data mining workflow.
+
+-   Finally, choose the **one** discussion from your group, either "bad" or "good", and have one team member share the discussion on #general in Slack.
+:::
+
+# Course components
+
+## Course website
+
+::: {.large style="text-align: center;"}
+[datamineaz.org](https://datamineaz.org/)
+:::
+
+::: {.hand style="text-align: center;"}
+aka "the one link to rule them all"
+:::
+
+::: {style="text-align: center;"}
+```{=html}
+<iframe width="1000" height="400" src="https://datamineaz.org" frameborder="1" style="background:white;"></iframe>
+```
+:::
+
+## Lectures {.smaller}
+
+-   In person
+
+-   Attendance is required (as long as you're healthy!)
+
+-   A little bit of everything:
+
+    -   Traditional lecture
+
+    -   Live coding + demos
+
+    -   Short exercises + solution discussion
+
+## Announcements
+
+-   Posted on D2L (Announcements tool) and sent (primarily) via Slack, be sure to check both regularly
+
+-   I'll assume that you've read an announcement by the next "business" day
+
+## Diversity and inclusion {.smaller}
+
+It is my intent that students from all diverse backgrounds and perspectives be well-served by this course, that students' learning needs be addressed both in and out of class, and that the diversity that the students bring to this class be viewed as a resource, strength and benefit.
+
+-   If you have a name that differs from those that appear in your official UArizona records, please let me know!
+
+-   Please let me know your preferred pronouns.
+
+-   If you feel like your performance in the class is being impacted by your experiences outside of class, please don't hesitate to come and talk with me. I want to be a resource for you. If you prefer to speak with someone outside of the course, your advisers and deans are excellent resources.
+
+-   I (like many people) am still in the process of learning about diverse perspectives and identities. If something was said in class (by anyone) that made you feel uncomfortable, please talk to me about it.
+
+## Accessibility
+
+-   The [Disability Resource Center](https://drc.arizona.edu/) is available to ensure that students are able to engage with their courses and related assignments.
+
+-   I am committed to making all course materials accessible and I'm always learning how to do this better. If any course component is not accessible to you in any way, please don't hesitate to let me know.
+
+# Assessments
+
+## Attendance + participation (5%)
+
+-   Required throughout the semester in lecture
+
+-   Students who attend at least 80% of the lectures and participate regularly in lecture and/or other course venues (Slack) will receive full credit for this portion of their grade
+
+## Reading quizzes (10%)
+
+-   Online, individual
+-   Cover reading that is due since the previous quiz and up to and including the deadline for the given quiz
+-   Due by 11:59 pm AZ Time on the indicated day on the course schedule
+-   **Lowest dropped**
+
+## Homework assignments (45%)
+
+-   Submitted on GitHub, individual
+-   Some lab sessions allocated to working on homework / getting feedback from your TA
+-   Due by 11:59 pm AZ Time on the indicated day on the course schedule
+-   **Lowest dropped**
+
+## Projects (40%)
+
+-   Submitted on GitHub, team-based
+
+-   Interim deadlines, peer review on content, peer evaluation for team contribution
+
+## Teams
+
+-   Team assignments
+    -   In class exercises and projects
+    -   Assigned different teams for each project
+    -   Peer evaluation during teamwork and after completion
+-   Expectations and roles
+    -   Everyone is expected to contribute equal *effort*
+    -   Everyone is expected to understand *all* code turned in
+    -   Individual contribution evaluated by peer evaluation, commits, etc.
+
+## Project 1 (15%)
+
+-   Same/similar data, different results
+
+-   Presentation and write-up
+
+-   Wrapped up before midterms grades are due
+
+## Project 2 (25%)
+
+-   The world is your oyster! (and more details TBA)
+
+-   New team
+
+-   Presentation and write-up
+
+-   Wrapped up on the final exam date
+
+## Grading {.smaller}
+
+This course is assessed 100% on your coursework (there is no exam). We will be assessing you based on the following assignments,
+
+| Assignment                 | Type       | Value | n   | Due                                        |
+|:--------------|:--------------|:--------------|:--------------|---------------|
+| Attendance + participation | Individual | 5%    |     |                                            |
+| Reading quizzes            | Individual | 10%   | 7   | \~ Every other week                        |
+| Homeworks                  | Individual | 45%   | 6   | \~ Every 2-3 weeks                         |
+| Project 1                  | Team       | 15%   | 1   | \~ Week 10 + earlier interim deadlines     |
+| Project 2                  | Team       | 25%   | 1   | \~ Finals week + earlier interim deadlines |
+
+# Course policies
+
+## COVID policies
+
+-   Wear a mask if the university requires
+
+-   Stay home if you're sick and follow guidance
+
+-   Read and follow university guidance
+
+## Late work policy {.smaller}
+
+-   Reading quizzes: Late submissions not accepted
+
+-   Homework assignments:
+
+    -   Late, but next day (before noon): -10% of available points
+    -   Late, but next day (after noon): -20% of available points
+    -   Two days late or later: No credit, and we will not provide written feedback
+
+-   Project presentations: Late submissions not accepted
+
+-   Project write-ups:
+
+    -   Late, but next day (before noon): -10% of available points
+    -   Late, but next day (after noon): -20% of available points
+    -   Two days late or later: No credit, and we will not provide written feedback
+
+-   Peer evaluation:
+
+    -   Late submissions not accepted
+    -   Must turn in peer evaluation if you want your own score from others
+
+## Free passes
+
+Three "free passes" for the semester
+
+::: incremental
+-   1 pass = 1 whole day extension
+
+-   Passes can be stacked up to 3
+
+-   Once they're gone, that's it...
+
+-   ...so use them wisely!
+
+-   *Hint: like during midterms...*
+:::
+
+## Collaboration policy
+
+-   Only work that is clearly assigned as team work should be completed collaboratively (Projects)
+
+-   Reading quizzes must be completed individually, you may not discuss answers with teammates, clarification questions should only be asked to myself and the TAs
+
+-   Homework assignments must be completed individually. You may not directly share answers / code with others, however you are welcome to discuss the problems in general and ask for advice
+
+## Sharing / reusing code policy
+
+-   We are aware that a huge volume of code is available on the web, and many tasks may have solutions posted
+
+-   Unless explicitly stated otherwise, this course's policy is that you may make use of any online resources (e.g. RStudio Community, StackOverflow, etc.) but you must explicitly cite where you obtained any code you directly use or use as inspiration in your solution(s).
+
+-   Any recycled code that is discovered and is not explicitly cited will be treated as plagiarism, regardless of source
+
+## ChatGPT / AI policy
+
+-   We are additionally aware of the potential code AI for coding (your instructor taught a workshop on it...).
+
+-   While these tools are amazing, learners should be aware of the impacts that using such tools can have on core competency. David Humphrey, a computer science professor, [**wrote about ChatGPT and its potentially negative impacts on core learning.**](https://blog.humphd.org/cheatgpt/) It is a good read about the pitfalls of using generative AI in an educational context.
+
+-   By using a generative AI, learners may miss the opportunity to discover how something works and why things are done that way.
+
+## Academic integrity
+
+> To uphold the [UArizona iSchool Community Standard](https://ischool.arizona.edu/sites/ischool.arizona.edu/files/iSchool%20Policy%20on%20Academic%20Integrity%20in%20Computing%202023%20-%20approved%20by%20faculty%20vote%20April%202023.pdf#:~:text=UArizona%20iSchool%20Instructors%20are%20expected%20to%20help%20students,prohibited%20in%20some%20courses%20are%20allowed%20in%20others.):
+
+> -   I will not lie, cheat, or steal in my academic endeavors;
+> -   I will conduct myself honorably in all my endeavors; and
+> -   I will act if the Standard is compromised.
+
+## 
+
+<br><br><br>
+
+::: {.large .hand style="text-align: center"}
+most importantly:
+
+ask if you're not sure if something violates a policy!
+:::
+
+# Support
+
+## Office hours {.smaller}
+
+-   Greg:
+
+    -   Mondays 1 - 2 pm - Harvill 420
+
+        -   Except Mon, Jan 15 (MLK Holiday)
+
+        -   Any other exceptions will be announced in class / by email
+
+    -   By appointment - Zoom or Harvill 420
+
+-   \+ lots more resources listed on the syllabus!
+
+## Wellness
+
+I want to make sure that you learn everything you were hoping to learn from this class. If this requires flexibility, please don't hesitate to ask.
+
+-   You never owe me personal information about your health (mental or physical) but you're always welcome to talk to me. If I can't help, I likely know someone who can.
+
+-   I want you to learn lots of things from this class, but I primarily want you to stay healthy, balanced, and grounded.
+
+# Course Tools
+
+## JupyterLab
+
+::: {.large style="text-align: center;"}
+<https://jupyter.org/try>
+:::
+
+-   Browser based JupyterLab instance(s)
+
+-   Requires internet connection to access
+
+-   Provides consistency in hardware and software environments
+
+-   Local Python and JupyterLab installations are fine but we will not guarantee support
+
+## GitHub {.smaller}
+
+::: {.large style="text-align: center;"}
+<https://github.com/INFO523-S24>
+:::
+
+-   All of your work and your membership (enrollment) in the organization is private
+
+-   Each assignment is a private repo on GitHub, I distribute the assignments on GitHub and you submit them there
+
+-   Feedback on assignments is given as GitHub issues, scores recorded on D2L Gradebook
+
+::: task
+Send me your Github account names on Slack, later this week you will be invited to the course organization.
+:::
+
+## Username advice {.smaller}
+
+::: hand
+in case you don't yet have a GitHub account...
+:::
+
+Some brief advice about selecting your account names (particularly for GitHub),
+
+-   Incorporate your actual name! People like to know who they're dealing with and makes your username easier for people to guess or remember
+
+-   Reuse your username from other contexts, e.g., Twitter or Slack
+
+-   Pick a username you will be comfortable revealing to your future boss
+
+-   Shorter is better than longer, but be as unique as possible
+
+-   Make it timeless. Avoid highlighting your current university, employer, or place of residence
+
+## Slack {.smaller}
+
+-   Online forum for asking and answering questions
+
+-   Private repo in the course organization
+
+-   You will need to join the course organization for access
+
+-   Ask **and answer** questions related to course logistics, assignment, etc. here
+
+-   Personal questions (e.g., extensions, illnesses, etc.) should be via email to me
+
+-   Once you join, browse the channels to make sure you're posting questions in the right channel, update your profile with your name, photo/avatar of you that matches your GitHub profile, and your pronouns
+
+-   **Unfortunately** Slack is **not** the best place to ask coding questions, but it's a great place for real-time connection and collaboration
+
+::: task
+Demo on Wednesday for asking good questions with proper code formatting.
+:::
+
+## Before the weekend
+
+1.  Create a GitHub account if you don't have one
+
+2.  Read the [syllabus](https://datamineaz.org/course-syllabus)
+
+3.  Make sure you can use JupyterLab
+
+    1.  If not, install Python and JupyterLab (or VS Code)
+
+# Quarto
+
+# What is Quarto?
+
+## Quarto ...
+
+-   is a new, open-source, scientific, and technical publishing system.
+
+![Artwork from "Hello, Quarto" keynote by Julia Lowndes and Mine Çetinkaya-Rundel, presented at RStudio Conference 2022. Illustrated by Allison Horst.](images/horst_quarto_schematic.png){fig-alt="A schematic representing the multi-language input (e.g. Python, R, Observable, Julia) and multi-format output (e.g. PDF, html, Word documents, and more) versatility of Quarto." fig-align="center"}
+
+## Quarto
+
+With Quarto you can weave together narrative text and code to produce elegantly formatted output as documents, web pages, blog posts, books and more.
+
+. . .
+
+<br>
+
+*just like R Markdown...*
+
+. . .
+
+<br>
+
+but not *just like* it, there's more to it...
+
+## Quarto unifies + extends R Markdown
+
+::: incremental
+-   Consistent implementation of attractive and handy features across outputs: tabsets, code-folding, syntax highlighting, etc.
+-   More accessible defaults as well as better support for accessibility
+-   Support for other languages like Python, Julia, Observable, and more via Jupyter engine for executable code chunks.
+:::
+
+## A tour of Quarto
+
+<br><br>
+
+::: {.hand-blue-large style="text-align: center;"}
+Sit back and enjoy!
+:::
+
+## Git + GitHub
+
+::: columns
+::: {.column width="50%"}
+![](images/git-icon-logo.png){fig-align="center" width="150"}
+
+::: incremental
+-   **Version Control System**
+
+-   **Local and Remote Repositories**
+
+-   **Branching and Merging**
+:::
+:::
+
+::: {.column width="50%"}
+![](images/GitHub-Symbol.png){fig-align="center" width="250"}
+
+::: incremental
+-   **Code Hosting Platform**
+
+-   **Open Source and Private Projects**
+
+-   **Community and Networking**
+:::
+:::
+:::
+
+## Git setup
+
+```{=html}
+<iframe width="1000" height="400" src="https://datavizaz.org/computing/computing-git.html" frameborder="1" style="background:white;"></iframe>
+```
+# Let's setup! {style="text-align: center;"}
+
+# Intro to Python {style="text-align: center;"}
+
+![](images/python.jpeg){fig-align="center" width="200"}
+
+## What is Python?
+
+::: incremental
+-   "Python is the second best language at everything." - **Van Lindberg**
+
+-   Versatile and popular programming language with simple syntax
+
+-   Large collection of frameworks and libraries
+
+-   Large, active community
+
+-   Widely used for web development, data analysis, artificial intelligence, scientific computing, and more.
+:::
+
+## Basic syntax and comments
+
+```{python}
+# This is a comment
+print("Hello, Python!")  # This prints a message
+```
+
+::: incremental
+-   Indentation for code blocks (instead of brackets)
+
+-   Comments start with a `#` (used to explain code)
+:::
+
+## Variables and data types
+
+```{python}
+#| eval: false
+
+# Integer
+x = 5
+
+# Float
+y = 3.14
+
+# String
+name = "Python"
+
+# Boolean
+is_easy = True
+```
+
+::: incremental
+-   Variables store data values.
+
+-   Python uses integers (whole numbers), floats (non-whole numbers), strings (text), and booleans (true/false).
+:::
+
+## Basic operations
+
+```{python}
+#| eval: false
+
+# Arithmetic Operations
+a = 10
+b = 3
+sum = a + b
+difference = a - b
+product = a * b
+quotient = a / b
+
+# Logical Operations
+is_greater = a > b
+is_equal = (a == b)
+```
+
+::: incremental
+-   Python supports various arithmetic and logical operations.
+:::
+
+## Control structures: if-else
+
+```{python}
+age = 20
+if age >= 18:
+    print("Adult")
+else:
+    print("Minor")
+```
+
+::: incremental
+-   Python uses **`if`**, **`elif`**, and **`else`** for decision-making.
+:::
+
+## Loops
+
+```{python}
+#| eval: false
+
+# For Loop
+for i in range(5):
+    print(i)
+
+# While Loop
+j = 0
+while j < 5:
+    print(j)
+    j += 1
+```
+
+::: incremental
+-   Python has two types of loops: **`for`** and **`while`**.
+:::
+
+## Lists
+
+```{python}
+#| eval: false
+
+fruits = ["apple", "banana", "cherry"]
+print(fruits[0])  # Accessing the first item
+```
+
+::: incremental
+-   Lists store multiple items in a single variable.
+-   Access elements using index (starting at 0).
+:::
+
+## Functions
+
+```{python}
+#| eval: false
+
+def greet(name):
+    return "Hello " + name
+
+print(greet("Alice"))
+```
+
+::: incremental
+-   Functions perform specific tasks.
+
+-   Call a function with its name and arguments.
+:::
+
+## Conclusion
+
+::: incremental
+-   Python is a versatile and user-friendly language.
+
+-   Ideal for beginners and widely used.
+
+-   Encourages readable and maintainable code.
+
+-   Extensive libraries and community support.
+:::

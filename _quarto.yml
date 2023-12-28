@@ -4,6 +4,7 @@ project:
   resources:
     - info523-f23-syllabus.pdf
     - ./slides
+    - ./readings
 
 website:
   page-navigation: true
@@ -75,6 +76,7 @@ website:
           - href: https://github.com/INFO523-S24/hw-01
             text: HW 01
       - section: "Student work"
+
             
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."

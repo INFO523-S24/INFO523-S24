@@ -89,6 +89,44 @@ website:
             text: Ugly plots
           - href: student-work/project-1.qmd
             text: Project 1
+      - section: "Readings"
+        contents: 
+          - href: readings/dmc_chp1.pdf
+            text: Data Mining Concept - Chp 1
+          - href: readings/dmc_chp4.pdf
+            text: Data Mining Concept - Chp 4
+          - href: readings/dmc_chp8.4.pdf
+            text: Data Mining Concept - Chp 8.4
+          - href: readings/dmc_chp11.pdf
+            text: Data Mining Concept - Chp 11
+          - href: readings/ISL_chp3.pdf
+            text: Intro to Stat Learning - Chp 3
+          - href: readings/ISL_chp4.pdf
+            text: Intro to Stat Learning - Chp 4
+          - href: readings/ISL_chp5.pdf
+            text: Intro to Stat Learning - Chp 5
+          - href: readings/ISL_chp6.pdf
+            text: Intro to Stat Learning - Chp 6
+          - href: readings/ISL_chp7.pdf
+            text: Intro to Stat Learning - Chp 7
+          - href: readings/ISL_chp8.1.pdf
+            text: Intro to Stat Learning - Chp 8.1
+          - href: readings/ISL_chp8.2.pdf
+            text: Intro to Stat Learning - Chp 8.2
+          - href: readings/ISL_chp9.pdf
+            text: Intro to Stat Learning - Chp 9 
+          - href: readings/psds_chp1.pdf
+            text: Prac Stats for Data Sci - Chp 1
+          - href: readings/psds_chp2.pdf
+            text: Prac Stats for Data Sci - Chp 2
+          - href: readings/psds_chp7.pdf
+            text: Prac Stats for Data Sci - Chp 7
+          - href: readings/pts_chp1.pdf
+            text: Prac Time Series - Chp 1
+          - href: readings/pts_chp2.pdf
+            text: Prac Time Series - Chp 2
+          - href: readings/pts_chp3.pdf
+            text: Prac Time Series - Chp 3
 
   page-footer:
     right: "This page is built with 💛 and [Quarto](https://quarto.org/)."

@@ -1,0 +1,1249 @@
+---
+title: Exploratory Data Analysis + Data Visualization
+subtitle: Lecture 3
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   HW 01 is due tonight, 11:59pm
+
+-   RQ #2 is due Feb 07, 11:59pm
+
+-   Project 01 peer-review is Feb 07, first round proposals are due before class
+
+## Setup
+
+```{python}
+#| label: setup
+#| message: false
+
+# Import all required libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+from scipy.stats import skewnorm
+from scipy.stats import kurtosis, norm
+from scipy.stats import gamma
+import missingno as msno
+import random
+import statsmodels.api as sm
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+
+# Load in UK Smoking Data
+births14 = pd.read_csv("data/births14.csv")
+
+# Set seed
+random.seed(123)
+```
+
+# Exploratory Data Analysis
+
+## What is exploratory data analysis? {.smaller}
+
+> Exploratory data analysis is a [statistical](https://en.wikipedia.org/wiki/Statistics), approach towards analyzing [data sets](https://en.wikipedia.org/wiki/Data_set) to investigate and summarize their main characteristics, often through [statistical graphics](https://en.wikipedia.org/wiki/Statistical_graphics) and other data visualization methods.
+
+## What is exploratory data analysis? {.smaller}
+
+<div>
+
+```{python}
+#| echo: false
+#| fig-align: "center"
+dataplot = births14[["fage", "gained", "weight", "mature"]]
+
+sns.set_style("white")
+
+g = sns.PairGrid(dataplot, hue = "mature", height = 2)
+g1 = g.map_upper(sns.scatterplot, alpha = 0.5, s = 100)
+g2 = g1.map_diag(sns.kdeplot, fill = True, linewidth = 3)
+g3 = g2.map_lower(sns.kdeplot, levels = 5, alpha = 0.75)
+
+plt.show()
+```
+
+</div>
+
+## Examining data {.smaller}
+
+::: panel-tabset
+## Head
+
+```{python}
+births14.head()
+```
+
+## Info
+
+```{python}
+births14.info()
+```
+
+## Describe
+
+```{python}
+births14.describe()
+```
+:::
+
+::: fragment
+**Always do these first thing after loading in data**
+:::
+
+## Group descriptive statistics {.smaller}
+
+```{python}
+# Example with the premie column
+groups = births14.groupby('premie').describe().unstack(1)
+
+# Print all rows
+print(groups.to_string())
+```
+
+## Outliers {.smaller}
+
+![](images/outliers.png){fig-align="center" width="877"}
+
+::: fragment
+> Outliers = 1.5 \* Interquartile range
+:::
+
+## Assess outliers visually {.smaller}
+
+```{python}
+#| fig-align: "center"
+
+# Change theme to "white"
+sns.set_style("white")
+
+# Boxplot of all numerical variables
+sns.boxplot(data = births14, x = 'weight', width = 0.20)
+plt.show()
+```
+
+## Find outliers {.smaller}
+
+::: panel-tabset
+## Output
+
+```{python}
+#| echo: false
+
+# Make a copy of the births14 data 
+dataCopy = births14.copy()
+
+# Select only numerical columns
+dataRed = dataCopy.select_dtypes(include = np.number)
+
+# List of numerical columns
+dataRedColsList = dataRed.columns[...]
+
+# For all values in the numerical column list from above
+for i_col in dataRedColsList:
+  # List of the values in i_col
+  dataRed_i = dataRed.loc[:,i_col]
+  
+  # Define the 25th and 75th percentiles
+  q25, q75 = round((dataRed_i.quantile(q = 0.25)), 3), round((dataRed_i.quantile(q = 0.75)), 3)
+  
+  # Define the interquartile range from the 25th and 75th percentiles defined above
+  IQR = round((q75 - q25), 3)
+  
+  # Calculate the outlier cutoff 
+  cut_off = IQR * 1.5
+  
+  # Define lower and upper cut-offs
+  lower, upper = round((q25 - cut_off), 3), round((q75 + cut_off), 3)
+  
+  # Print the values
+  print(' ')
+  
+  # For each value of i_col, print the 25th and 75th percentiles and IQR
+  print(i_col, 'q25 =', q25, 'q75 =', q75, 'IQR =', IQR)
+  
+  # Print the lower and upper cut-offs
+  print('lower, upper:', lower, upper)
+
+  # Count the number of outliers outside the (lower, upper) limits, print that value
+  print('Number of Outliers: ', dataRed_i[(dataRed_i < lower) | (dataRed_i > upper)].count())
+```
+
+## Code
+
+```{python}
+#| eval: false
+
+# Make a copy of the births14 data 
+dataCopy = births14.copy()
+
+# Select only numerical columns
+dataRed = dataCopy.select_dtypes(include = np.number)
+
+# List of numerical columns
+dataRedColsList = dataRed.columns[...]
+
+# For all values in the numerical column list from above
+for i_col in dataRedColsList:
+  # List of the values in i_col
+  dataRed_i = dataRed.loc[:,i_col]
+  
+  # Define the 25th and 75th percentiles
+  q25, q75 = round((dataRed_i.quantile(q = 0.25)), 3), round((dataRed_i.quantile(q = 0.75)), 3)
+  
+  # Define the interquartile range from the 25th and 75th percentiles defined above
+  IQR = round((q75 - q25), 3)
+  
+  # Calculate the outlier cutoff 
+  cut_off = IQR * 1.5
+  
+  # Define lower and upper cut-offs
+  lower, upper = round((q25 - cut_off), 3), round((q75 + cut_off), 3)
+  
+  # Print the values
+  print(' ')
+  
+  # For each value of i_col, print the 25th and 75th percentiles and IQR
+  print(i_col, 'q25 =', q25, 'q75 =', q75, 'IQR =', IQR)
+  
+  # Print the lower and upper cut-offs
+  print('lower, upper:', lower, upper)
+
+  # Count the number of outliers outside the (lower, upper) limits, print that value
+  print('Number of Outliers: ', dataRed_i[(dataRed_i < lower) | (dataRed_i > upper)].count())
+```
+:::
+
+::: fragment
+-   `q25`: 1/4 quartile, 25th percentile; `q75`: 3/4 quartile, 75th percentile
+
+-   `IQR`: interquartile range, $IQR = q75-q25$
+
+-   `lower`; `upper`: lower, upper limit of $1.5\times IQR$ used to calculate outliers
+:::
+
+## Remove outliers {.smaller}
+
+::: panel-tabset
+## Cleaning
+
+```{python}
+#| code-line-numbers: "1-14|2|4|6,7,8|10,11|13"
+# Select numerical columns
+numerical_cols = births14.select_dtypes(include = ['number']).columns
+
+for col in numerical_cols:
+    # Find Q1, Q3, and interquartile range (IQR) for each column
+    Q1 = births14[col].quantile(0.25)
+    Q3 = births14[col].quantile(0.75)
+    IQR = Q3 - Q1
+    # Upper and lower bounds for each column
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    # Filter out the outliers from the DataFrame
+    births14_clean = births14[(births14[col] >= lower_bound) & (births14[col] <= upper_bound)]
+```
+
+## Plot
+
+```{python}
+#| echo: false
+#| fig-align: "center"
+
+# Change theme to "white"
+sns.set_style("white")
+
+# Boxplot of all numerical variables
+sns.boxplot(data = births14_clean, x = 'weight', width = 0.20)
+plt.show()
+```
+:::
+
+::: fragment
+#### Why are there still outliers?
+:::
+
+## Missing values (`NaN`)
+
+```{python}
+# Sum of NAs in each column (should be the same, 10% of all)   
+births14.isnull().sum()
+```
+
+## Missing values (`NaN`) visually {.smaller}
+
+::: panel-tabset
+## Bar plot
+
+```{python}
+#| fig-align: "center"
+msno.bar(births14, figsize = (7, 5), fontsize = 10)
+plt.tight_layout()
+```
+
+## Matrix
+
+```{python}
+#| fig-align: "center"
+msno.matrix(births14, figsize = (7, 5), fontsize = 10)
+plt.tight_layout()
+```
+:::
+
+## Describe categorical variables {.smaller}
+
+::: panel-tabset
+## Describe
+
+```{python}
+births14.describe(exclude = [np.number])
+```
+
+## Unique levels
+
+```{python}
+#| echo: false
+# Select categorical columns
+categorical_cols = births14.select_dtypes(include = ['object', 'category']).columns
+
+# Initialize a dictionary to store results
+category_analysis = {}
+
+# Loop through each categorical column
+for col in categorical_cols:
+    counts = births14[col].value_counts()
+    proportions = births14[col].value_counts(normalize=True)
+    unique_levels = births14[col].unique()
+    
+    # Store results in dictionary
+    category_analysis[col] = {
+        'Unique Levels': unique_levels,
+        'Counts': counts,
+        'Proportions': proportions
+    }
+
+# Print results
+for col, data in category_analysis.items():
+    print(f"Analysis for {col}:\n")
+    print("Unique Levels:", data['Unique Levels'])
+    print("\nCounts:\n", data['Counts'])
+    print("\nProportions:\n", data['Proportions'])
+    print("\n" + "-"*50 + "\n")
+```
+
+## Code
+
+```{python}
+#| eval: false
+#| code-line-numbers: "1-26|2|5|8-11|14-17|21-26"
+# Select categorical columns
+categorical_cols = births14.select_dtypes(include = ['object', 'category']).columns
+
+# Initialize a dictionary to store results
+category_analysis = {}
+
+# Loop through each categorical column
+for col in categorical_cols:
+    counts = births14[col].value_counts()
+    proportions = births14[col].value_counts(normalize=True)
+    unique_levels = births14[col].unique()
+    
+    # Store results in dictionary
+    category_analysis[col] = {
+        'Unique Levels': unique_levels,
+        'Counts': counts,
+        'Proportions': proportions
+    }
+
+# Print results
+for col, data in category_analysis.items():
+    print(f"Analysis for {col}:\n")
+    print("Unique Levels:", data['Unique Levels'])
+    print("\nCounts:\n", data['Counts'])
+    print("\nProportions:\n", data['Proportions'])
+    print("\n" + "-"*50 + "\n")
+```
+:::
+
+## Conditions of normality {.smaller}
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Parameters for the normal distribution
+mu = 0  # Mean
+sigma = 1  # Standard deviation
+
+# Setting up the plot font scale
+sns.set_theme(font_scale = 1.25)
+
+# Setting seaborn style
+sns.set_style("whitegrid")
+
+# Generate a sample from a normal distribution
+data = np.random.normal(loc = mu, scale = sigma, size = 10000)
+
+# Plot the distribution using seaborn's distplot
+plt.figure(figsize = (8, 4))
+sns.histplot(data, kde = True, color = 'steelblue', bins = 30, stat = 'density', edgecolor = 'black')
+
+# Add labels and title to the plot
+plt.title('Normal Distribution')
+plt.xlabel('Value')
+plt.ylabel('Probability Density')
+
+# Show the plot
+plt.show()
+```
+
+::: fragment
+::: incremental
+-   **Histogram**: bell-shaped curve
+
+-   **Skewness**: Close to 0 for symmetry; **Kurtosis**: Close to 3 for normal "tailedness."
+
+-   **Sample Size**: Larger samples are less sensitive to non-normality.
+
+-   **Empirical Rule**: 68-95-99.7% rule (data within 1, 2, and 3 st dev. of the mean).
+:::
+:::
+
+## Skewness {.smaller}
+
+```{python}
+#| echo: false
+#| fig-align: "center"
+# Parameters for the distributions
+params = {
+    'Negative Skewness': -5,  # Negative skewness parameter for skewnorm
+    'Zero Skewness': 0,       # Zero skewness (normal distribution) for skewnorm
+    'Positive Skewness': 5    # Positive skewness parameter for skewnorm
+}
+
+# Set up the matplotlib figure and axes
+fig, axs = plt.subplots(1, 3, figsize = (10, 4))
+
+# Generate and plot the data for each type of skewness
+for ax, (label, param) in zip(axs, params.items()):
+    # Generate a skewed dataset
+    data = skewnorm.rvs(a = param, loc = 0.5, scale = 0.15, size = 1000)
+
+    # Plot the histogram of the data
+    ax.hist(data, bins = 30, density=True, color = 'steelblue', alpha = 0.6, edgecolor='black')
+    
+    # Set title and labels
+    ax.set_title(label)
+    
+# Set common labels
+fig.text(0.5, 0, 'Value', ha = 'center', va = 'center', fontsize = 16)
+fig.text(0, 0.5, 'Frequency', ha = 'center', va = 'center', rotation = 'vertical', fontsize = 16)
+
+
+# Adjust the layout
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+
+```
+
+::: fragment
+::: incremental
+-   Several definitions
+-   Sensitive to outliers
+-   Designed for one peak (*unimodal*)
+-   Mean and median are inconclusive from skew alone
+:::
+:::
+
+## Kurtosis {.smaller}
+
+```{python}
+#| echo: false
+#| fig-align: "center"
+x = np.linspace(-5, 5, 100)
+ax = plt.subplot()
+distnames = ['laplace', 'norm', 'uniform']
+
+# Create kurtosis plots
+for distname in distnames:
+    if distname == 'uniform':
+        dist = getattr(stats, distname)(loc=-2, scale=4)
+    else:
+        dist = getattr(stats, distname)
+    data = dist.rvs(size = 1000)
+    kur = kurtosis(data, fisher=True)
+    y = dist.pdf(x)
+    ax.plot(x, y, label="{}, {}".format(distname, round(kur, 3)))
+    ax.legend()
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Frequency")
+    
+# Show the plot
+plt.show()
+```
+
+::: fragment
+::: incremental
+-   Several definitions...
+-   Sensitive to outliers
+-   Designed for one peak (*unimodal*)
+:::
+:::
+
+## Q-Q plot {.smaller}
+
+```{python}
+#| echo: false
+# Define skewness parameters
+skew_params = {
+    'Negative Skew': -10,
+    'Normal Distn': 0,
+    'Positive Skew': 10
+}
+
+# Number of samples
+n_samples = 100
+
+# Generate data for each skewness parameter
+data = {skew_type: skewnorm.rvs(a = skew_param, size = n_samples) for skew_type, skew_param in skew_params.items()}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+```
+
+::: panel-tabset
+## Normal
+
+```{python}
+#| fig.width: 10
+#| fig.asp: 0.618
+#| fig-align: center
+#| echo: false
+# Change theme to "white"
+sns.set_style("white")
+
+# Q-Q plot of normal distribution
+sm.qqplot(data['Normal Distn'], line = 's')
+
+# Display the plot
+plt.show()
+```
+
+## Negative skew
+
+```{python}
+#| fig.width: 10
+#| fig.asp: 0.618
+#| fig-align: center
+#| echo: false
+# Change theme to "white"
+sns.set_style("white")
+
+# Q-Q plot of negative skew
+sm.qqplot(data['Negative Skew'], line = 's')
+
+# Display the plot
+plt.show()
+```
+
+## Positive skew
+
+```{python}
+#| fig.width: 10
+#| fig.asp: 0.618
+#| fig-align: center
+#| echo: false
+
+# Change theme to "white"
+sns.set_style("white")
+
+# Q-Q plot of positive skew
+sm.qqplot(data['Positive Skew'], line = 's')
+
+# Display the plot
+plt.show()
+```
+:::
+
+## Testing normality: data shape {.smaller}
+
+::: panel-tabset
+## One column
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: "1-24|2,5|8|11|14|17,18|21-24"
+#| fig-align: center
+
+# Change theme to "white"
+sns.set_style("white")
+
+# Make a copy of the data 
+dataCopy = births14.copy()
+
+# Remove NAs
+dataCopyFin = dataCopy.dropna()
+
+# Specify desired column
+i_col = dataCopyFin.weight
+
+# Subplots
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+# Density plot
+sns.kdeplot(i_col, linewidth = 5, ax = ax1)
+ax1.set_title('Newborn Weight Density plot')
+
+# Q-Q plot
+sm.qqplot(i_col, line='s', ax = ax2)
+ax2.set_title('Newborn Weight Q-Q plot')
+plt.tight_layout()
+plt.show()
+```
+
+::: fragment
+**Positive-skew (left-tailed)**
+:::
+
+## Multiple columns
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: "1-24|2|5,8|11,13|16,17|20,21|23,24"
+#| fig-align: center
+
+# Change theme to "white"
+sns.set_style("white")
+
+# Make a copy of the data 
+dataCopy = births14.copy()
+
+# Select only numerical columns
+dataRed = dataCopyFin.select_dtypes(include=np.number)
+
+# Fill the subplots
+for k in dataRed.columns:
+    # Create a figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+    
+    # Density plot
+    sns.kdeplot(dataRed[k], linewidth = 5, ax = ax1)
+    ax1.set_title(f'{k} Density Plot')
+    
+    # Q-Q plot
+    sm.qqplot(dataRed[k], line = 's', ax = ax2)
+    ax2.set_title(f'{k} QQ Plot')
+
+    plt.tight_layout()
+    plt.show()
+```
+:::
+
+## Conclusions
+
+::: incremental
+-   Inspect all data immediately
+
+-   Assess outliers and missing values
+
+-   Assess normality
+
+-   Make corrections as needed (**more next time**)
+:::
+
+# Exploratory plotting
+
+## Data visualization
+
+> The practice of [designing](https://en.wikipedia.org/wiki/Design "Design") and creating easy-to-communicate and easy-to-understand [graphic](https://en.wikipedia.org/wiki/Graphics "Graphics") or visual [representations](https://en.wikipedia.org/wiki/Representation_(arts) "Representation (arts)") of a large amount of complex quantitative and qualitative [data](https://en.wikipedia.org/wiki/Data "Data") and [information](https://en.wikipedia.org/wiki/Information "Information") with the help of static, dynamic or interactive visual items.
+
+::: fragment
+My definition: telling a story with your data, visually.
+:::
+
+## Why storytelling? {.smaller}
+
+::: columns
+::: {.column width="50%"}
+![](images/gilgamesh-1.png){fig-align="center" width="678"}
+:::
+
+::: {.column width="50%"}
+![](images/gilgamesh-2.jpeg){fig-align="center" width="266"}
+:::
+:::
+
+::: fragment
+::: incremental
+-   **Epic of Gilgamesh** (c. 2100 BC)
+
+-   First known "hero's journey"
+
+-   **Goal**: Apply storytelling to your visuals
+:::
+:::
+
+## **Aircraft-Wildlife Collisions**
+
+::: columns
+::: {.column width="50%"}
+<br>
+
+![](images/plane-birds.jpeg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+![](images/plane-birds-1.webp){fig-align="center" width="450"}
+:::
+:::
+
+## Aircraft-Wildlife Collisions {.smaller}
+
+```{python}
+birds = pd.read_csv("data/birds.csv")
+birds['date'] = pd.to_datetime(birds['date'])
+```
+
+::: panel-tabset
+## Head
+
+```{python}
+birds.head()
+```
+
+## Info
+
+```{python}
+birds.info()
+```
+
+## Describe
+
+```{python}
+birds.describe().round(2)
+```
+:::
+
+## [{seaborn}](https://seaborn.pydata.org/index.html)
+
+> Seaborn is a Python data visualization library based on [matplotlib](https://matplotlib.org/). It provides a high-level interface for drawing attractive and informative statistical graphics.
+
+![](images/seaborn.png){fig-align="center"}
+
+## Some data viz rules
+
+::: incremental
+-   ALWAYS make custom titles (axes, legends)
+
+-   Use color blind friendly [color palettes](https://seaborn.pydata.org/tutorial/color_palettes.html)
+
+-   Use either the `whitegrid` or `white` [themes](https://seaborn.pydata.org/tutorial/aesthetics.html)
+
+-   Don't clutter with unnecessary information
+
+-   Use annotations to aid the reader
+
+-   Use the **Golden Ratio**: 0.625, or 8in/5in
+:::
+
+# Exploratory visuals
+
+## How to choose a plot
+
+::: {style="text-align: center;"}
+```{=html}
+<iframe width="1000" height="500" src="https://www.data-to-viz.com/" frameborder="1" style="background:white;"></iframe>
+```
+:::
+
+## One Numeric Variable
+
+::: columns
+::: {.column width="50%" style="text-align: center;"}
+**Histogram**
+
+![](images/Histogram.png){fig-align="center" width="75"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Frequency Distribution
+-   Easy to Interpret
+-   Identifies Patterns
+:::
+:::
+:::
+
+::: {.column width="50%" style="text-align: center;"}
+**Density Plot**
+
+![](images/Density.png){fig-align="center" width="75"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Smooth Distribution Curve
+-   Highlights Density
+-   Comparative Analysis
+:::
+:::
+:::
+:::
+
+## Histograms {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|1,2|4,6
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.displot(data = birds, x = "speed")
+
+plt.show()
+```
+
+## Histograms: bins {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|2
+sns.displot(data = birds, x = "speed", 
+            bins = 15, height = 5, aspect = 8/5)
+
+plt.show()
+```
+
+## Density Plot {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|2
+sns.displot(data = birds, x = "speed", 
+            kind = 'kde', height = 5, aspect = 8/5)
+
+plt.show()
+```
+
+## Two Numeric Variables
+
+::: columns
+::: {.column width="50%" style="text-align: center;"}
+**Scatterplot**
+
+![](images/ScatterPlot.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Relationship Visualization
+-   Outlier Identification
+-   Pattern Recognition
+:::
+:::
+:::
+
+::: {.column width="50%" style="text-align: center;"}
+**2D Density Plot**
+
+![](images/2dDensity.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Density Distributions
+-   Combine Contour and Color
+-   Complex Data Interpretation
+:::
+:::
+:::
+:::
+
+## Scatterplots {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-5|3
+
+sns.set_theme(style = "whitegrid")
+
+sns.scatterplot(data = birds, x = "speed", y = "height")
+
+plt.show()
+```
+
+## Scatterplots - color {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|4
+
+sns.set_theme(style = "whitegrid")
+
+sns.scatterplot(data = birds, x = "speed", y = "height",
+                hue = "sky")
+
+plt.show()
+```
+
+## Scatterplots - size + color {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|4
+
+sns.set_theme(style = "whitegrid")
+
+sns.scatterplot(data = birds, x = "speed", y = "height",
+                size = "num_engs", hue = "ac_mass")
+
+plt.show()
+```
+
+## Scatterplots - linear relationships {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|1
+sns.lmplot(data = birds, x = "speed", y = "height",
+           aspect = 8/5)
+
+plt.show()
+```
+
+## Scatterplots - grouped relationships {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|1
+sns.lmplot(data = birds, x = "speed", y = "height",
+           hue = "num_engs", aspect = 8/5)
+
+plt.show()
+```
+
+## 2D Density Plots {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|2
+sns.histplot(data = birds, x = "speed", y = "height", 
+             bins = 50, pthresh = 0.1, cmap = "mako")
+
+plt.show()
+```
+
+## 2D Density plots: contours {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|1,2
+sns.kdeplot(data = birds, x = "speed", y = np.log(birds['height'] + 1), 
+             thresh = 0.1, hue = "sky", palette = "colorblind")
+
+plt.show()
+```
+
+## 2D Density plots: filled contours {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|1,2
+sns.kdeplot(data = birds, x = "speed", y = np.log(birds['height'] + 1), 
+             thresh = 0, cmap = "mako", fill = True, levels = 10)
+
+plt.show()
+```
+
+## Two Ordered Numeric Variables
+
+::: columns
+::: {.column width="50%" style="text-align: center;"}
+**Line Plot**
+
+![](images/Line.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Trend Identification
+-   Simple and Clear
+-   Comparative Analysis
+:::
+:::
+:::
+
+::: {.column width="50%" style="text-align: center;"}
+**Area Plot**
+
+![](images/Area.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Cumulative Representation
+-   Emphasizes Volume
+-   Layered Comparisons
+:::
+:::
+:::
+:::
+
+## Line Plot {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|3
+sns.set_theme(style = "whitegrid")
+
+sns.lineplot(data = birds, x = "date", y = "speed")
+
+plt.show()
+```
+
+## Line Plot: grouped lines
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-4|2
+sns.lineplot(data = birds, x = "date", y = "speed",
+             hue = "sky")
+
+plt.show()
+```
+
+## One Categorical
+
+::: columns
+::: {.column width="50%" style="text-align: center;"}
+**Barplot**
+
+![](images/Bar.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Categorical Comparison
+-   Clear Visualization
+-   Versatile Use
+:::
+:::
+:::
+
+::: {.column width="50%" style="text-align: center;"}
+**Pie Chart**
+
+![](images/Pie.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Proportional Representation
+-   Simple Interpretation
+-   Visual Appeal
+:::
+:::
+:::
+:::
+
+## Barplot {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|3
+
+sns.set_theme(style = "white")
+
+sns.countplot(data = birds, x = "sky", 
+              palette = "colorblind")
+              
+plt.show()
+```
+
+## Pie Chart {.smaller}
+
+Can't use {seaborn}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-9|1|3-5|7
+category_counts = birds['sky'].value_counts()
+
+plt.pie(category_counts, labels = category_counts.index, 
+        autopct = lambda p: f'{p:.1f}%', 
+        textprops = {'size':14})
+
+plt.axis('equal')
+
+plt.show()
+```
+
+## One Numerical + One Categorical
+
+::: columns
+::: {.column width="50%" style="text-align: center;"}
+**Boxplot**
+
+![](images/box.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Displays Quartiles
+-   Identifies Outliers
+-   Comparative Analysis
+:::
+:::
+:::
+
+::: {.column width="50%" style="text-align: center;"}
+**Violin chart**
+
+![](images/Violin.png){fig-align="center" width="100"}
+
+::: fragment
+::: {.incremental style="text-align: left;"}
+-   Density Representation
+-   Richer Data Insight
+-   Visualizes Data Spread
+:::
+:::
+:::
+:::
+
+## Boxplots {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|1|3,4
+sns.set_style("whitegrid")
+
+sns.boxplot(data = birds, x = "speed", y = "sky",
+            hue = "sky", palette = "colorblind")
+
+plt.show()
+```
+
+## Trim axes {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-8|6
+
+sns.set_style("whitegrid")
+
+p1 = sns.boxplot(data = birds, x = "speed", y = "sky",
+                 hue = "sky", palette = "colorblind")
+
+p1.set_xlim(0, 250)
+
+plt.show()
+```
+
+## Violin Plots {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|3,4
+
+sns.set_style("white")
+
+sns.violinplot(data = birds, x = "speed", y = "sky", hue = "sky",
+                    palette = "colorblind")
+               
+plt.show()
+```
+
+## Violin Plots: paired {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-10|3,5|7
+sns.set_style("white")
+
+options = ['Night', 'Day']
+
+birds_filt = birds[birds['time_of_day'].isin(options)]
+
+sns.violinplot(data = birds_filt, x = "speed", y = "sky", hue = "time_of_day",
+                    palette = "colorblind")
+               
+plt.show()
+```
+
+## Violin Plots: quartiles + split {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-7|5
+sns.set_style("white")
+
+sns.violinplot(data = birds_filt, x = "speed", y = "sky", hue = "time_of_day",
+                    palette = "colorblind",
+                    inner = "quart", split = True)
+               
+plt.show()
+```
+
+## Cleaning up our plots {.smaller}
+
+#### **My minimum expectation:**
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-11|6-9
+sns.set_style("white")
+
+g1 = sns.violinplot(data = birds_filt, x = "speed", y = "sky", hue = "time_of_day",
+                    palette = "colorblind")
+
+g1.set(xlabel = "Speed (mph)")
+g1.set(ylabel = None)
+g1.set(title = "Speed of plane collisions with birds")
+g1.legend(title = "Time of day")
+
+plt.show()
+```
+
+## Aside: Correlations {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-16|3|5|7|9,11|13,14
+sns.set_theme(style = "white")
+
+birds_num = birds.select_dtypes(include = 'number')
+
+corr = birds_num.corr()
+
+mask = np.triu(np.ones_like(corr, dtype = bool))
+
+f, ax = plt.subplots(figsize = (8, 6))
+
+cmap = sns.diverging_palette(230, 20, as_cmap = True)
+
+sns.heatmap(corr, mask = mask, cmap = cmap, vmax = 0.5, center = 0,
+            square = True, linewidths = .5, cbar_kws = {"shrink": 0.5})
+            
+plt.show()
+```
+
+## Lastly: Pairgrids {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-11|3|5-9|
+sns.set_theme(style = "white")
+
+birds_sub = birds[['ac_mass', 'height', 'speed', 'sky']]
+
+g = sns.PairGrid(birds_sub, diag_sharey = False, 
+                 height = 2, hue = "sky")
+g.map_upper(sns.scatterplot, s = 15)
+g.map_lower(sns.kdeplot)
+g.map_diag(sns.kdeplot, lw = 2)
+
+plt.show()
+```
