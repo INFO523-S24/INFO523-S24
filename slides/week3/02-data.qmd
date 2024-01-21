@@ -9,6 +9,14 @@ format: revealjs
 auto-stretch: false
 ---
 
+# Warm up
+
+## Announcements
+
+-   Project 1 teams have been created
+
+-   HW 01 is due Wednesday, Jan 31, 11:59pm
+
 # Hello data
 
 ## Setup
@@ -139,7 +147,7 @@ Source: [Lending Club](https://www.lendingclub.com/info/statistics.action)
 ## Metadata {.smaller}
 
 | Variable        | Description                                                                                                             |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------|
+|--------------|----------------------------------------------------------|
 | `loan_amount`   | Amount of the loan received, in US dollars.                                                                             |
 | `interest_rate` | Interest rate on the loan, in an annual percentage.                                                                     |
 | `term`          | The length of the loan, which is always set as a whole number of months.                                                |

@@ -546,6 +546,14 @@ plt.show()
 -   Tools for working with arrays
 :::
 
+::: fragment
+**Start with**
+
+```{bash}
+pip install numpy
+```
+:::
+
 ## Why NumPy for data mining?
 
 ::: incremental

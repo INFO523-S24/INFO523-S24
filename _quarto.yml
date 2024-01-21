@@ -2,9 +2,8 @@ project:
   type: website
   output-dir: docs
   resources:
-    - info523-f23-syllabus.pdf
-    - ./slides
-    - ./readings
+    - /slides
+    - /readings/"*.pdf"
 
 website:
   page-navigation: true
@@ -71,11 +70,26 @@ website:
           - href: computing/computing-git.qmd
             text: Setting up Git
       - section: "Projects"
+        contents: 
+          - href: project/project-1.qmd
+            text: Project 1
+          - href: project/project-2.qmd
+            text: Project 2
       - section: "Homework"
         contents:
           - href: https://github.com/INFO523-S24/hw-01
             text: HW 01
-      - section: "Student work"
+          #- href: https://github.com/INFO523-S24/hw-02
+            #text: HW 02
+          #- href: https://github.com/INFO523-S24/hw-03
+            #text: HW 03
+          #- href: https://github.com/INFO523-S24/hw-04
+            #text: HW 04
+          #- href: https://github.com/INFO523-S24/hw-05
+            #text: HW 05
+          #- href: https://github.com/INFO523-S24/hw-06
+            #text: HW 06
+      #- section: "Student work"
 
             
   page-footer:

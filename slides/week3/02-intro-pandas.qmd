@@ -9,14 +9,6 @@ format: revealjs
 auto-stretch: false
 ---
 
-# Warm up
-
-## Announcements
-
--   Project 1 teams have been created
-
--   HW 01 is due Wednesday, Jan 31, 11:59pm
-
 # Introduction to {style="text-align: center;"}
 
 ![](images/pandas.png){fig-align="center" width="618"}

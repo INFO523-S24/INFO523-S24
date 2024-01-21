@@ -5,7 +5,9 @@ title-slide-attributes:
   data-background-image: ../minedata-bg.png
   data-background-size: 600px, cover
   data-slide-number: none
-format: revealjs
+format: 
+  revealjs:
+    incremental: true
 auto-stretch: false
 ---
 
@@ -23,12 +25,20 @@ Office: Harvill 420,
 
 [gchism\@arizona.edu](mailto:gchism@arizona.edu)
 :::
+
+::: {.column width="50%"}
+### Teaching assistant
+
+Laura Dozal
+
+[lwerthmann\@arizona.edu](mailto:lwerthmann@arizona.edu)
+:::
 :::
 
 ## Timetable
 
 -   Lectures (weekly)
-    -   Wednesdays, 1:00 - 2:30 pm - Henry Koffler, RM 216
+    -   Wednesdays, 1:00 - 3:30 pm - Chemistry, RM 205
 -   Meeting dates
     -   01/10/2023 - 05/05/2023
 
@@ -190,7 +200,7 @@ This course is assessed 100% on your coursework (there is no exam). We will be a
 | Assignment                 | Type       | Value | n   | Due                                        |
 |:--------------|:--------------|:--------------|:--------------|---------------|
 | Attendance + participation | Individual | 5%    |     |                                            |
-| Reading quizzes            | Individual | 10%   | 7   | \~ Every other week                        |
+| Reading quizzes            | Individual | 10%   | 6   | \~ Every other week                        |
 | Homeworks                  | Individual | 45%   | 6   | \~ Every 2-3 weeks                         |
 | Project 1                  | Team       | 15%   | 1   | \~ Week 10 + earlier interim deadlines     |
 | Project 2                  | Team       | 25%   | 1   | \~ Finals week + earlier interim deadlines |
@@ -463,7 +473,7 @@ Sit back and enjoy!
 ## Git setup
 
 ```{=html}
-<iframe width="1000" height="400" src="https://datavizaz.org/computing/computing-git.html" frameborder="1" style="background:white;"></iframe>
+<iframe width="1000" height="400" src="https://datamineaz.org/computing/computing-git.html" frameborder="1" style="background:white;"></iframe>
 ```
 # Let's setup! {style="text-align: center;"}
 

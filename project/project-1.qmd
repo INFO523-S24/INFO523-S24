@@ -28,9 +28,10 @@ Each of the two questions you come up with should involve more than two variable
 
 ## Due dates
 
--   Proposals for peer review: due on Tuesday, February 7 at noon.
--   Revised proposals for teaching team review: due Friday, February 10 at 5pm.
--   Write-up and presentation: due Wednesday, February 22 at the **beginning** of your lab section.
+-   Proposals for peer review: due on Wednesday, February 7 at noon.
+-   Revised proposals for teaching team review: due Monday, February 12 at 5pm.
+-   Presentation: due Wednesday, February 22 at the **beginning** of class.
+-   Write-up: due Wednesday, February 22 at 11:59pm.
 
 ## Deliverables
 
@@ -47,7 +48,7 @@ Your proposal should include:
 
 #### Reviewer tasks {.unnumbered}
 
-Each team will review the proposals of two other teams. The peer review will be completed during the lab session on Wednesday, February 8. On that day teams will have access to the project repos of the two teams whose work they're reviewing. Reviews should start by cloning the team's repo, re-rendering it locally to make sure you can reproduce their work, and then adding an issue to their repo with your peer review feedback.
+Each team will review the proposals of two other teams. The peer review will be completed during the lab session on Wednesday, February 7. On that day teams will have access to the project repos of the two teams whose work they're reviewing. Reviews should start by cloning the team's repo, re-rendering it locally to make sure you can reproduce their work, and then adding an issue to their repo with your peer review feedback.
 
 The reviewer / reviewee assignments can be found below (TBD):
 

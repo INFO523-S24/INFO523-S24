@@ -33,7 +33,7 @@ Students are assumed to know the basics in computer programming (e.g., variables
 
 ## Course Format
 
-Live in-person lectures, W 1:00-3:30pm, Henry Koffler, RM 216. Attendance is mandatory.
+Live in-person lectures, W 1:00-3:30pm, Chemistry, RM 205. Attendance is mandatory.
 
 ## Course Objective
 
@@ -263,11 +263,11 @@ If there are circumstances that are having a longer-term impact on your academic
 
 ### Regrade requests
 
-#### Before hw-03 (training wheels on)
+#### Before hw-02 (training wheels on)
 
-I will regrade your homework assignments 1 and 2 once to encourage the correct format for future submissions. Your final score will be the midpoint of the first and second score (e.g., first score: 70%, second score: 100% = final score: 85%). Re-submissions must be received within 1-week of the original grade.
+I will regrade your homework assignments 1 once to encourage the correct format for future submissions. Your final score will be the midpoint of the first and second score (e.g., first score: 70%, second score: 100% = final score: 85%). Re-submissions must be received within 1-week of the original grade.
 
-#### From hw-03 and on (training wheels come off)
+#### From hw-02 and on (training wheels come off)
 
 Regrade requests must be made within one week of when the assignment is returned, and must be typed up and submitted via email to me. These will be considered if points were tallied incorrectly or if you feel your answer is correct but it was marked wrong. No regrade will be made to alter the number of points deducted for a mistake. There will be no grade changes after the second project presentations. Note that during the regrade process your score could go up or go down or not change.
 
@@ -285,7 +285,7 @@ Tutoring can be found through the UArizona [Think Tank](#0 "https://thinktank.ar
 
 Responsibility for class attendance rests with individual students. Since regular and punctual class attendance is expected, students must accept the consequences of failure to attend.
 
-However, there may be many reasons why you cannot be in class on a given day, particularly with possible extra personal and academic stress and health concerns this semester. All course lectures will be recorded and available to enrolled students after class. If you miss a lecture, make sure to watch the recording and review the material before the next class session. Overall this policy is put in place to ensure communication between team members, respect for each others' time, and also to give you a safety net in the case of illness or other reasons that keep you away from attending class.
+However, there may be many reasons why you cannot be in class on a given day, particularly with possible extra personal and academic stress and health concerns this semester. I am always available to personally catch you up from missed lectures. Please contact me directly about these additional "office hours".
 
 Note that attendance and participation is part of your grade as well.
 

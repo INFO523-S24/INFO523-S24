@@ -31,6 +31,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 import statsmodels.api as sm
@@ -38,6 +39,7 @@ import scipy.stats as stats
 from scipy.stats import gaussian_kde
 from scipy.signal import find_peaks, argrelextrema
 from scipy.stats import pearsonr
+
 
 
 # Increase font size of all Seaborn plot elements
@@ -802,7 +804,7 @@ plt.show()
 -   The data is **bimodal**, so no transformation is perfect
 :::
 
-## Aside: dealing with multimodality
+## Dealing with multimodality
 
 ::: incremental
 -   K-Means Clustering
@@ -924,6 +926,150 @@ sns.histplot(data = hfi_clean, x = "pf_score_square",
 
 plt.show()
 ```
+
+## Dimensional reduction {.smaller}
+
+> **Dimension reduction**, is the transformation of data from a high-dimensional space into a low-dimensional space so that the low-dimensional representation retains some meaningful properties of the original data, ideally close to its [intrinsic dimension](https://en.wikipedia.org/wiki/Intrinsic_dimension "Intrinsic dimension").
+
+::: fragment
+**Principal component analysis (PCA)** - Unsupervised
+
+::: incremental
+-   Maximizes variance in the dataset.
+
+-   Finds orthogonal principal components.
+
+-   Useful for feature extraction and data visualization.
+:::
+:::
+
+::: fragment
+**t-Distributed Stochastic Neighbor Embedding (t-SNE)** - Unsupervised
+
+::: incremental
+-   Preserves local structures and relationships
+
+-   Maximizes the ratio of between-class variance to within-class variance.
+
+-   Stochastic and iterative process (probabilistic), iteratively minimizing the divergence between distributions
+
+-   Ideal for complex data visualization
+:::
+:::
+
+## Dimensional reduction: applied {.smaller}
+
+::: panel-tabset
+## Data prep
+
+```{python}
+numeric_cols = hfi.select_dtypes(include = [np.number]).columns
+
+# Applying mean imputation only to numeric columns
+hfi[numeric_cols] = hfi[numeric_cols].fillna(hfi[numeric_cols].mean())
+
+features = ['pf_rol_procedural', 'pf_rol_civil', 'pf_rol_criminal', 'pf_rol', 'hf_score', 'hf_rank', 'hf_quartile']
+
+x = hfi.loc[:, features].values
+y = hfi.loc[:, 'region'].values
+x = StandardScaler().fit_transform(x)
+```
+
+## PCA: variance
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-5|1|2|3|4|5 
+pca = PCA(n_components = 2)
+principalComponents = pca.fit_transform(x)
+principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
+pca_variance_explained = pca.explained_variance_ratio_
+print("Variance explained:", pca_variance_explained, "\n", principalDf)
+```
+
+## PCA: scree plot
+
+```{python}
+#| code-fold: true
+# Combining the scatterplot of principal components with the scree plot using the correct column names
+fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 5))
+
+# Scatterplot of Principal Components
+axes[0].scatter(principalDf['principal component 1'], principalDf['principal component 2'])
+for i in range(len(pca.components_)):
+    axes[0].arrow(0, 0, pca.components_[i, 0], pca.components_[i, 1], head_width = 0.1, head_length = 0.15, fc = 'r', ec = 'r', linewidth = 2)
+    axes[0].text(pca.components_[i, 0] * 1.2, pca.components_[i, 1] * 1.2, f'Eigenvector {i+1}', color = 'r', fontsize = 12)
+axes[0].set_xlabel('Principal Component 1')
+axes[0].set_ylabel('Principal Component 2')
+axes[0].set_title('Scatterplot of Principal Components with Eigenvectors')
+axes[0].grid()
+
+# Scree Plot for PCA
+axes[1].bar(range(1, len(pca_variance_explained) + 1), pca_variance_explained, alpha = 0.6, color = 'g', label = 'Individual Explained Variance')
+axes[1].set_ylabel('Explained variance ratio')
+axes[1].set_xlabel('Principal components')
+axes[1].set_title('Scree Plot for PCA')
+axes[1].legend(loc='best')
+
+plt.tight_layout()
+plt.show()
+```
+
+## t-SNE: components
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-5|1|2|4 
+tsne = TSNE(n_components = 2, random_state = 42)
+tsne_results = tsne.fit_transform(x)
+
+tsne_df = pd.DataFrame(data = tsne_results, columns = ['tsne-2d-one', 'tsne-2d-two'])
+tsne_df
+```
+
+## t-SNE: plot
+
+```{python}
+#| code-fold: true
+tsne_df['region'] = y
+
+plt.figure(figsize = (7, 5))
+plt.scatter(tsne_df['tsne-2d-one'], tsne_df['tsne-2d-two'], c = pd.factorize(tsne_df['region'])[0], alpha=0.5)
+plt.colorbar(ticks = range(len(np.unique(y))))
+plt.xlabel('TSNE Dimension 1')
+plt.ylabel('TSNE Dimension 2')
+plt.title('t-SNE Results with Region Color Coding')
+plt.show()
+```
+:::
+
+## Dimensional reduction: what now? {.smaller}
+
+::: incremental
+1.  **Feature Selection:** Choose the most informative components.
+
+2.  **Visualization:** Graph the reduced dimensions to identify patterns.
+
+3.  **Clustering:** Group similar data points using clustering algorithms.
+
+4.  **Classification:** Predict categories using classifiers on reduced features.
+
+5.  **Model Evaluation:** Assess model performance with metrics like accuracy.
+
+6.  **Cross-Validation:** Validate model stability with cross-validation.
+
+7.  **Hyperparameter Tuning:** Optimize model settings for better performance.
+
+8.  **Model Interpretation:** Understand feature influence in the models.
+
+9.  **Ensemble Methods:** Improve predictions by combining multiple models.
+
+10. **Deployment:** Deploy the model for real-world predictions.
+
+11. **Iterative Refinement:** Refine analysis based on initial results.
+
+12. **Reporting:** Summarize findings for stakeholders.
+:::
 
 # Back to our question
 
@@ -1165,4 +1311,6 @@ How does **environmental stability** [correlate]{.underline} with **human freedo
 3.  **Normalize** the data with different units
 
 4.  **Correlations** are a good start, but **regressions** are more definitive
+
+5.  It's "as needed", ergo we didn't cover everything...
 :::

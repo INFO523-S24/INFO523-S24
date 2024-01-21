@@ -1,0 +1,113 @@
+---
+title: "Setting up Quarto"
+execute:
+  eval: false
+---
+
+## Quarto
+
+Quarto is an open-source scientific and technical publishing system built on Pandoc, the universal document converter. It is designed to create dynamic and reproducible documents, presentations, and reports. Quarto extends the functionality of Markdown by integrating with computational tools like Jupyter, R, and Python, allowing users to weave together narrative text and code in a single document. This integration enables the direct embedding of code outputs (like graphs and tables) into the final document, which is especially useful in data science and academic research.
+
+## Installing Quarto
+
+### **For all systems:**
+
+1.  **Check the newest version**: quarto.org has a great [Get Started](https://quarto.org/docs/get-started/) page
+
+    If Quarto is installed, this command in a terminal will return the version number. If not, proceed to the next steps.
+
+    ```{bash}
+    quarto -v 
+    ```
+
+2.  **Install Homebrew (if not already installed)**: Homebrew is a package manager for macOS that makes it easy to install software. In Terminal, type:
+
+    ```{bash}
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    ```
+
+3.  **Install Git via Homebrew**: After installing Homebrew, you can easily install Git with:
+
+    ```{bash}
+    brew install git
+    ```
+
+### Windows (PC)
+
+**For Windows (PC):**
+
+1.  **Download the Installer**: Go to [**Git's official website**](https://git-scm.com/) and download the Windows installer.
+
+2.  **Run the Installer**: Execute the downloaded **`.exe`** file. This will open the installation wizard.
+
+3.  **Installation Settings**: During installation, you'll be presented with several options. For most users, the default settings will be adequate. However, you can customize them based on your preferences.
+
+4.  **Finish the Installation**: Click through the rest of the setup steps, and Git will be installed.
+
+5.  **Open Git Bash or Command Prompt**: Once installed, you can use Git Bash (a Git-specific command terminal) or the regular Command Prompt to use Git.
+
+## Setting up Git
+
+### Terminal
+
+**Setting Up Git Configurations in a terminal:**
+
+1.  **Open a new terminal**: `Ctrl + Shift + N` (Windows); `Cmd + Space` to open spotlight search, type terminal and hit `return`.
+
+2.  **Set Git Configurations**: In the terminal, set your email and name which will be used for commits:
+
+    ```{bash}
+    git config --global user.name "Your Name"
+    git config --global user.email "youremail@example.com"
+    ```
+
+### VS Code
+
+**Setting Up Git Configurations in VS Code:**
+
+1.  **Open VS Code** and ensure you have the **`Git`** extension installed. By default, VS Code comes with it.
+
+2.  **Set Git Configurations**: In the terminal, set your email and name which will be used for commits:
+
+    ```{bash}
+    git config --global user.name "Your Name"
+    git config --global user.email "youremail@example.com"
+    ```
+
+**Setting Up Token-Based Authentication for GitHub:**
+
+1.  **Generate a New Token on GitHub**:
+
+    -   Go to your GitHub settings (click your profile picture in the top right \> Settings).
+
+    -   In the left sidebar, click on **`Developer settings`**.
+
+    -   Click on **`Personal access tokens`**, then **`Generate new token`**.
+
+    -   Give your token a name, set the necessary scopes (permissions). For typical Git operations, you'll need repo, workflow, and write:packages, read:packages, delete:packages (for package management), and user (for account details).
+
+    -   Click **`Generate token`** at the bottom.
+
+2.  **Copy the Generated Token**: Once generated, you'll see the token value. Make sure to copy the token now as you won't be able to view it again.
+
+3.  **(Optional) Use Token in VS Code**: When you push or pull from a GitHub repository, VS Code will prompt for authentication. Instead of your GitHub password, you'll provide the token you just generated.
+
+    If you previously saved your credentials and VS Code isn't prompting for authentication, you might need to update or remove your old credentials.
+
+4.  **For Mac**: If you're on a Mac and had previously saved your credentials in the Keychain, you can update them:
+
+    -   Open **`Keychain Access`**, which you can find with Spotlight.
+
+    -   In Keychain Access, search for **`github.com`**.
+
+    -   Find the internet password entry for **`github.com`** and edit or delete it.
+
+    -   (Optional) The next time you push/pull from VS Code, you'll be prompted for your username and the new token.
+
+5.  **For Windows**: If you're on Windows and had previously saved your credentials:
+
+    -   Go to the Control Panel \> User Accounts \> Credential Manager \> Windows Credentials.
+
+    -   Find the credentials related to GitHub and edit or remove them.
+
+    -   (Optional) The next time you push/pull from VS Code, you'll be prompted for your username and the new token.

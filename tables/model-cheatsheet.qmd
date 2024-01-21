@@ -314,7 +314,7 @@ clustering_models %>%
 
 ```
 
-## Unsupervised Learning
+## Unsupervised<br>Learning
 
 ```{r, echo=FALSE}
 # Create the tibble
@@ -417,5 +417,80 @@ association_methods %>%
   gt_theme_538()  %>%
   fmt_markdown(columns = everything())
 
+```
+
+## Model<br>Selection/<br>Validation
+
+```{r, echo=FALSE}
+# Create the tibble
+# Create the tibble for combined information
+combined_model_methods <- tibble(
+  `Technique` = c(
+    "[Accuracy](https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification)",
+    "[AUC-ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve)",
+    "[Precision](https://en.wikipedia.org/wiki/Precision_and_recall#Precision)",
+    "[Recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall)",
+    "[F1-Score](https://en.wikipedia.org/wiki/F-score)",
+    "[Cross-Validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics))",
+    "[The Validation Set Approach](https://en.wikipedia.org/wiki/Training,_validation,_and_test_sets)",
+    "[Leave-One-Out Cross-Validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation)",
+    "[k-Fold Cross-Validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)#k-fold_cross-validation)",
+    "[The Bootstrap Method](https://en.wikipedia.org/wiki/Bootstrapping_(statistics))"
+  ),
+  Strengths = c(
+    "- Simple and intuitive\n- Effective for balanced datasets",
+    "- Effective for binary classification\n- Good for imbalanced datasets",
+    "- Focuses on positive class\n- Reduces false positives",
+    "- Identifies actual positives well\n- Minimizes false negatives",
+    "- Balances precision and recall\n- Useful for imbalanced datasets",
+    "- Reduces overfitting\n- Provides robust model evaluation",
+    "- Simple and easy to implement\n- Good for initial model assessment",
+    "- Very detailed\n- Each observation used for validation exactly once",
+    "- Balances computational cost and validation accuracy\n- Suitable for various data sizes",
+    "- Good for estimating model accuracy\n- Effective for small datasets"
+  ),
+  Limitations = c(
+    "- Misleading for imbalanced datasets\n- Doesn't reflect true positives/negatives",
+    "- Can be overly optimistic in imbalanced data\n- Not threshold-specific",
+    "- Ignores false negatives\n- Not useful alone in imbalanced datasets",
+    "- Ignores false positives\n- Can be misleading if positives are rare",
+    "- May not reflect true model performance\n- Depends on balance of precision and recall",
+    "- Computationally expensive\n- May not be ideal for very large datasets",
+    "- Can lead to overfitting\n- Dependent on the split",
+    "- Computationally intensive\n- Not suitable for large datasets",
+    "- Variability in results depending on how data is divided\n- Choice of 'k' can impact results",
+    "- Results can be sensitive to outliers\n- May overestimate accuracy for small datasets"
+  ),
+  `Example Use Cases` = c(
+    "- General classification problems\n- Comparing baseline models",
+    "- Medical diagnosis classification\n- Fraud detection models",
+    "- Spam detection\n- Content moderation systems",
+    "- Disease outbreak detection\n- Recall-focused tasks",
+    "- Customer churn prediction\n- Sentiment analysis",
+    "- General model evaluation\n- Comparing multiple models",
+    "- Quick model prototyping\n- Small datasets",
+    "- Small but rich datasets\n- Highly sensitive models",
+    "- Medium-sized datasets\n- Model selection",
+    "- Small or medium-sized datasets\n- Uncertainty estimation"
+  ),
+  `Implementation` = c(
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html)",
+    "[Python](https://scikit-learn.org/stable/modules/cross_validation.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.LeaveOneOut.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)",
+    "[Python](https://scikit-learn.org/stable/modules/generated/sklearn.utils.resample.html)"
+  )
+)
+
+# Convert the tibble to a gt table with Markdown formatting
+combined_model_methods %>%
+  gt() %>%
+  gt_theme_538()  %>%
+  fmt_markdown(columns = everything())
 ```
 :::

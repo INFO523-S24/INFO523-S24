@@ -1,0 +1,1239 @@
+---
+title: Classification
+subtitle: Lecture 5
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   HW 02 is due tonight, 11:59pm
+
+-   RQ #2 is due tonight, 11:59pm
+
+## Setup {.smaller}
+
+```{python}
+#| label: setup
+#| message: false
+
+# Import all required libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.ensemble import RandomForestClassifier
+import mord as m
+import xgboost as xgb
+import tensorflow as tf
+import logging
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+import os
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+
+# Set Seaborn theme
+sns.set_theme(style = "white")
+
+# Suppress tensorflow messages and progress bars 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  
+```
+
+# Classification
+
+## Supervised machine learning {.smaller}
+
+> **Supervised learning** is a paradigm in [machine learning](https://en.wikipedia.org/wiki/Machine_learning "Machine learning") where input objects (for example, a vector of predictor variables) and a desired output value (also known as human-labeled *supervisory signal*) train a model. The training data is processed, building a function that maps new data on expected output values.
+
+::: fragment
+#### Broadly categorized into two categories
+:::
+
+::: fragment
+**Classification**
+
+-   This type of supervised learning is used when the output variable is a category, such as "spam" or "not spam", "malignant" or "benign", etc. The goal is to predict discrete labels.
+:::
+
+::: fragment
+**Regression**
+
+-   In regression, the output variable is a real value, such as "salary", "temperature", or "height". Regression is used for predicting continuous outcomes.
+:::
+
+## Classification {.smaller}
+
+#### Examples of tasks
+
+::: columns
+::: {.column width="50%"}
+::: {.fragment fragment-index="1"}
+-   Classifying tumors as benign or malignant
+
+<br>
+
+<br>
+
+<br>
+:::
+
+::: {.fragment fragment-index="2"}
+-   Classifying credit card transactions as legitimate or fraudulent
+
+<br>
+
+<br>
+
+<br>
+:::
+
+::: {.fragment fragment-index="3"}
+-   Categorizing news stories as finance, weather, entertainment, sports, etc.
+:::
+:::
+
+::: {.column width="50%"}
+::: {.fragment fragment-index="1"}
+![](images/cancer.png){fig-align="center" width="196"}
+:::
+
+::: {.fragment fragment-index="2"}
+![](images/credit-cards.jpeg){fig-align="center" width="181"}
+:::
+
+::: {.fragment fragment-index="3"}
+![](images/news.jpeg){fig-align="center" width="225"}
+:::
+:::
+:::
+
+## Question
+
+**Can we [predict high-risk credit individuals]{.underline} by their [financial traits]{.underline}?**
+
+![](images/credit-risk.jpeg){fig-align="center" width="500"}
+
+::: aside
+Source: [Lending Club](https://www.lendingclub.com/info/statistics.action)
+:::
+
+## Explore our data {.smaller}
+
+```{python}
+#| code-fold: true
+loans = pd.read_csv("data/loans.csv")
+
+# Pandas options to print everything
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+```
+
+::: panel-tabset
+## Head
+
+```{python}
+loans.head()
+```
+
+## Info
+
+```{python}
+loans.info()
+```
+
+## Describe
+
+```{python}
+loans.describe().round(3)
+```
+
+## Categories
+
+```{python}
+loans.describe(exclude = [np.number])
+```
+
+## Levels
+
+```{python}
+#| code-fold: true
+categorical_cols = loans.select_dtypes(include = ['object', 'category']).columns
+
+category_analysis = {}
+
+for col in categorical_cols:
+    counts = loans[col].value_counts()
+    proportions = loans[col].value_counts(normalize=True)
+    unique_levels = loans[col].unique()
+    
+    category_analysis[col] = {
+        'Unique Levels': unique_levels,
+        'Counts': counts,
+        'Proportions': proportions.round(3)
+    }
+
+for col, data in category_analysis.items():
+    print(f"Analysis for {col}:\n")
+    print("Unique Levels:", data['Unique Levels'])
+    print("\nCounts:\n", data['Counts'])
+    print("\nProportions:\n", data['Proportions'])
+    print("\n" + "-"*50 + "\n")
+```
+
+## Missing values
+
+```{python}
+total_rows = len(loans)
+
+missing_values = loans.isna().sum()
+missing_percentage = (missing_values / total_rows) * 100
+
+missing_data = pd.DataFrame({
+    'Missing Values': missing_values,
+    'Percentage (%)': missing_percentage
+})
+
+missing_data
+```
+
+## Outliers
+
+```{python}
+#| code-fold: true
+
+dataCopy = loans.copy()
+
+dataRed = dataCopy.select_dtypes(include = np.number)
+
+dataRedColsList = dataRed.columns[...]
+
+for i_col in dataRedColsList:
+  dataRed_i = dataRed.loc[:,i_col]
+  
+  q25, q75 = round((dataRed_i.quantile(q = 0.25)), 3), round((dataRed_i.quantile(q = 0.75)), 3)
+  
+  IQR = round((q75 - q25), 3)
+  
+  cut_off = IQR * 1.5
+  
+  lower, upper = round((q25 - cut_off), 3), round((q75 + cut_off), 3)
+  
+  print(' ')
+  
+  print(i_col, 'q25 =', q25, 'q75 =', q75, 'IQR =', IQR)
+  
+  print('lower, upper:', lower, upper)
+
+  print('Number of Outliers: ', dataRed_i[(dataRed_i < lower) | (dataRed_i > upper)].count())
+```
+:::
+
+## Dealing with missing values
+
+::: panel-tabset
+## Remove
+
+```{python}
+columns_to_remove = ['annual_income_joint', 'verification_income_joint', 'debt_to_income_joint', 'months_since_90d_late', 'months_since_last_delinq', ]
+
+loans = loans.drop(columns = columns_to_remove)
+```
+
+## Imputate
+
+```{python}
+loans['emp_title'] = loans['emp_title'].fillna('unknown')
+
+loans['emp_length'] = loans['emp_length'].fillna(loans['emp_length'].mean())
+
+loans['debt_to_income'] = loans['debt_to_income'].fillna(loans['debt_to_income'].median())
+
+loans['months_since_last_credit_inquiry'] = loans['months_since_last_credit_inquiry'].fillna(loans['months_since_last_credit_inquiry'].median())
+
+loans['num_accounts_120d_past_due'] = loans['num_accounts_120d_past_due'].fillna(0)
+
+```
+:::
+
+## Feature engineering {.smaller}
+
+**We will simplify grades to levels of risk**
+
+```{python}
+# Pandas options to print everything
+pd.set_option('display.max_rows', 20)
+
+loans['risk'] = loans['grade']
+
+low_risk = ['A', 'B']
+med_risk = ['C', 'D']
+high_risk = ['E', 'F', 'G']
+
+loans['risk'] = loans['grade'].apply(lambda x: 'Low Risk' if x in low_risk else ('Medium Risk' if x in med_risk else 'High Risk'))
+
+loans['risk'] = loans['risk'].astype('category')
+
+loans['risk'] = loans['risk'].cat.reorder_categories(['Low Risk', 'Medium Risk', 'High Risk'])
+
+loans.drop(columns = 'grade')
+```
+
+## Dimensional reduction: PCA {.smaller}
+
+::: panel-tabset
+## Application
+
+```{python}
+#| code-fold: true
+numerical_cols = loans.select_dtypes(include = ['int64', 'float64']).columns
+
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(loans[numerical_cols])
+
+pca = PCA(n_components = 0.95)
+
+reduced_data = pca.fit_transform(scaled_data)
+
+loading_scores = pd.DataFrame(pca.components_, columns = numerical_cols)
+
+threshold = 0.5
+
+def get_top_features_for_each_component(loading_scores, threshold):
+    top_features = {}
+    for i in range(loading_scores.shape[0]):
+        component = f"Component {i+1}"
+        scores = loading_scores.iloc[i]
+        top_features_for_component = scores[abs(scores) > threshold].index.tolist()
+        top_features[component] = top_features_for_component
+    return top_features
+
+top_features = get_top_features_for_each_component(loading_scores, threshold)
+
+for component, features in top_features.items():
+    print(f"{component}: {features}")
+```
+
+## Visual
+
+```{python}
+#| code-fold: true
+pca_full = PCA()
+pca_full.fit(scaled_data)
+cumulative_variance = np.cumsum(pca_full.explained_variance_ratio_)
+
+plt.figure(figsize = (8, 6))
+plt.plot(cumulative_variance)
+plt.xlabel('Number of Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.title('Scree Plot')
+plt.grid(True)
+
+inflection_point = np.argmax(cumulative_variance >= 0.95) + 1  
+plt.axvline(x=inflection_point, color='red', linestyle='--')
+plt.axhline(y=cumulative_variance[inflection_point], color='red', linestyle='--')
+plt.text(inflection_point+1, 0.5, f'Inflection Point:\n{inflection_point} Components', color = 'red')
+
+plt.show()
+```
+:::
+
+## Correlations {.smaller}
+
+::: panel-tabset
+## Correlations
+
+```{python}
+numerical_cols = loans.select_dtypes(include = ['int64', 'float64'])
+corr_matrix = numerical_cols.corr()
+
+threshold = 0.75  # This is an example threshold
+highly_correlated_pairs = [(i, j) for i in corr_matrix.columns for j in corr_matrix.columns if (i != j) and (abs(corr_matrix[i][j]) > threshold)]
+
+print("Highly correlated pairs:")
+for pair in highly_correlated_pairs:
+    print(pair)
+```
+
+## Remove columns
+
+```{python}
+columns_to_remove = [
+    'total_credit_lines',  # Redundant with open_credit_lines and other credit line features
+    'num_satisfactory_accounts',  # Likely a subset of other credit line features
+    'tax_liens',  # If num_historical_failed_to_pay is more relevant
+    'current_accounts_delinq',  # Redundant with num_accounts_30d_past_due
+    'num_total_cc_accounts',  # Redundant with num_open_cc_accounts
+    'installment',  # If loan_amount is more fundamental to the analysis
+    'balance',  # If loan_amount provides a better perspective
+    'grade',  # Sub_grade provides more detailed information
+    'paid_total',  # If paid_principal provides a better perspective
+]
+
+loans.drop(columns = columns_to_remove)
+
+loans.head()
+```
+:::
+
+## Spending our data 💰
+
+![](images/data-split.png){fig-align="center" width="789"}
+
+## Data Preparation {.smaller}
+
+```{python}
+#| code-line-numbers: 1-19|2|5-7|10,11|14|17-19
+
+# Encode categorical variables
+categorical_columns = loans.select_dtypes(include = ['object', 'category']).columns.tolist()
+
+# Encode categorical variables
+label_encoders = {col: LabelEncoder() for col in categorical_columns}
+for col in categorical_columns:
+    loans[col] = label_encoders[col].fit_transform(loans[col])
+    
+# Define features and target
+X = loans.drop('risk', axis = 1)
+y = loans['risk']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+# Reduce dimensionality to prevent overfitting
+pca = PCA(n_components = 2)
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+```
+
+## Confusion matrix
+
+![](images/confusion.jpeg){fig-align="center" width="1067"}
+
+## Aside: visualizing decision boundaries
+
+```{python}
+def decisionplot(model, X, y, resolution=216):
+    # Split the data into features (X) and the class variable (y)
+    x_min, x_max = X.iloc[:, 0].min() - 1, X.iloc[:, 0].max() + 1
+    y_min, y_max = X.iloc[:, 1].min() - 1, X.iloc[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, resolution),
+                         np.linspace(y_min, y_max, resolution))
+
+    # Predict outcomes for each point on the grid
+    if isinstance(model, LinearDiscriminantAnalysis):
+        # For LDA, we need to use the decision_function method
+        Z = model.decision_function(np.c_[xx.ravel(), yy.ravel()])
+    else:
+        Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    
+    if isinstance(model, LinearDiscriminantAnalysis):
+    # Reshape LDA decision function output appropriately
+        Z = Z.reshape(-1, 1)
+    else:
+        Z = Z.reshape(xx.shape)
+
+    # Plot the actual data points
+    plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=y, edgecolors='k', s=20)
+
+    # Overlay the decision boundary
+    plt.contourf(xx, yy, Z, alpha = 0.5)
+    
+    # Calculate the accuracy
+    predictions = model.predict(X)
+    acc = accuracy_score(y, predictions)
+    
+  
+    # Set labels for axes
+    plt.xlabel(X.columns[0])
+    plt.ylabel(X.columns[1])
+
+    plt.show()
+
+```
+
+## Logistic regression {.smaller}
+
+::: panel-tabset
+## Visual
+
+![](images/logregression.png){fig-align="center" width="926"}
+
+## Key points
+
+::: incremental
+-   **Used for Binary Classification**: Ideal for predicting binary outcomes (e.g., yes/no decisions). **But! Softmax regression** can [predict 2+ outcomes]{.underline}.
+
+-   **Estimates Probabilities**: Computes the likelihood of class membership (between 0 and 1).
+
+-   **Sigmoid Function**: Transforms linear predictions into probabilities using a logistic curve.
+
+-   **Coefficients and Odds Ratio**: Coefficients estimate the impact on the odds of the outcome.
+
+-   **Maximum Likelihood Estimation**: Optimizes the fit of the model to the data.
+
+-   **Interpretable**: The model's output is straightforward and easy to understand.
+
+-   **Linear Relationship Assumption**: Assumes a linear relationship between predictors and the log-odds of the outcome.
+
+-   **Independent Observations Required**: Each observation should be independent of others.
+:::
+:::
+
+## Logistic regression: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1|2|3|4
+log_reg = LogisticRegression(multi_class = 'multinomial', solver = 'lbfgs', max_iter = 1000, random_state = 42)
+log_reg.fit(X_train_pca, y_train)
+predictions = log_reg.predict(X_test_pca)
+print("Logistic Regression Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-6|1|2-6
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('Logistic Regression Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+#| code-fold: true
+decisionplot(log_reg, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Linear discriminant analysis {.smaller}
+
+::: panel-tabset
+## Visual
+
+::: columns
+::: {.column .fragment width="33.3%" fragment-index="1"}
+![](images/lda-1.webp){fig-align="center" width="311"}
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="2"}
+![](images/lda-2.webp){fig-align="center" width="279"}
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="3"}
+![](images/lda-3.webp){fig-align="center" width="269"}
+:::
+
+::: columns
+::: {.column .fragment width="50%" style="font-size: 3rem; text-align: center;" fragment-index="4"}
+```{=html}
+<style>
+    .mu1, .sigma1 { color: green; }
+    .mu2, .sigma2 { color: red; }
+</style>
+
+<p>
+    <span class="mu1">\(\mu_1\)</span> - <span class="mu2">\(\mu_2\)</span> / 
+    <span class="sigma1">\(\sigma_1\)</span> + <span class="sigma2">\(\sigma_2\)</span>
+</p>
+```
+:::
+
+::: {.column .fragment width="50%" fragment-index="4"}
+![](images/lda-4.webp){fig-align="center" width="300" height="31"}
+:::
+:::
+:::
+
+## Key points
+
+::: incremental
+-   **Classification**: Primarily used for finding a linear combination of features that best separates two or more classes.
+
+-   **Dimensionality Reduction**: Reduces the number of variables while preserving as much class discriminatory information as possible.
+
+-   **Assumptions**: Assumes normally distributed data, equal class covariances, and independence of features.
+
+-   **Multiclass Classification**: Effective in situations where there are more than two classes.
+
+-   **Result Interpretation**: Provides linear discriminants that act as a decision rule for classification.
+:::
+:::
+
+## Linear discriminant analysis: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+lda = LinearDiscriminantAnalysis()
+lda.fit(X_train_pca, y_train)
+predictions = lda.predict(X_test_pca)
+print("LDA Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('LDA Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+#| code-fold: true
+acc = accuracy_score(y_test, predictions).round(3)
+# Create a meshgrid for plotting
+x_min, x_max = X_test_pca[:, 0].min() - 1, X_test_pca[:, 0].max() + 1
+y_min, y_max = X_test_pca[:, 1].min() - 1, X_test_pca[:, 1].max() + 1
+xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
+
+# Predict on grid points using test data
+Z = lda.predict(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)  # Reshape to match grid shape
+
+# Plot the decision boundary
+plt.contourf(xx, yy, Z, alpha = 0.5)
+
+# Overlay data points from the test set
+plt.scatter(X_test_pca[:, 0], X_test_pca[:, 1], c=y_test, edgecolors = 'k', s = 20)
+
+# Customize plot
+plt.title(f"Decision Boundary; Training Accuracy: {acc:.2f}", fontsize = 13)
+plt.xlabel("PCA 1")
+plt.ylabel("PCA 2")
+plt.show()
+```
+:::
+
+## K-Nearest Neighbors (KNN) {.smaller}
+
+::: panel-tabset
+## Visual
+
+::: columns
+::: {.column .fragment width="50%" fragment-index="1"}
+![](images/knn-1.jpeg){fig-align="center" width="359"}
+:::
+
+::: {.column .fragment width="50%" fragment-index="2"}
+![](images/knn-2.jpeg){fig-align="center" width="359"}
+:::
+:::
+
+## Key points
+
+::: incremental
+-   **Instance-Based**: Uses the entire training set for prediction.
+
+-   **Simple Algorithm**: Classifies based on the majority class among 'k' closest neighbors.
+
+-   **Distance Metrics**: Employs Euclidean or Manhattan distance for neighbor identification.
+
+-   **Parameter 'k'**: Critical to model performance; balancing is needed.
+
+-   **No Explicit Training**: Leads to slower predictions with larger datasets.
+
+-   **Feature Scaling Needed**: Performance depends on scaled features.
+
+-   **Small Dataset Efficiency**: Ideal for small datasets, less so for large ones.
+
+-   **Versatile Use**: Applicable for both classification and regression.
+:::
+:::
+
+## K-Nearest Neighbors (KNN): applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+knn = KNeighborsClassifier(n_neighbors = 5)
+knn.fit(X_train_pca, y_train)
+predictions = knn.predict(X_test_pca)
+print("KNN Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt ='g')
+plt.title('KNN Confusion Matrix') 
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(knn, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Naive Bayes
+
+::: panel-tabset
+## Visual
+
+::: columns
+::: {.column .fragment width="33.3%" fragment-index="1"}
+![](images/naive-bayes-1.png){fig-align="center" width="256"}
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="2"}
+**Baye's Theorem** <br>
+
+$$\begin{equation}
+P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\end{equation}$$
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="3"}
+![](images/naive-bayes-3.png){fig-align="right" width="180"}
+:::
+:::
+
+## Key points
+
+::: {.incremental style="font-size: 24px"}
+-   **Probabilistic Classifier**: Calculates the probability of data belonging to a class.
+
+-   **Independence Assumption**: Assumes features are independent given the class, simplifying calculations.
+
+-   **Variants**: Includes Multinomial and Gaussian Naive Bayes for different data types.
+
+-   **Applications**: Commonly used in text classification, spam detection, and recommendation systems.
+
+-   **Fast Training**: Quick training, suitable for large datasets.
+
+-   **Laplace Smoothing**: Used to handle zero probabilities.
+
+-   **High-Dimensional Data**: Performs well in high-dimensional data.
+
+-   **Interpretable**: Provides interpretable results with class probabilities.
+
+-   **Sensitivity to Outliers**: Sensitive to outliers and irrelevant features.
+
+-   **Complex Relationships**: May not capture complex feature dependencies well.
+
+-   **Baseline Model**: Useful as a baseline for more complex classifiers.
+:::
+:::
+
+## Naive Bayes: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+gnb = GaussianNB()
+gnb.fit(X_train_pca, y_train)
+predictions = gnb.predict(X_test_pca)
+print("Naive Bayes Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt ='g')
+plt.title('Naive Bayes Confusion Matrix') 
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(gnb, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Decision trees {.smaller}
+
+::: panel-tabset
+## Visual
+
+![](images/tree.webp){fig-align="center" width="1165"}
+
+## Key points
+
+::: incremental
+-   **Hierarchical Structure**: Decision trees have a hierarchical structure with nodes, branches, and leaves.
+
+-   **Splitting Criteria**: They use criteria like Gini impurity or entropy to split data based on feature values.
+
+-   **Interpretability**: Highly interpretable due to the visual tree structure.
+
+-   **Overfitting**: Prone to overfitting, requiring techniques like pruning to mitigate.
+
+-   **Feature Importance**: Provide feature importance scores for understanding variable impact.
+
+-   **Versatility**: Applicable to various classification tasks with both categorical and numerical data.
+
+-   **Ensemble Methods**: Often used as base models in ensemble methods for improved accuracy.
+
+-   **Computational Complexity**: Can be computationally expensive for large datasets; optimized algorithms available.
+:::
+:::
+
+## Decision trees: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+dtree = DecisionTreeClassifier()
+dtree.fit(X_train_pca, y_train)
+predictions = dtree.predict(X_test_pca)
+print("Decision Tree Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('Decision Tree Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(dtree, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Random forest {.smaller}
+
+::: panel-tabset
+## Visual
+
+![](images/random-forest.png){.fragment fig-align="center" width="834" fragment-index="1"}
+
+![](images/random-forest-2.png){.fragment fig-align="center" width="816" fragment-index="2"}
+
+![](images/random-forest-3.png){.fragment fig-align="center" width="655" fragment-index="3"}
+
+## Key points
+
+::: incremental
+-   **Ensemble Method**: Combines multiple decision trees for better predictions.
+
+-   **Bagging**: Uses bootstrapped data subsets for tree training.
+
+-   **Feature Randomization**: Randomly selects features for each tree split.
+
+-   **Voting Mechanism**: Combines tree outputs via majority voting.
+
+-   **Versatile**: Works for classification and regression tasks.
+
+-   **Robust to Overfitting**: Less prone to overfitting than single trees.
+
+-   **Out-of-Bag Error**: Estimates generalization error using unused data.
+
+-   **Feature Importance**: Measures the importance of input features.
+
+-   **Parallelization**: Can be parallelized for faster training.
+
+-   **Robust to Noisy Data**: Handles noisy data and outliers well.
+
+-   **Hyperparameter Tuning**: Requires tuning for optimal performance.
+
+-   **Widely Adopted**: Used in various domains for its effectiveness.
+:::
+:::
+
+## Random Forest: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+rf_classifier = RandomForestClassifier()
+rf_classifier.fit(X_train_pca, y_train)
+predictions = rf_classifier.predict(X_test_pca)
+print("Random Forest Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('Random Forest Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(rf_classifier, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Gradient Boosting (XGBoost) {.smaller}
+
+::: panel-tabset
+## Visual
+
+::: columns
+::: {.column width="33.3%"}
+![](images/gradient-boost.png){.fragment fig-align="center" width="219" fragment-index="1"}
+:::
+
+::: {.column width="33.3%"}
+![](images/gradient-boost-2.png){.fragment fig-align="center" width="295" fragment-index="2"}
+:::
+
+::: {.column width="33.3%"}
+![](images/gradient-boost-3.png){.fragment fig-align="left" width="167" fragment-index="3"}
+:::
+:::
+
+## Key points
+
+::: incremental
+-   **Gradient Boosting:** algorithm for classification and regression tasks.
+
+-   **Ensemble Learning:** It combines multiple decision trees to create a robust predictive model.
+
+-   **Sequential Trees:** Builds decision trees sequentially to correct errors from previous ones.
+
+-   **Feature Importance:** Provides feature importance scores for identifying influential features.
+
+-   **Handling Missing Data:** Offers built-in support for managing missing data.
+
+-   **Parallel & Distributed:** Efficiently parallelized and distributed for scalability.
+
+-   **Speed & Efficiency:** Known for its speed due to tree pruning and histogram-based algorithms.
+
+-   **Custom Objectives:** Allows defining custom objective functions for specific problems.
+
+-   **Applications:** Used in predictive modeling, NLP, recommendation systems, and more.
+:::
+:::
+
+## Gradient Boost (XGBoost): applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-4|1
+xgb_model = xgb.XGBClassifier()
+xgb_model.fit(X_train_pca, y_train)
+predictions = xgb_model.predict(X_test_pca)
+print("XGBoost Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('XGBoost Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(xgb_model, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Neural Networks {.smaller}
+
+::: panel-tabset
+## Visual
+
+![](images/nn.gif){fig-align="center"}
+
+## Key points
+
+::: incremental
+-   **Layers & Neurons:** Interconnected nodes in layers.
+
+-   **Weights & Activation:** Neurons use weights and activations.
+
+-   **Forward & Backward:** Data flows in both directions.
+
+-   **Deep Architectures:** Many hidden layers for complexity.
+
+-   **Training Data:** Requires abundant labeled data.
+
+-   **Loss Functions:** Measure prediction errors.
+
+-   **Backpropagation:** Adjusts weights using errors.
+
+-   **Hyperparameters:** Tuning for model performance.
+
+-   **Overfitting:** Risk with complex models, mitigated by regularization.
+
+-   **GPU Acceleration:** Faster training with GPUs.
+
+-   **Transfer Learning:** Reusing pre-trained models.
+
+-   **Interpretability:** Limited in complex models.
+
+-   **Applications:** Image, NLP, autonomous systems.
+:::
+:::
+
+## Neural Networks: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-10|1-5
+model = Sequential()
+model.add(Dense(10, input_dim = X_train_pca.shape[1], activation = 'relu'))
+model.add(Dense(1, activation = 'sigmoid'))
+
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+model.fit(X_train_pca, y_train, epochs = 100, batch_size = 10, verbose=0)
+
+nn_predictions = model.predict(X_test_pca)
+nn_predictions = np.round(nn_predictions).flatten()
+print("Neural Network Accuracy:", accuracy_score(y_test, nn_predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, nn_predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('Neural Network Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+#| eval: false
+decisionplot(model, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+
+![](images/nn-plot.png){fig-align="left" width="825"}
+:::
+
+## Conclusions: question
+
+**Can we [predict high-risk credit individuals]{.underline} by their [financial traits]{.underline}?**
+
+::: fragment
+Not with the reduced dataset...
+:::
+
+## However...
+
+![](images/credit-risk.jpeg){fig-align="center" width="1200"}
+
+::: fragment
+What type of category is credit risk?
+:::
+
+## Feature engineering (ordinal) {.smaller}
+
+```{python}
+#| code-line-numbers: 1-11|7,8
+loans['risk'] = loans['grade']
+
+low_risk = ['A', 'B']
+med_risk = ['C', 'D']
+high_risk = ['E', 'F', 'G']
+
+loans['risk'] = loans['grade'].apply(lambda x: 'Low Risk' if x in low_risk else ('Medium Risk' if x in med_risk else 'High Risk'))
+
+risk_mapping = {'Low Risk': 1, 'Medium Risk': 2, 'High Risk': 3}
+loans['risk'] = loans['risk'].map(risk_mapping)
+
+loans.drop(columns = 'grade')
+```
+
+## Ordinal logistic regression {.smaller}
+
+::: incremental
+1.  **Dependent Variable**: It is used when the response variable is ordinal, meaning the categories have a natural order (e.g., 'poor' to 'excellent' ratings).
+
+2.  **Proportional Odds Assumption**: Assumes that the odds of being in a higher category versus all lower categories are the same across each threshold of the dependent variable.
+
+3.  **Cumulative Probabilities**: Models the probability of the response variable being in a certain category or a lower one, rather than modeling each category individually.
+
+4.  **Coefficients Interpretation**: Coefficients indicate the change in the log odds of being in a higher category for a one-unit increase in the predictor, holding other variables constant.
+
+5.  **Model Diagnostics**: Important to assess the proportional odds assumption and model fit using diagnostics like likelihood ratio tests or pseudo R-squared values.
+
+6.  **Applications**: Widely used in fields like social sciences and medical research for analyzing ordinal data.
+:::
+
+## Ordinal logistic regression: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+#| code-line-numbers: 1-5|1,2
+ord_log_reg = m.LogisticAT(alpha = 1)  
+ord_log_reg.fit(X_train_pca, y_train)
+
+ordinal_predictions = ord_log_reg.predict(X_test_pca)
+print("Ordinal Logistic Regression Accuracy:", accuracy_score(y_test, ordinal_predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, ordinal_predictions)
+sns.heatmap(cm, annot=True, fmt='g')
+plt.title('Ordinal Logistic Regression Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+#| code-fold: true
+decisionplot(ord_log_reg, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## K-Nearest Neighbors (KNN): applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+knn = KNeighborsClassifier(n_neighbors = 5)
+knn.fit(X_train_pca, y_train)
+predictions = knn.predict(X_test_pca)
+print("KNN Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt ='g')
+plt.title('KNN Confusion Matrix') 
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(knn, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Decision trees: applied {.smaller}
+
+::: panel-tabset
+## Accuracy
+
+```{python}
+dtree = DecisionTreeClassifier()
+dtree.fit(X_train_pca, y_train)
+predictions = dtree.predict(X_test_pca)
+print("Decision Tree Accuracy:", accuracy_score(y_test, predictions).round(3))
+```
+
+## Confusion matrix
+
+```{python}
+#| code-fold: true
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot = True, fmt = 'g')
+plt.title('Decision Tree Confusion Matrix')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
+```
+
+## Decision boundary
+
+```{python}
+decisionplot(dtree, pd.DataFrame(X_train_pca, columns = ['PC1', 'PC2']), y_train)
+plt.show()
+```
+:::
+
+## Conclusions ...cont
+
+-   Similar performance as nominal models
+
+-   ...BUT **Ordinal Logistic Regression** performed best, and better than the nominal model.

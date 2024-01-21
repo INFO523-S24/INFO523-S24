@@ -1,0 +1,227 @@
+---
+title: Model Evaluation
+subtitle: Lecture 6
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   HW 03 is due today, 11:59pm
+
+-   RQ #3 is due today, 11:59pm
+
+-   Spring break next week!
+
+-   Project 1 Presentations are on March 13th, 1pm
+
+## Setup {.smaller}
+
+```{python}
+#| label: setup
+#| message: false
+
+# Import all required libraries
+# Data handling and manipulation
+import pandas as pd
+import numpy as np
+
+# Machine learning models
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.decomposition import PCA
+import mord as m
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+
+# Model evaluation and validation methods
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
+from sklearn.model_selection import LeaveOneOut
+from sklearn.model_selection import cross_val_score
+from sklearn.utils import resample
+
+# Metrics for model evaluation
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import confusion_matrix
+
+# Utility for data preprocessing
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import label_binarize
+
+# For advanced visualizations
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+
+# Set Seaborn theme
+sns.set_theme(style = "white")
+```
+
+# Regressions
+
+## Linear regression {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+students = {'hours': [29, 9, 10, 38, 16, 26, 50, 10, 30, 33, 43, 2, 39, 15, 44, 29, 41, 15, 24, 50],
+            'test_results': [65, 7, 8, 76, 23, 56, 100, 3, 74, 48, 73, 0, 62, 37, 74, 40, 90, 42, 58, 100]}
+
+student_data = pd.DataFrame(data=students)
+x = student_data.hours
+y = student_data.test_results
+model = np.polyfit(x, y, 1)
+predict = np.poly1d(model)
+hours_studied = 20
+predict(hours_studied)
+x_lin_reg = range(0, 51)
+y_lin_reg = predict(x_lin_reg)
+plt.scatter(x, y)
+plt.plot(x_lin_reg, y_lin_reg, c = 'r')
+```
+
+## Definition
+
+**Objective**: Minimize the sum of squared differences between observed and predicted.
+
+**Model structure:**
+
+$Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$
+
+::: incremental
+-   $Y_i$: Dependent/response variable
+
+-   $X_i$: Independent/predictor variable
+
+-   $\beta_0$: y-intercept
+
+-   $\beta_1$: Slope
+
+-   $\epsilon_i$: Random error term, deviation of the real value from predicted
+:::
+
+## Key points
+
+::: incremental
+1.  **Assumptions**: Linearity, independent residuals, constant variance (homoscedasticity), and normally distributed residuals.
+
+2.  **Goodness of Fit**: Assessed by $R^2$, the proportion of variance in $Y$ explained by $X$.
+
+3.  **Statistical Significance**: Tested by t-tests on the coefficients.
+
+4.  **Confidence Intervals**: Provide a range for the estimated coefficients.
+
+5.  **Predictions**: Use the model to predict $Y$ for new $X$ values.
+
+6.  **Diagnostics**: Check residuals for model assumption violations.
+
+7.  **Sensitivity**: Influenced by outliers which can skew the model.
+
+8.  **Applications**: Used across various fields for predictive modeling and data analysis.
+:::
+
+## 
+:::
+
+## Assumptions {.smaller}
+
+::: columns
+::: {.column .fragment width="33.3%" fragment-index="1"}
+**Linearity**
+
+(Linear relationship between Y \~ X)
+
+![](images/assumptions1.png)
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="2"}
+**Homoscedasticity**
+
+(Equal variance among variables)
+
+![](images/assumptions2.png)
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="3"}
+**Multivartiate Normality**
+
+(Normally distributed residuals)
+
+![](images/assumptions3.png)
+:::
+:::
+
+::: columns
+::: {.column .fragment width="33.3%" fragment-index="4"}
+**Independence**
+
+(Observations are independent)
+
+![](images/assumptions4.png)
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="5"}
+**Lack of Multicollinearity**
+
+(Predictors are not correlated)
+
+![](images/assumptions5.png)
+:::
+
+::: {.column .fragment width="33.3%" fragment-index="6"}
+**Outlier check**
+
+(Technically not an assumption)
+
+![](images/assumptions6.png)
+:::
+:::
+
+## Ordinary Least Squares (OLS) {.smaller}
+
+::: columns
+::: {.column .fragment width="50%" fragment-index="1"}
+![](images/error-in-machine-learning-ols.webp)
+:::
+
+::: {.column .fragment width="50%" fragment-index="2"}
+![](images/error-ordinary-least-squares-ols.webp)
+:::
+:::
+
+::: {.fragment fragment-index="3"}
+$\displaystyle y_{i}=\beta_{1} x{i_1}+\beta_{2} x{i_2}+\cdots +\beta_{p} x{i_p}+\varepsilon _{i}$
+
+::: incremental
+1.  $y_i$: Dependent variable for the $i$-th observation.
+2.  $\beta_1, \beta_2, …, \beta_p$: Coefficients representing the impact of each independent variable.
+3.  $x_{i1}, ​x_{i1},…, x_{ip}$: Independent variables for the $i$-th observation.
+4.  $\epsilon_i$​: Error term for the $i$-th observation, indicating unexplained variance.
+:::
+:::
+
+## Our data
