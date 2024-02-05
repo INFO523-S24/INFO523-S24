@@ -77,17 +77,17 @@ website:
             text: Project 2
       - section: "Homework"
         contents:
-          - href: https://github.com/INFO523-S24/hw-01
+          - href: homework/hw-01.qmd
             text: HW 01
-          #- href: https://github.com/INFO523-S24/hw-02
-            #text: HW 02
-          #- href: https://github.com/INFO523-S24/hw-03
+          - href: homework/hw-02.qmd
+            text: HW 02
+          #- href: homework/hw-03.qmd
             #text: HW 03
-          #- href: https://github.com/INFO523-S24/hw-04
+          #- href: homework/hw-04.qmd
             #text: HW 04
-          #- href: https://github.com/INFO523-S24/hw-05
+          #- href: homework/hw-05.qmd
             #text: HW 05
-          #- href: https://github.com/INFO523-S24/hw-06
+          #- href: homework/hw-06.qmd
             #text: HW 06
       #- section: "Student work"
 

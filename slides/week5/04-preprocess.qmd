@@ -19,6 +19,17 @@ auto-stretch: false
 
 -   Project 01 peer-review is Feb 07, first round proposals are due before class
 
+## HW 1 lessons learned 
+
+::: incremental
+1.  **Start early**. No late work exceptions will be made in the future
+2.  **Ask your peers**. I have been monopolized by a few individuals, which is not fair to the rest.
+    1.  Peers will likely have the answer
+    2.  Peers will likely get to the question before I will.
+3.  **Ask descriptive questions**. See [this page](https://datamineaz.org/course-support.html#how-to-ask-for-help) on asking effective questions.
+4.  **Please respect my work hours**. I will no longer reply to messages after 5pm on work days and at all on weekends.
+:::
+
 ## Setup
 
 ```{python}

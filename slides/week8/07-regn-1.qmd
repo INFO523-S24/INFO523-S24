@@ -1,6 +1,6 @@
 ---
-title: Model Evaluation
-subtitle: Lecture 6
+title: Regressions I
+subtitle: Lecture 7
 title-slide-attributes:
   data-background-image: ../minedata-bg.png
   data-background-size: 600px, cover
@@ -32,41 +32,19 @@ auto-stretch: false
 import pandas as pd
 import numpy as np
 
-# Machine learning models
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.decomposition import PCA
-import mord as m
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-
-
-# Model evaluation and validation methods
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
-from sklearn.model_selection import LeaveOneOut
-from sklearn.model_selection import cross_val_score
-from sklearn.utils import resample
-
-# Metrics for model evaluation
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import confusion_matrix
-
-# Utility for data preprocessing
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import label_binarize
+# Implementing and selecting models
+import statsmodels.api as sm
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
+from itertools import combinations
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
 
 # For advanced visualizations
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+# Show computation time
+import time
 
 # Increase font size of all Seaborn plot elements
 sns.set(font_scale = 1.25)
@@ -84,10 +62,6 @@ sns.set_theme(style = "white")
 
 ```{python}
 #| echo: false
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-
 students = {'hours': [29, 9, 10, 38, 16, 26, 50, 10, 30, 33, 43, 2, 39, 15, 44, 29, 41, 15, 24, 50],
             'test_results': [65, 7, 8, 76, 23, 56, 100, 3, 74, 48, 73, 0, 62, 37, 74, 40, 90, 42, 58, 100]}
 
@@ -224,4 +198,1144 @@ $\displaystyle y_{i}=\beta_{1} x{i_1}+\beta_{2} x{i_2}+\cdots +\beta_{p} x{i_
 :::
 :::
 
-## Our data
+## Assessing accuracy of coefficients {.smaller}
+
+**Two major methods**:
+
+::: incremental
+1.  **Standard errors (SE)**:
+
+-   Indicate the precision of coefficient estimates; smaller values suggest more precise estimates.
+
+-   Formula: $\sigma_{\bar{x}} \approx \frac{\sigma_x}{\sqrt{n}}$
+
+2.  **Confidence Intervals**:
+
+-   Ranges constructed from standard errors that indicate where the true coefficient is likely to fall, typically at a 95% confidence level.
+
+-   Derived from same method as **p-values**
+:::
+
+## Assessing accuracy of model {.smaller}
+
+::: panel-tabset
+## Overview
+
+::: {.fragment fragment-index="1"}
+**Three major methods**:
+
+1.  **Mean square error (MSE)**: MSE of a **predictor** is calculated as the average of the squares of the errors, where the error is the difference between the actual value and the predicted value.
+2.  **R-squared (**$R^2$**)**: Proportion of variance in the dependent variable explained by the model; closer to 1 indicates a better fit.
+3.  **Adjusted R-squared (**$R^2_{adj}$**)**: Modified R² that accounts for the number of predictors; useful for comparing models with different numbers of independent variables.
+4.  **Residual plots**: Visual check for randomness in residuals; patterns may indicate model issues like non-linearity or heteroscedasticity.
+:::
+
+## MSE
+
+> In [statistics](https://en.wikipedia.org/wiki/Statistics "Statistics"), the mean squared error (MSE) or mean squared deviation (MSD) of an [estimator](https://en.wikipedia.org/wiki/Estimator "Estimator") measures the [average](https://en.wikipedia.org/wiki/Expected_value "Expected value") of the squares of the [errors](https://en.wikipedia.org/wiki/Error_(statistics) "Error (statistics)")---that is, the average squared difference between the estimated values and the actual value. The MSE either assesses the quality of a [***predictor***](https://en.wikipedia.org/wiki/Predictor_(statistics) "Predictor (statistics)")or of an [*estimator*](https://en.wikipedia.org/wiki/Estimator "Estimator")*.*
+
+::: {.fragment fragment-index="2"}
+**Predictor**
+
+$MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$
+
+-   $y_i$: the actual values
+
+-   $\hat{y}_i$: the predicted values
+
+-   $n$: sample size
+:::
+
+## R-squared
+
+::: {.fragment fragment-index="3"}
+Define the [residuals](https://en.wikipedia.org/wiki/Residuals_(statistics) "Residuals (statistics)") as $e_i = y_i − f_i$(forming a vector $e$).
+:::
+
+::: {.fragment fragment-index="4"}
+If $\bar{y}$ is the observed mean:
+
+$\bar{y}=\frac{1}{n} \sum_{i=1}^{n}y_i$
+:::
+
+::: {.fragment fragment-index="5"}
+then the variability of the data set can be measured with two [sums of squares](https://en.wikipedia.org/wiki/Mean_squared_error "Mean squared error") (SS) formulas:
+:::
+
+::: {.fragment fragment-index="5"}
+[**Residual SS**](https://en.wikipedia.org/wiki/Residual_sum_of_squares):
+:::
+
+::: {.fragment fragment-index="6"}
+$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$
+:::
+
+::: {.fragment fragment-index="5"}
+[**Total SS**](https://en.wikipedia.org/wiki/Total_sum_of_squares):
+:::
+
+::: {.fragment fragment-index="6"}
+$TSS = \sum_{i=1}^{n} (y_i - \bar{y})^2$
+:::
+
+::: {.fragment fragment-index="7"}
+**R-squared**:
+
+$R^2 = 1 - \frac{RSS}{TSS}$
+:::
+
+## Adjusted R-squared
+
+::: {.fragment fragment-index="8"}
+**Formula** $R^2 = 1 - \frac{RSS / df_{res}}{TSS / df_{tot}}$
+:::
+
+::: {.fragment fragment-index="9"}
+**Key points**:
+
+::: incremental
+-   **Penalizes Complexity**: Adjusts for the number of terms in the model, penalizing the addition of irrelevant predictors.
+
+-   **Comparability**: More reliable than R-squared for comparing models with different numbers of independent variables.
+
+-   **Value Range**: Can be negative if the model is worse than using just the mean of the dependent variable, whereas R-squared is always between 0 and 1.
+:::
+:::
+
+::: incremental
+-   $df_{res}$: [degrees of freedom](https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)) of the estimate of the population variance around the model
+-   $df_{tot}$: degrees of freedom of the estimate of the population variance around the mean
+:::
+
+## Residual plots
+
+```{python}
+#| echo: false
+# Simulating data
+np.random.seed(0)
+X = np.random.rand(100, 1) * 10  # Random values for X
+y = 3 * X.squeeze() + np.random.randn(100) * 2  # Linear relationship with noise for Y
+
+# Fitting a linear regression model
+model = LinearRegression()
+model.fit(X, y)
+
+# Predicting values
+y_pred = model.predict(X)
+
+# Calculating residuals
+residuals = y - y_pred
+
+# Creating residual plot using seaborn
+plt.figure(figsize = (8, 6))
+sns.residplot(x = y_pred, y = residuals, scatter_kws = {'alpha':0.5})
+plt.xlabel('Predicted Values')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.show()
+```
+:::
+
+## Our data {.smaller}
+
+::: panel-tabset
+## Read
+
+```{python}
+elmhurst = pd.read_csv("data/elmhurst.csv")
+```
+
+## Info
+
+```{python}
+elmhurst.info()
+```
+
+## Describe
+
+```{python}
+elmhurst.describe()
+```
+
+## Plot
+
+```{python}
+sns.scatterplot(data = elmhurst, x = "family_income", y = "gift_aid")
+plt.xlabel("Family income ($)")
+plt.ylabel("Gift aid from university ($)")
+plt.show()
+```
+:::
+
+## OLS regression: applied {.smaller}
+
+::: panel-tabset
+## Model summary
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: "|1,2|4|5|7|9"
+X = elmhurst['family_income']  # Independent variable
+y = elmhurst['gift_aid']  # Dependent variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+X_train_with_const = sm.add_constant(X_train)
+
+model = sm.OLS(y_train, X_train_with_const).fit()
+
+model_summary2 = model.summary2()
+print(model_summary2)
+```
+
+## Residual plot
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: "|1|2|3|5-9"
+X_test_with_const = sm.add_constant(X_test)
+predictions = model.predict(X_test_with_const)
+residuals = y_test - predictions
+
+sns.residplot(x = predictions, y = residuals)
+plt.xlabel('Predicted Values')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.show()
+```
+
+## Regression fit plot
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: "|1|3,4|5|7-11"
+plt.scatter(X_test, y_test, label = 'Data')
+
+line_x = np.linspace(X_test.min(), X_test.max(), 100)
+line_y = model.predict(sm.add_constant(line_x))
+plt.plot(line_x, line_y, color = 'red', label = 'OLS Regression Line')
+
+plt.xlabel("Family income ($)")
+plt.ylabel("Gift aid from university ($)")
+plt.title('OLS Regression Fit')
+plt.legend()
+plt.show()
+```
+:::
+
+# Multiple regression
+
+## Multiple regression
+
+::: panel-tabset
+## Visual
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+# Generating synthetic data
+np.random.seed(0)
+X1 = np.random.randn(100)
+X2 = np.random.randn(100)
+Y = 2 * X1 + 3 * X2 + np.random.randn(100)  # Y depends on X1 and X2
+
+# Creating a DataFrame
+df = pd.DataFrame({'X1': X1, 'X2': X2, 'Y': Y})
+
+# Create an interaction term
+df['X1_X2'] = df['X1'] * df['X2']
+
+# Creating the first plot for pairwise relationships
+sns.pairplot(df[['X1', 'X2', 'Y']], kind='reg', height=1.75)
+plt.suptitle('Pairwise Relationships', y=1.02)
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+sns.lmplot(x='X1_X2', y='Y', data=df)
+plt.xlabel('X1 * X2 (Interaction Term)')
+plt.ylabel('Y')
+plt.title('Interaction Effect of X1 and X2 on Y')
+plt.show()
+```
+:::
+:::
+
+## Key points
+
+::: incremental
+1.  **Multiple Predictors**: more than one predictor variable to predict a response variable.
+
+2.  **Model Form**: $Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$ , where $Y$ is the response variable, $X_1, X_2,...,X_n$ are predictor variables, $\beta$s are coefficients, and $\epsilon$ is the error term.
+
+3.  **Coefficient Interpretation**: Each coefficient represents the change in the response variable for one unit change in the predictor, holding other predictors constant.
+
+4.  **Assumptions**: Includes linearity, no perfect multicollinearity, homoscedasticity, independence of errors, and normality of residuals.
+
+5.  **Adjusted R-squared**: Used to determine the model's explanatory power, adjusting for the number of predictors.
+
+6.  **Multicollinearity Concerns**: High correlation between predictor variables can distort the model and make coefficient estimates unreliable.
+
+7.  **Interaction Effects**: Can be included to see if the effect of one predictor on the response variable depends on another predictor.
+:::
+:::
+
+## Our data {.smaller}
+
+::: panel-tabset
+## Question
+
+How do factors like debt-to-income ratio, bankruptcy history, and loan term affect the interest rate of a loan?
+
+![](images/credit-risk.jpeg){fig-align="center" width="1000"}
+
+## Read + examine
+
+```{python}
+loans = pd.read_csv("data/loans.csv")
+loans.head()
+```
+
+## Relevant variables
+
+| **Variable**      | **Description**                                                                                                                                                                    |
+|:------------------------|:----------------------------------------------|
+| `interest_rate`   | Interest rate on the loan, in an annual percentage.                                                                                                                                |
+| `verified_income` | Borrower's income verification: `Verified`, `Source Verified`, and `Not Verified`.                                                                                                 |
+| `debt_to_income`  | Debt-to-income ratio, which is the percentage of total debt of the borrower divided by their total income.                                                                         |
+| `credit_util`     | The fraction of available credit utilized.                                                                                                                                         |
+| `bankruptcy`      | An indicator variable for whether the borrower has a past bankruptcy in their record. This variable takes a value of `1` if the answer is **yes** and `0` if the answer is **no**. |
+| `term`            | The length of the loan, in months.                                                                                                                                                 |
+| `issue_month`     | The month and year the loan was issued.                                                                                                                                            |
+| `credit_checks`   | Number of credit checks in the last 12 months.                                                                                                                                     |
+
+## Info
+
+```{python}
+loans.info()
+```
+
+## Describe
+
+```{python}
+loans.describe()
+```
+
+## Plot
+
+```{python}
+#| code-fold: true
+sns.scatterplot(data = loans, x = "debt_to_income", y = "interest_rate", hue = "loan_purpose")
+plt.xlabel("Annual income ($)")
+plt.ylabel("Loan interest rate (%)")
+plt.legend(title = "Loan purpose")
+plt.show()
+```
+:::
+
+## Our data: preprocessed
+
+```{python}
+loans['credit_util'] = loans['total_credit_utilized'] / loans['total_credit_limit']
+loans['bankruptcy'] = (loans['public_record_bankrupt'] != 0).astype(int)
+loans['verified_income'] = loans['verified_income'].astype('category').cat.remove_unused_categories()
+loans = loans.rename(columns = {'inquiries_last_12m': 'credit_checks'})
+
+loans = loans[['interest_rate', 'verified_income', 'debt_to_income', 'credit_util', 'bankruptcy', 'term', 'credit_checks', 'issue_month']]
+```
+
+## Multiple regression: applied {.smaller}
+
+::: panel-tabset
+## Model summary
+
+```{python}
+#| code-fold: true
+X = loans[['verified_income', 'debt_to_income', 'credit_util', 'bankruptcy', 'term', 'credit_checks', 'issue_month']]  
+y = loans['interest_rate']  
+X = pd.get_dummies(X, columns = ['verified_income', 'issue_month'], drop_first = True)
+X.fillna(0, inplace=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+X_train_with_const = sm.add_constant(X_train)
+X_test_with_const = sm.add_constant(X_test)
+
+X_train_with_const = X_train_with_const.astype(int)
+X_test_with_const = X_test_with_const.astype(int)
+
+model = sm.OLS(y_train, X_train_with_const).fit()
+
+model_summary2 = model.summary2()
+print(model_summary2)
+```
+
+## Coefficients
+
+```{=tex}
+\begin{aligned}
+\widehat{\texttt{interest\_rate}} &= b_0 \\
+&+ b_1 \times \texttt{verified\_income}_{\texttt{Source Verified}} \\
+&+ b_2 \times \texttt{verified\_income}_{\texttt{Verified}} \\
+&+ b_3 \times \texttt{debt\_to\_income} \\
+&+ b_4 \times \texttt{credit\_util} \\
+&+ b_5 \times \texttt{bankruptcy} \\
+&+ b_6 \times \texttt{term} \\
+&+ b_9 \times \texttt{credit\_checks} \\
+&+ b_7 \times \texttt{issue\_month}_{\texttt{Jan-2018}} \\
+&+ b_8 \times \texttt{issue\_month}_{\texttt{Mar-2018}}
+\end{aligned}
+```
+## Residual plot
+
+```{python}
+#| code-fold: true
+X_test_with_const = sm.add_constant(X_test)
+predictions = model.predict(X_test_with_const)
+predictions = pd.to_numeric(predictions, errors='coerce')
+residuals = y_test - predictions
+residuals = pd.to_numeric(residuals, errors='coerce').fillna(0)
+
+# Plotting the residuals
+sns.residplot(x = predictions, y = residuals)
+plt.xlabel('Predicted Values')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.show()
+```
+
+## Regression fit
+
+```{python}
+#| code-fold: true
+plt.scatter(predictions, y_test, label = 'Data')
+plt.plot(y_test, y_test, color = 'red', label = 'Ideal Fit')  
+
+plt.xlabel('Predicted Interest Rate')
+plt.ylabel('Actual Interest Rate')
+plt.title('Multiple Regression Fit')
+plt.legend()
+plt.show()
+```
+:::
+
+## Model optimization {.smaller}
+
+::: panel-tabset
+## Overview
+
+**Three major methods**:
+
+::: incremental
+1.  **AIC (Akaike Information Criterion)**: a measure of the relative quality of a statistical model for a given set of data. **Lower** and **fewer parameters = better**.
+    -   $AIC=2k−2\ln(L)$, where $k$ is the number of parameters, and $L$ is the likelihood of the model.
+2.  **BIC (Bayesian Information Criterion):** a criterion for model selection based on the likelihood of the model. **Lower** and [**fewer parameters**]{.underline} **= better**.
+    -   $BIC = k \ln(n) - 2 \ln(L)$, where $k$ is the number of parameters, $n$ is the sample size, and $L$ is the likelihood of the model
+3.  **Cross-Validation**: a statistical method used for assessing how the results of a predictive model will generalize to an independent data set.
+    -   Most common method is **k-Fold Cross Validation**
+:::
+
+## AIC
+
+**Pros:**
+
+::: incremental
+1.  **Balanced Approach**: AIC balances model fit with complexity, reducing overfitting.
+
+2.  **Comparative Utility**: Suitable for comparing models on the same dataset.
+
+3.  **Widespread Acceptance**: Commonly used and recognized in statistical analysis.
+
+4.  **Versatile**: Applicable across various types of statistical models.
+:::
+
+**Cons:**
+
+::: incremental
+1.  **Relative Measurement**: Only provides a comparative metric and doesn't indicate absolute model quality.
+
+2.  **Risk of Underfitting**: Penalizing complex models may lead to underfitting.
+
+3.  **Sample Size Sensitivity**: Its effectiveness can vary with the size of the dataset.
+
+4.  **Assumption of Large Sample**: Infinite sample size assumption is impractical.
+
+5.  **No Probabilistic Interpretation**: Lacks a direct probabilistic meaning, unlike some other statistical measures.
+:::
+
+## BIC
+
+**Pros**:
+
+::: incremental
+1.  **Penalizes Complexity**: Penalizes complexity, preventing overfitting.
+
+2.  **Good for Large Data**: The penalty term is more significant in larger datasets.
+
+3.  **Model Comparison**: Useful for comparing different models on the same dataset.
+
+4.  **Widely Recognized**: Commonly used in statistical model selection.
+
+**Cons**:
+
+1.  **Relative, Not Absolute**: Only provides a comparative metric and doesn't indicate absolute model quality.
+
+2.  **Can Favor Simpler Models**: Penalizing complex models may lead to underfitting.
+
+3.  **Sample Size Dependent**: The effectiveness of BIC is influenced by sample size.
+
+4.  **Assumes Correct Model is in Set**: Assumes that the true model is given.
+
+5.  **Lacks Probabilistic Meaning**: Lacks a direct probabilistic meaning, unlike some other statistical measures.
+:::
+
+## k-Fold CV
+
+**Pros**:
+
+::: incremental
+1.  **Robustness**: Provides a more accurate measure of out-of-sample accuracy.
+
+2.  **Prevents Overfitting**: Helps in detecting overfitting by evaluating model performance on unseen data.
+
+3.  **Versatile**: Can be used with any predictive modeling technique.
+
+4.  **Tuning Hyperparameters**: Useful for selecting the best model hyperparameters.
+
+**Cons**:
+
+1.  **Computationally Intensive**: Can be slow with large datasets and complex models.
+
+2.  **Data Requirements**: Requires a sufficient amount of data to partition into meaningful subsets.
+
+3.  **Variance**: Results can be sensitive to the way in which data is divided.
+
+4.  **No Single Best Model**: only provides an estimation of how well a model type will perform.
+:::
+:::
+
+# Model selection
+
+## Model selection {.smaller}
+
+> The task of selecting a model from among various candidates on the basis of performance criterion to choose the best one.
+
+#### Two major methods:
+
+::: incremental
+1.  **Best subset selection**: Evaluate all combinations, choose by a criterion - e.g., lowest $RSS$ or highest $R^{2}_{adj}$
+2.  **Stepwise selection**: **Forward Selection** or **Backward Selection**
+:::
+
+## Best subset selection {.smaller}
+
+::: panel-tabset
+## Overview
+
+**Definition**
+
+Best Subset Selection is a statistical method used in regression analysis to select a subset of predictors that provides the best fit for the response variable.
+
+**It involves**:
+
+::: incremental
+1.  **Considering All Possible Predictor Subsets**: For $p$ predictors, all possible combinations (totaling $2_p$) of these predictors are considered.
+
+2.  **Fitting a Model for Each Subset**: A regression model is fitted for each subset of predictors.
+
+3.  **Selecting the Best Model**: The best model is selected based on a criterion that balances fit and complexity, such as the lowest Residual Sum of Squares ($RSS$) or the highest $R^{2}_{adj}$ (or $AIC$, $BIC$).
+:::
+
+## Formula
+
+**For each subset, the model is given by**:
+
+$Y = \beta_0 + \sum_{i \in S} \beta_i X_i + \epsilon$
+
+::: incremental
+-   $Y$: Response variable.
+
+-   $\beta_0$: Intercept.
+
+-   $\beta_i$: Coefficients for predictors.
+
+-   $X_i$: Predictor variables.
+
+-   $\epsilon$: Error term.
+
+-   $S$: Set of indices of selected predictors.
+:::
+
+The quality of each model is assessed using a criterion like:
+
+$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$
+
+...or $R^{2}_{adj}$,$AIC$,$BIC$
+
+## Pros + cons
+
+**Pros**:
+
+::: incremental
+1.  **Comprehensive Approach**: Evaluates all possible combinations of predictors, ensuring a thorough search.
+
+2.  **Flexibility**: Can be used with various selection criteria and types of regression models.
+
+3.  **Intuitive**: Provides a clear framework for model selection.
+:::
+
+**Cons**:
+
+::: incremental
+1.  **Computational Intensity**: The number of models to evaluate grows exponentially with the number of predictors, making it computationally demanding.
+
+2.  **Overfitting Risk**: May lead to overfit models, especially when the number of observations is not significantly larger than the number of predictors.
+
+3.  **Model Selection Complexity**: Requires careful choice and interpretation of model selection criteria to balance between model fit and complexity.
+:::
+:::
+
+## Stepwise selection (both types) {.smaller}
+
+::: panel-tabset
+## Overview
+
+**Definition**
+
+Stepwise selection is a method used in regression analysis to select predictor variables. There are two main types:
+
+**Forward Selection**:
+
+::: incremental
+1.  Starts with no predictor variables in the model.
+
+2.  Iteratively adds the variable that provides the most significant model improvement.
+
+3.  Continues until no significant improvement is made by adding more variables.
+:::
+
+**Backward Selection**:
+
+::: incremental
+1.  Begins with all candidate predictor variables.
+
+2.  Iteratively removes the least significant variable (that least worsens the model).
+
+3.  Continues until removing more variables significantly worsens the model.
+:::
+
+## Formula
+
+The criteria for adding or removing a variable are usually based on statistical tests like the **F-test** or **p-values**:
+
+**Forward selection (adding a variable)**
+
+$F = \frac{(\text{RSS}_0 - \text{RSS}_1) / p_1}{\text{RSS}_1 / (n - p_0 - 1)}$
+
+::: incremental
+-   $RSS_0$ is the Residual Sum of Squares of the current model.
+-   $RSS_1$ is the Residual Sum of Squares with the additional variable.
+-   $p_1$ is the number of predictors in the new model.
+-   $n$ is the number of observations.
+-   $p_0$ is the number of predictors in the current model.
+:::
+
+**Backward selection (removing a variable)**
+
+Similar criteria but in reverse, considering the increase in $RSS$ or the **p-values** of the coefficients.
+
+## Pros + cons
+
+**Pros**:
+
+::: incremental
+1.  **Simplicity**: More straightforward and computationally less intensive than Best Subset Selection.
+
+2.  **Flexibility**: Can be adapted to various criteria for entering and removing variables.
+
+3.  **Practical**: Useful with multicollinearity and large sets of potential predictors.
+:::
+
+**Cons**:
+
+::: incremental
+1.  **Arbitrary Choices**: Depends on the order of variables and the specific entry and removal criteria.
+
+2.  **Local Optima**: Might not find the best possible model as it doesn't evaluate all possible combinations.
+
+3.  **Overfitting Risk**: Especially in datasets with many variables relative to the number of observations.
+
+4.  **Statistical Issues**: Stepwise methods can inflate the significance of variables and do not account for the search process in assessing the fit.
+:::
+:::
+
+## Best Subset Selection: applied {.smaller}
+
+::: panel-tabset
+## Original
+
+```{python}
+#| code-fold: true
+X = loans[['verified_income', 'debt_to_income', 'credit_util', 'bankruptcy', 'term', 'credit_checks', 'issue_month']]  
+y = loans['interest_rate']  
+X = pd.get_dummies(X, columns = ['verified_income', 'issue_month'], drop_first = True)
+X.fillna(0, inplace=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+X_train_with_const = sm.add_constant(X_train)
+X_test_with_const = sm.add_constant(X_test)
+
+X_train_with_const = X_train_with_const.astype(int)
+X_test_with_const = X_test_with_const.astype(int)
+
+model = sm.OLS(y_train, X_train_with_const).fit()
+
+model_summary2 = model.summary2()
+print(model_summary2)
+```
+
+## Implementing BSS
+
+```{python}
+def best_subset_selection(X, y):
+    results = []
+    for k in range(1, len(X.columns) + 1):
+        for combo in combinations(X.columns, k):
+            X_subset = sm.add_constant(X[list(combo)].astype(int))
+            model = sm.OLS(y, X_subset).fit()
+            results.append({'model': model, 'predictors': combo})
+    return results
+
+subset_results = best_subset_selection(X_train, y_train)
+```
+
+## AIC
+
+```{python}
+best_aic = np.inf
+best_model_1 = None
+
+for result in subset_results:
+    if result['model'].aic < best_aic:
+        best_aic = result['model'].aic
+        best_model_1 = result
+        
+print("Best Model Predictors:", best_model_1['predictors'])
+print("Best Model AIC:", best_aic.round(2))
+```
+
+## BIC
+
+```{python}
+best_bic = np.inf
+best_model_2 = None
+
+for result in subset_results:
+    if result['model'].bic < best_bic:
+        best_bic = result['model'].bic
+        best_model_2 = result
+        
+print("Best Model Predictors:", best_model_2['predictors'])
+print("Best Model BIC:", best_bic.round(2))
+```
+
+## $R^{2}_{adj}$
+
+```{python}
+best_r_sq_adj = -np.inf  
+best_model_3 = None
+
+for result in subset_results:
+    if result['model'].rsquared_adj > best_r_sq_adj:  
+        best_r_sq_adj = result['model'].rsquared_adj
+        best_model_3 = result
+        
+print("Best Model Predictors:", best_model_3['predictors'])
+print("Best Model Adjusted R-squared:", best_r_sq_adj.round(2))
+```
+:::
+
+## Step-wise selection: applied {.smaller}
+
+::: panel-tabset
+## Original
+
+```{python}
+#| code-fold: true
+X = loans[['verified_income', 'debt_to_income', 'credit_util', 'bankruptcy', 'term', 'credit_checks', 'issue_month']]  
+y = loans['interest_rate']  
+X = pd.get_dummies(X, columns = ['verified_income', 'issue_month'], drop_first = True)
+X.fillna(0, inplace=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+X_train_with_const = sm.add_constant(X_train)
+X_test_with_const = sm.add_constant(X_test)
+
+X_train_with_const = X_train_with_const.astype(int)
+X_test_with_const = X_test_with_const.astype(int)
+
+model = sm.OLS(y_train, X_train_with_const).fit()
+
+model_summary2 = model.summary2()
+print(model_summary2)
+```
+
+## Forward selection
+
+```{python}
+#| code-fold: true
+lr = LinearRegression()
+
+# Initialize SequentialFeatureSelector (SFS) for forward selection
+sfs = SFS(lr, 
+          k_features = 'best',  # Select the best number of features based on criterion
+          forward = True,  # Forward selection
+          floating = False,
+          scoring = 'neg_mean_squared_error',  # Using negative MSE as scoring criterion
+          cv = 0)  # No cross-validation
+
+# Fit SFS on the training data
+sfs.fit(X_train, y_train)
+
+# Get the names of the selected features
+selected_features = list(sfs.k_feature_names_)
+
+# Convert the DataFrame to numeric to ensure all features are numeric
+X_train = X_train.apply(pd.to_numeric, errors='coerce').fillna(0)
+X_test = X_test.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# Select the features identified by forward selection
+X_train_selected = X_train[selected_features]
+
+# Fit the final Linear Regression model using selected features
+final_model = lr.fit(X_train_selected, y_train)
+
+# For AIC, BIC, and adjusted R-squared, use statsmodels
+X_train_selected_with_const = sm.add_constant(X_train_selected)
+
+# Ensure data type consistency
+X_train_selected_with_const = X_train_selected_with_const.astype(float)
+
+# Fit the OLS model
+model_sm = sm.OLS(y_train, X_train_selected_with_const).fit()
+
+# Output the results
+print("Forward Selection Results")
+print("Selected predictors:", selected_features)
+print("AIC:", model_sm.aic.round(3))
+print("BIC:", model_sm.bic.round(3))
+print("Adjusted R-squared:", model_sm.rsquared_adj.round(3))
+```
+
+## Backward selection
+
+```{python}
+#| code-fold: true
+# Initialize the linear regression model
+lr = LinearRegression()
+
+# Initialize SequentialFeatureSelector (SFS) for forward selection
+sfs = SFS(lr, 
+          k_features = 'best',  # Select the best number of features based on criterion
+          forward = False,  # Forward selection
+          floating = False,
+          scoring = 'neg_mean_squared_error',  # Using negative MSE as scoring criterion
+          cv = 0)  # No cross-validation
+
+# Fit SFS on the training data
+sfs.fit(X_train, y_train)
+
+# Get the names of the selected features
+selected_features = list(sfs.k_feature_names_)
+
+# Convert the DataFrame to numeric to ensure all features are numeric
+X_train = X_train.apply(pd.to_numeric, errors='coerce').fillna(0)
+X_test = X_test.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# Select the features identified by forward selection
+X_train_selected = X_train[selected_features]
+
+# Fit the final Linear Regression model using selected features
+final_model = lr.fit(X_train_selected, y_train)
+
+# For AIC, BIC, and adjusted R-squared, use statsmodels
+X_train_selected_with_const = sm.add_constant(X_train_selected)
+
+# Ensure data type consistency
+X_train_selected_with_const = X_train_selected_with_const.astype(float)
+
+# Fit the OLS model
+model_sm = sm.OLS(y_train, X_train_selected_with_const).fit()
+
+# Output the results
+print("Backward Selection Results")
+print("Selected predictors:", selected_features)
+print("AIC:", model_sm.aic.round(3))
+print("BIC:", model_sm.bic.round(3))
+print("Adjusted R-squared:", model_sm.rsquared_adj.round(3))
+```
+:::
+
+## Cross validation {.smaller}
+
+::: panel-tabset
+## Best Subset Selection
+
+```{python}
+#| code-fold: true
+def best_subset_cv(X, y, max_features=5):
+    best_score = np.inf
+    best_subset = None
+    
+    # Limiting the number of features for computational feasibility
+    for k in range(1, max_features + 1):
+        for subset in combinations(X.columns, k):
+            # Define the model
+            model = LinearRegression()
+            
+            # Perform k-fold cross-validation
+            kf = KFold(n_splits = 5, shuffle = True, random_state = 42)
+            cv_scores = cross_val_score(model, X[list(subset)], y, cv = kf, scoring = 'neg_mean_squared_error')
+            
+            # Compute the average score
+            score = -np.mean(cv_scores)  # Convert back to positive MSE
+            
+            # Update the best score and subset
+            if score < best_score:
+                best_score = score
+                best_subset = subset
+    
+    return best_subset, best_score
+
+# Start timing
+start_time = time.time()
+
+# Assuming X and y are already defined and preprocessed
+best_subset, best_score = best_subset_cv(X, y)
+
+# End timing
+end_time = time.time()
+
+# Calculate duration
+duration = end_time - start_time
+
+print("Best Subset:", best_subset)
+print("Best CV Score (MSE):", best_score)
+print("Computation Time: {:.2f} seconds".format(duration))
+```
+
+## Stepwise Selection
+
+```{python}
+#| code-fold: true
+# Initialize the linear regression model
+lr = LinearRegression()
+
+# Initialize SequentialFeatureSelector for forward selection with cross-validation
+sfs = SFS(lr,
+          k_features = 'best',  # 'best' or specify a number with ('1, 10') for range
+          forward=True,
+          floating=False,
+          scoring = 'neg_mean_squared_error',
+          cv = KFold(n_splits = 5, shuffle = True, random_state = 42))
+
+# Start timing
+start_time = time.time()
+
+# Fit SFS on the training data
+sfs.fit(X, y)
+
+# End timing
+end_time = time.time()
+
+# Calculate duration
+duration = end_time - start_time
+
+# Get the names of the selected features
+selected_features = list(sfs.k_feature_names_)
+
+print("Selected predictors (forward selection):", selected_features)
+print("Computation Time: {:.2f} seconds".format(duration))
+```
+
+## Model output
+
+```{python}
+#| code-fold: true
+# Convert the DataFrame to numeric to ensure all features are numeric
+X_train = X_train.apply(pd.to_numeric, errors = 'coerce').fillna(0)
+X_test = X_test.apply(pd.to_numeric, errors = 'coerce').fillna(0)
+
+# Select the features identified by forward selection
+X_train_selected = X_train[selected_features]
+
+# Fit the final Linear Regression model using selected features
+final_model = lr.fit(X_train_selected, y_train)
+
+# For AIC, BIC, and adjusted R-squared, use statsmodels
+X_train_selected_with_const = sm.add_constant(X_train_selected)
+
+# Ensure data type consistency
+X_train_selected_with_const = X_train_selected_with_const.astype(float)
+
+# Fit the OLS model
+model_sm = sm.OLS(y_train, X_train_selected_with_const).fit()
+
+# Model results
+model_summary2 = model_sm.summary2()
+print("Forward selection best fit:\n")
+print(model_summary2)
+```
+:::
+
+## Conclusions
+
+-   OLS regression is a great baseline model to compare against
+
+-   Falls victim to collinearity, overly complex models
+
+    -   Hence selection methods with model assessment
+
+-   Best subset selection can overfit easier than stepwise selection
+
+-   Stepwise selection is faster
+
+-   Stepwise inflates Type I error with multiple testing...
+
+## Live coding: Indoor air pollution
+
+::: panel-tabset
+## Fuel access
+
+| variable          | class     | description                                                          |
+|--------------|--------------|---------------------------------------------|
+| Entity            | character | Country name                                                         |
+| Code              | character | Country code                                                         |
+| Year              | double    | Year                                                                 |
+| access_clean_perc | double    | Access to clean fuels and technologies for cooking (% of population) |
+
+## Fuel GDP
+
+| variable          | class     | description                                          |
+|---------------|---------------|------------------------------------------|
+| Entity            | character | The country                                          |
+| Code              | character | Country code                                         |
+| Year              | double    | Year                                                 |
+| access_clean_perc | double    | \% of population with access to clean cooking fuels  |
+| GDP               | double    | GDP per capita, PPP (constant 2017 international \$) |
+| popn              | double    | Country population                                   |
+| Continent         | character | Continent the country resides on                     |
+
+## Death source
+
+| variable       | class     | description                                                            |
+|-------------|-------------|----------------------------------------------|
+| Entity         | character | The country                                                            |
+| Code           | character | Country code                                                           |
+| Year           | double    | Year                                                                   |
+| Death_Rate_ASP | double    | Cause of death related to air pollution from solid fuels, standardized |
+:::
+
+## Live coding {.smaller}
+
+```{python}
+#| code-fold: true
+#| eval: false
+from sklearn.impute import SimpleImputer
+from feature_engine.imputation import CategoricalImputer
+
+# Read in data
+fuel_access = pd.read_csv('data/fuel_access.csv')
+fuel_gdp = pd.read_csv('data/fuel_gdp.csv')
+death_source = pd.read_csv('data/death_source.csv')
+
+# Select relevant columns and rename for consistency if needed
+fuel_access = fuel_access[['Entity', 'Year', 'access_clean_perc']]
+fuel_gdp = fuel_gdp[['Entity', 'Year', 'GDP', 'popn']]
+death_source = death_source[['Entity', 'Year', 'Death_Rate_ASP']]
+
+# Ensure 'Year' is an integer
+fuel_access['Year'] = fuel_access['Year'].astype(int)
+fuel_gdp['Year'] = fuel_gdp['Year'].astype(int)
+death_source['Year'] = death_source['Year'].astype(int)
+
+# Merge datasets on 'Entity' and 'Year'
+merged_data = pd.merge(fuel_access, fuel_gdp, on = ['Entity', 'Year'], how = 'inner')
+merged_data = pd.merge(merged_data, death_source, on = ['Entity', 'Year'], how = 'inner')
+
+# Check for missing values
+print(merged_data.isnull().sum())
+
+# Handle missing values if necessary (e.g., fill with mean or median, or drop)
+num_imputer = SimpleImputer(strategy = 'mean')  # or 'median'
+numerical_cols = merged_data.select_dtypes(include = ['int64', 'float64']).columns.tolist()
+merged_data[numerical_cols] = num_imputer.fit_transform(merged_data[numerical_cols])
+
+merged_data.dropna()
+merged_data['Entity'] = pd.factorize(merged_data['Entity'])[0]
+
+# Final check for data types and missing values
+print(merged_data.info())
+print(merged_data.isnull().sum())
+
+# Optional: Standardize/normalize numerical columns if necessary
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+numerical_columns = ['access_clean_perc', 'GDP', 'popn']
+merged_data[numerical_columns] = scaler.fit_transform(merged_data[numerical_columns])
+merged_data.to_csv()
+# Define the predictor variables and the response variable
+X = merged_data.drop(['Death_Rate_ASP'], axis = 1)  # Assuming 'Death_Rate_ASP' is the response variable
+y = merged_data['Death_Rate_ASP']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+# Initialize LinearRegression model
+lr = LinearRegression()
+
+# Initialize SequentialFeatureSelector for forward selection with cross-validation
+sfs = SFS(lr,
+          k_features = 'best',  # 'best' or specify a number with ('1, 10') for range
+          forward = True,  # Forward selection
+          floating = False,  # Set to True for stepwise selection
+          scoring = 'neg_mean_squared_error',  # Using negative MSE as scoring criterion
+          cv = KFold(n_splits = 5, shuffle = True, random_state = 42))  # 5-fold cross-validation
+
+# Fit SFS on the training data
+sfs.fit(X_train, y_train)
+
+# Get the names of the selected features
+selected_features = list(sfs.k_feature_names_)
+
+# Fit the final Linear Regression model using selected features
+final_model = lr.fit(X_train[selected_features], y_train)
+
+# Evaluate the model performance on the test set
+from sklearn.metrics import mean_squared_error
+
+y_pred = final_model.predict(X_test[selected_features])
+mse = mean_squared_error(y_test, y_pred)
+
+print("Selected predictors (forward selection):", selected_features)
+print("Test MSE:", mse)
+
+# Extracting predictor variables (X) and the target variable (y)
+X = merged_data[selected_features]
+Y = merged_data['Death_Rate_ASP']
+
+# Adding a constant for the intercept term
+X = sm.add_constant(X)
+
+# Fit the regression model
+model = sm.OLS(y, X).fit()
+
+model_summary = model.summary2()
+print(model_summary)
+```

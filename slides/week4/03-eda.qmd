@@ -1247,3 +1247,122 @@ g.map_diag(sns.kdeplot, lw = 2)
 
 plt.show()
 ```
+
+## Diwali sales data: metadata {.smaller}
+
+| **variable**     | **class** | **description**                               |
+|------------------|-----------|-----------------------------------------------|
+| User_ID          | double    | User identification number                    |
+| Cust_name        | character | Customer name                                 |
+| Product_ID       | character | Product identification number                 |
+| Gender           | character | Gender of the customer (e.g. Male, Female)    |
+| Age Group        | character | Age group of the customer                     |
+| Age              | double    | Age of the customer                           |
+| Marital_Status   | double    | Marital status of customer (Married, Single)  |
+| State            | character | State of the customer                         |
+| Zone             | character | Geographic zone of the customer               |
+| Occupation       | character | Occupation of the customer                    |
+| Product_Category | character | Category of the product                       |
+| Orders           | double    | Number of orders made by the customer         |
+| Amount           | double    | Amount in Indian rupees spent by the customer |
+
+## Livecoding: Diwali sales data {.smaller}
+
+::: panel-tabset
+## Read in
+
+```{python}
+diwali = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-14/diwali_sales_data.csv', encoding = 'iso-8859-1')
+diwali.head()
+```
+
+## Code
+
+```{python}
+#| code-fold: true
+#| eval: false
+# Examine data
+diwali.info()
+
+# Data types
+diwali.dtypes
+
+# Describe numerical columns
+diwali.describe()
+
+# Describe categories
+diwali.describe(exclude = [np.number])
+
+# Unique levels
+categorical_cols = diwali.select_dtypes(include = ['object', 'category']).columns
+unique_levels = diwali[col].unique()
+
+# Outliers
+# Make a copy of the diwali data 
+dataCopy = diwali.copy()
+
+# Select only numerical columns
+dataRed = dataCopy.select_dtypes(include = np.number)
+
+# List of numerical columns
+dataRedColsList = dataRed.columns[...]
+
+# For all values in the numerical column list from above
+for i_col in dataRedColsList:
+  # List of the values in i_col
+  dataRed_i = dataRed.loc[:,i_col]
+  
+  # Define the 25th and 75th percentiles
+  q25, q75 = round((dataRed_i.quantile(q = 0.25)), 3), round((dataRed_i.quantile(q = 0.75)), 3)
+  
+  # Define the interquartile range from the 25th and 75th percentiles defined above
+  IQR = round((q75 - q25), 3)
+  
+  # Calculate the outlier cutoff 
+  cut_off = IQR * 1.5
+  
+  # Define lower and upper cut-offs
+  lower, upper = round((q25 - cut_off), 3), round((q75 + cut_off), 3)
+  
+  # Print the values
+  print(' ')
+  
+  # For each value of i_col, print the 25th and 75th percentiles and IQR
+  print(i_col, 'q25 =', q25, 'q75 =', q75, 'IQR =', IQR)
+  
+  # Print the lower and upper cut-offs
+  print('lower, upper:', lower, upper)
+
+  # Count the number of outliers outside the (lower, upper) limits, print that value
+  print('Number of Outliers: ', dataRed_i[(dataRed_i < lower) | (dataRed_i > upper)].count())
+
+# Missing values
+diwali.isnull().sum()
+
+# Normality - qq plot
+# Change theme to "white"
+sns.set_style("white")
+
+# Make a copy of the data 
+dataCopy = diwali.copy()
+
+# Remove NAs
+dataCopyFin = dataCopy.dropna()
+
+# Specify desired column
+i_col = dataCopyFin.Amount
+
+# Subplots
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+# Density plot
+sns.kdeplot(i_col, linewidth = 5, ax = ax1)
+ax1.set_title('Amount spent (₹)')
+
+# Q-Q plot
+sm.qqplot(i_col, line = 's', ax = ax2)
+ax2.set_title('Amount spent Q-Q plot')
+plt.tight_layout()
+plt.show()
+```
+:::
