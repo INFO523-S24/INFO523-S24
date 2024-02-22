@@ -1,0 +1,1351 @@
+---
+title: Data Preprocessing
+subtitle: Lecture 4
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+execute: 
+  warning: false
+  message: false
+  error: false
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   RQ 02 is due Wed, Feb 14, 11:59pm
+
+-   HW 02 is due Wed, Feb 21, 11:59pm
+
+-   Project 1 proposal reviews will be returned to you by Friday
+
+## HW 1 lessons learned
+
+::: incremental
+-   Review HW 1 issues, and show us you reviewed them by closing the issue.
+
+-   DO NOT hard code local paths!
+
+    -   **Instead**, you can use **{pyprojroot}**:
+
+        -   `python -m pip install pyprojroot`
+
+        -   `from pyprojroot.here import here`
+
+        -   e.g., `pd.read_csv(here('data/data.csv'))`
+
+    -   **Related**: data should go into a `data` folder
+
+-   Narrative/code description text should be plain text under a `###` or `####` header under the appropriate code chunk.
+:::
+
+## HW 1 lessons learned cont...
+
+::: incremental
+1.  **Start early**. No late work exceptions will be made in the future
+2.  **Ask your peers**. I have been monopolized by a few individuals, which is not fair to the rest.
+    1.  Peers will likely have the answer
+    2.  Peers will likely get to the question before I will.
+3.  **Ask descriptive questions**. See [this page](https://datamineaz.org/course-support.html#how-to-ask-for-help) on asking effective questions.
+4.  **Please respect my work hours**. I will no longer reply to messages after 5pm on work days and at all on weekends.
+:::
+
+## Setup
+
+```{python}
+#| label: setup
+#| message: false
+
+# Import all required libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+import statsmodels.api as sm
+import scipy.stats as stats
+from scipy.stats import gaussian_kde
+from scipy.signal import find_peaks, argrelextrema
+from scipy.stats import pearsonr
+
+
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+
+# Set Seaborn theme
+sns.set_theme(style = "whitegrid")
+
+```
+
+## Data Preprocessing
+
+> **Data preprocessing** can refer to manipulation, filtration or augmentation of data before it is analyzed, and is often an important step in the [data mining](https://en.wikipedia.org/wiki/Data_mining "Data mining") process.
+
+## Datasets {.smaller}
+
+```{python}
+#| echo: false
+hfi = pd.read_csv("data/hfi.csv")
+esi = pd.read_csv("data/esi.csv")
+```
+
+::: columns
+::: {.column width="50%"}
+**Human Freedom Index**
+
+The Human Freedom Index is a report that attempts to summarize the idea of "freedom" through variables for many countries around the globe.
+
+```{python}
+#| echo: false
+plt.figure(figsize = (5, 3))
+ax = sns.scatterplot(data = hfi, x = "pf_score", y = "ef_score",
+                hue = "region", palette = "colorblind")
+ax.legend(title = "Region",
+          bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0)
+ax.set(xlabel = "Economic Freedom")
+ax.set(ylabel = "Personal Freedom")
+ax.set(title = "Human Freedom Index")
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+**Environmental Sustainability**
+
+Countries are given an overall sustainability score as well as scores in each of several different environmental areas.
+
+```{python}
+#| echo: false
+hfi['country'] = hfi['countries']
+data = esi.merge(hfi, how = 'left', on = 'country')
+
+plt.figure(figsize = (5, 3))
+ax = sns.scatterplot(data = data, x = "sys_wqn", y = "vul_sus",
+                hue = "region", palette = "colorblind")
+ax.legend(title = "Region",
+          bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0)
+ax.set(xlabel = "Water Quantity")
+ax.set(ylabel = "Basic Human Sustenance")
+ax.set(title = "Environmental Sustainability")
+plt.show()
+```
+:::
+:::
+
+## Question
+
+How does **environmental stability** [correlate]{.underline} with **human freedom indices** in [different countries]{.underline}, and what [trends]{.underline} can be observed over [recent years]{.underline}?
+
+## Dataset #1: Human Freedom Index {.smaller}
+
+```{python}
+hfi = pd.read_csv("data/hfi.csv")
+hfi.head()
+```
+
+## Understand the data {.smaller}
+
+::: panel-tabset
+## `.info()`
+
+```{python}
+hfi.info(verbose = True)
+```
+
+## `.describe()`
+
+```{python}
+hfi.describe()
+```
+:::
+
+## Identifying missing values {.smaller}
+
+```{python}
+hfi.isna().sum()
+```
+
+::: fragment
+> A lot of missing values 🙃
+:::
+
+# Data Cleaning
+
+## Handling missing data
+
+#### Options
+
+::: incremental
+-   Do nothing...
+-   Remove them
+-   **Imputate**
+:::
+
+::: fragment
+We will be using `pf_score` from `hsi`: 80 missing values
+:::
+
+## Imputation
+
+> In [statistics](https://en.wikipedia.org/wiki/Statistics "Statistics"), **imputation** is the process of replacing [missing data](https://en.wikipedia.org/wiki/Missing_data "Missing data") with substituted values.
+
+::: fragment
+#### Considerations
+
+::: incremental
+-   Data distribution
+-   Impact on analysis
+-   Missing data mechanism
+-   Multiple imputation
+-   Can also be used on **outliers**
+:::
+:::
+
+## Mean imputation {.smaller}
+
+::: panel-tabset
+## Definition
+
+**How it Works**: Replace missing values with the arithmetic **mean** of the non-missing values in the same variable.
+
+::: fragment
+**Pros**:
+
+::: incremental
+-   Easy and fast.
+-   Works well with small numerical datasets
+:::
+
+**Cons**:
+
+::: incremental
+-   It only works on the column level.
+-   Will give poor results on encoded categorical features.
+-   Not very accurate.
+-   Doesn't account for the uncertainty in the imputations.
+:::
+:::
+
+## Visual
+
+```{python}
+#| echo: false
+#| fig.asp: 0.625
+
+hfi_copy = hfi
+
+mean_imputer = SimpleImputer(strategy = 'mean')
+hfi_copy['mean_pf_score'] = mean_imputer.fit_transform(hfi_copy[['pf_score']])
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'mean_pf_score', linewidth = 2, label = "Mean Imputated")
+
+plt.legend()
+
+plt.show()
+```
+
+## Code
+
+```{python}
+#| eval: false
+#| code-line-numbers: 1-12|1|3,4|6,8,10,12
+hfi_copy = hfi
+
+mean_imputer = SimpleImputer(strategy = 'mean')
+hfi_copy['mean_pf_score'] = mean_imputer.fit_transform(hfi_copy[['pf_score']])
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'mean_pf_score', linewidth = 2, label = "Mean Imputated")
+
+plt.legend()
+
+plt.show()
+```
+:::
+
+## Median imputation {.smaller}
+
+::: panel-tabset
+## Definition
+
+**How it Works**: Replace missing values with the **median** of the non-missing values in the same variable.
+
+::: fragment
+**Pros** (same as mean):
+
+::: incremental
+-   Easy and fast.
+-   Works well with small numerical datasets
+:::
+
+**Cons** (same as mean):
+
+::: incremental
+-   It only works on the column level.
+-   Will give poor results on encoded categorical features.
+-   Not very accurate.
+-   Doesn't account for the uncertainty in the imputations.
+:::
+:::
+
+## Visual
+
+```{python}
+#| ref.label: mean_imp
+#| echo: false
+#| fig.asp: 0.625
+
+median_imputer = SimpleImputer(strategy = 'median')
+hfi_copy['median_pf_score'] = median_imputer.fit_transform(hfi_copy[['pf_score']])
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+mean_plot = sns.kdeplot(data = hfi_copy, x = 'median_pf_score', linewidth = 2, label = "Median Imputated")
+
+plt.legend()
+
+plt.show()
+```
+
+## Code
+
+```{python}
+#| eval: false
+#| code-line-numbers: 1-10|1,2
+
+median_imputer = SimpleImputer(strategy = 'median')
+hfi_copy['median_pf_score'] = median_imputer.fit_transform(hfi_copy[['pf_score']])
+
+median_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+median_plot = sns.kdeplot(data = hfi_copy, x = 'median_pf_score', linewidth = 2, label = "Median Imputated")
+
+plt.legend()
+
+plt.show()
+```
+:::
+
+## Mode imputation {.smaller}
+
+::: panel-tabset
+## Definition
+
+**How it Works**: Replace missing values with the **mode** of the non-missing values in the same variable.
+
+::: fragment
+**Pros**:
+
+::: incremental
+-   Easy and fast.
+-   Works well with categorical features.
+:::
+
+**Cons**:
+
+::: incremental
+-   It also doesn't factor the correlations between features.
+-   It can introduce bias in the data.
+:::
+:::
+
+## Visual
+
+```{python}
+#| echo: false
+#| fig.asp: 0.625
+
+mode_imputer = SimpleImputer(strategy = 'most_frequent')
+hfi_copy['mode_pf_score'] = mode_imputer.fit_transform(hfi_copy[['pf_score']])
+
+mode_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+mode_plot = sns.kdeplot(data = hfi_copy, x = 'mode_pf_score', linewidth = 2, label = "Mode Imputated")
+
+plt.legend()
+
+plt.show()
+```
+
+## Code
+
+```{python}
+#| ref.label: mean-imp
+#| eval: false
+#| code-line-numbers: 1-12|1,2
+
+mode_imputer = SimpleImputer(strategy = 'most_frequent')
+hfi_copy['mode_pf_score'] = mode_imputer.fit_transform(hfi_copy[['pf_score']])
+
+mode_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+mode_plot = sns.kdeplot(data = hfi_copy, x = 'mode_pf_score', linewidth = 2, label = "Mode Imputated")
+
+plt.legend()
+
+plt.show()
+```
+:::
+
+## Capping (Winsorizing) imputation {.smaller}
+
+::: panel-tabset
+## Definition
+
+**How it Works**: Removing extreme values, or **outliers** based on cut-offs
+
+::: fragment
+**Pros**:
+
+::: incremental
+-   Not influenced by extreme values
+:::
+
+**Cons**:
+
+::: incremental
+-   Capping only modifies the smallest and largest values slightly.
+-   If no extreme outliers are present, Winsorization may be unnecessary.
+:::
+:::
+
+## Visual
+
+```{python}
+#| echo: false
+#| fig.asp: 0.625
+
+upper_limit = np.percentile(hfi_copy['pf_score'].dropna(), 95)
+lower_limit = np.percentile(hfi_copy['pf_score'].dropna(), 5)
+
+hfi_copy['capped_pf_score'] = np.clip(hfi_copy['pf_score'], lower_limit, upper_limit)
+
+cap_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+cap_plot = sns.kdeplot(data = hfi_copy, x = 'capped_pf_score', linewidth = 2, label = "Mode Imputated")
+
+plt.legend()
+
+plt.show()
+```
+
+## Code
+
+```{python}
+#| eval: false
+#| code-line-numbers: 1-12|1,2,4
+
+upper_limit = np.percentile(hfi_copy['pf_score'].dropna(), 95)
+lower_limit = np.percentile(hfi_copy['pf_score'].dropna(), 5)
+
+hfi_copy['capped_pf_score'] = np.clip(hfi_copy['pf_score'], lower_limit, upper_limit)
+
+cap_plot = sns.kdeplot(data = hfi_copy, x = 'pf_score', linewidth = 2, label = "Original")
+
+cap_plot = sns.kdeplot(data = hfi_copy, x = 'capped_pf_score', linewidth = 2, label = "Mode Imputated")
+
+plt.legend()
+
+plt.show()
+```
+:::
+
+## Other Imputation Methods {.smaller}
+
+::: {style="text-align: center;"}
+```{=html}
+<iframe width="1200" height="400" src="https://datamineaz.org/tables/model-cheatsheet.html" frameborder="1" style="background:white;"></iframe>
+```
+:::
+
+## Data type conversion {.smaller}
+
+```{python}
+hfi['year'] = pd.to_datetime(hfi['year'], format='%Y')
+
+hfi.head(1)
+```
+
+```{python}
+hfi.dtypes
+```
+
+## Removing duplicates {.smaller}
+
+```{python}
+hfi.info()
+```
+
+```{python}
+hfi.drop_duplicates(inplace = True)
+hfi.info()
+```
+
+::: fragment
+> No duplicates! 😊
+:::
+
+## Filtering data {.smaller}
+
+::: panel-tabset
+## Category
+
+Let's look at USA, India, Canada, China
+
+```{python}
+#| code-line-numbers: 1-6|1|2|5,6
+options = ['United States', 'India', 'Canada', 'China']
+
+filtered_hfi = hfi[hfi['countries'].isin(options)]
+
+unique_countries = filtered_hfi['countries'].unique()
+print(unique_countries)
+```
+
+## Numeric
+
+Let's look at [Economic Freedom](https://www.investopedia.com/terms/i/index-of-economic-freedom.asp#:~:text=An%20index%20of%20economic%20freedom%20is%20a%20composite,criteria%20such%20as%20property%20rights%20and%20tax%20burden.) \> 75
+
+```{python}
+#| code-line-numbers: 1-3|1
+filtered_hfi = hfi[hfi['pf_score'] > 8]
+sns.boxplot(filtered_hfi, x = "pf_score", y = "countries", palette = "colorblind")
+plt.show()
+```
+:::
+
+# Transformations
+
+## Normalizing {.smaller}
+
+::: panel-tabset
+## Standard Deviation
+
+```{python}
+#| echo: false
+import numpy as np
+from scipy.stats import norm
+import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+random.seed(123)
+
+
+# Line width: Maximum 130 characters in the output, post which it will continue in next line.
+np.set_printoptions(linewidth=130)
+
+sns.set_context("paper", font_scale=1.5)
+
+# Distribution
+mean = 5
+std = 2
+X = np.random.randn(10000)
+X = (X - X.mean())/X.std()*std + mean
+
+print("Mean:", mean)
+print("Standard Deviation:", std)
+
+"""
+Mean: 5.0
+Standard Deviation: 2.0
+"""
+
+plt.figure(figsize=(10, 5))
+
+ax = sns.kdeplot(X, shade=True)
+
+N = 10
+for i in [1, 2, 3]:
+    x1 = np.linspace(mean - i*std, mean - (i - 1)*std, N)
+    x2 = np.linspace(mean - (i - 1)*std, mean + (i - 1)*std, N)
+    x3 = np.linspace(mean + (i - 1)*std, mean + i*std, N)
+    x = np.concatenate((x1, x2, x3))
+    x = np.where((mean - (i - 1)*std < x) & (x < mean + (i - 1)*std), np.nan, x)
+    y = norm.pdf(x, mean, std)
+    ax.fill_between(x, y, alpha=0.5)
+
+ax.plot([mean - std, mean - std], [0, 0.21], linewidth=1.25, color='#bfc1c2')
+ax.plot([mean - (2*std), mean - (2*std)], [0, 0.23], linewidth=1.25, color='#bfc1c2')
+ax.plot([mean - (3*std), mean - (3*std)], [0, 0.25], linewidth=1.25, color='#bfc1c2')
+ax.plot([mean + std, mean + std], [0, 0.21], linewidth=1.25, color='#bfc1c2')
+ax.plot([mean + (2*std), mean + (2*std)], [0, 0.23], linewidth=1.25, color='#bfc1c2')
+ax.plot([mean + (3*std), mean + (3*std)], [0, 0.25], linewidth=1.25, color='#bfc1c2')
+
+ax.annotate('', xy=(mean - std - 0.1, 0.206), xytext=(mean + std + 0.1, 0.206),
+            arrowprops=dict(arrowstyle="<->", color='#bfc1c2'))
+ax.annotate('', xy=(mean - (2*std) - 0.1, 0.226), xytext=(mean + (2*std) + 0.1, 0.226),
+            arrowprops=dict(arrowstyle="<->", color='#bfc1c2'))
+ax.annotate('', xy=(mean - (3*std) - 0.1, 0.246), xytext=(mean + (3*std) + 0.1, 0.246),
+            arrowprops=dict(arrowstyle="<->", color='#bfc1c2'))
+ax.annotate('68.2% / Z-Score 1', xy=(mean, 0.215), ha='center', va='center', color = 'gray', fontweight = "bold", fontname = "Helvetica")
+ax.annotate('95.4% / Z-Score 2', xy=(mean, 0.235), ha='center', va='center', color = 'gray', fontweight = "bold", fontname = "Helvetica")
+ax.annotate('99.7% / Z-Score 3', xy=(mean, 0.255), ha='center', va='center', color = 'gray', fontweight = "bold", fontname = "Helvetica")
+
+
+plt.xlabel("Normal Distribution", fontname = "Helvetica")
+plt.ylabel("Probability Density Function", fontname = "Helvetica")
+ax.set_ylim([0, 0.275])
+ax.set_xticks([(mean - (3 * std)), 
+               (mean - (2 * std)), 
+               (mean - std), 
+               mean, 
+               (mean + std), 
+               (mean + (2 * std)), 
+               (mean + (3 * std))])
+ax.set_xticklabels(['$\\mu$ - 3$\\sigma$','$\\mu$ - 2$\\sigma$','$\\mu$ - $\\sigma$','$\\mu$','$\\mu$ + $\\sigma$','$\\mu$ + 2$\\sigma$','$\\mu$ + 3$\\sigma$'])
+plt.grid()
+
+plt.show()
+```
+
+## Z-Score Normalization
+
+```{python}
+#| code-line-numbers: 1-6|3,4|5
+hfi_copy = hfi
+
+scaler = StandardScaler()
+hfi_copy[['ef_score_scale', 'pf_score_scale']] = scaler.fit_transform(hfi_copy[['ef_score', 'pf_score']])
+
+hfi_copy[['ef_score_scale', 'pf_score_scale']].describe()
+```
+:::
+
+## Normality test: Q-Q plot {.smaller}
+
+::: panel-tabset
+## Q-Q Plot
+
+```{python}
+#| code-fold: true
+
+hfi_clean = hfi_copy.dropna(subset = ['pf_score'])
+
+sns.set_style("white")
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(data = hfi_clean, x = "pf_score", linewidth = 5, ax = ax1)
+ax1.set_title('Personal Freedom Score')
+
+sm.qqplot(hfi_clean['pf_score'], line = 's', ax = ax2, dist = stats.norm, fit = True)
+ax2.set_title('Personal Freedom Score Q-Q plot')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Issues
+
+**There were some issues in our plots**:
+
+::: incremental
+-   **Left Tail**: Points deviate downwards from the line, indicating more extreme low values than a normal distribution (**negative skewness**).
+
+-   **Central Section**: Points align closely with the line, suggesting the central data is *similar to a normal distribution*.
+
+-   **Right Tail**: Points curve upwards, showing potential for **extreme high values (positive skewness)**.
+:::
+:::
+
+## Correcting skew {.smaller}
+
+::: fragment
+[Square-root transformation](https://en.wikipedia.org/wiki/Square_root). $\sqrt x$ Used for **moderately** right-skew **(positive skew)**
+
+::: incremental
+-   Cannot handle negative values (but can handle zeros)
+:::
+:::
+
+::: fragment
+[Log transformation](https://en.wikipedia.org/wiki/Logarithm). $log(x + 1)$ Used for **substantial** right-skew **(positive skew)**
+
+::: incremental
+-   Cannot handle negative or zero values
+:::
+:::
+
+::: fragment
+[Inverse transformation](https://en.wikipedia.org/wiki/Inverse_function). $\frac{1}{x}$ Used for **severe** right-skew **(positive skew)**
+
+::: incremental
+-   Cannot handle negative or zero values
+:::
+:::
+
+::: fragment
+[Squared transformation](https://en.wikipedia.org/wiki/Quadratic_function). $x^2$ Used for **moderately** left-skew **(negative skew)**
+
+::: incremental
+-   Effective when lower values are densely packed together
+:::
+:::
+
+::: fragment
+[Cubed transformation](https://en.wikipedia.org/wiki/Cubic_function). $x^3$ Used for **severely** left-skew **(negative skew)**
+
+::: incremental
+-   Further stretches the tail of the distribution
+:::
+:::
+
+## Comparing transformations {.smaller}
+
+::: panel-tabset
+## Original
+
+```{python}
+#| echo: false
+
+hfi_clean = hfi_copy.dropna(subset = ['pf_score'])
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(data = hfi_clean, x = "pf_score", linewidth = 5, ax = ax1)
+ax1.set_title('Personal Freedom Score')
+
+sm.qqplot(hfi_clean['pf_score'], line = 's', ax = ax2, dist = stats.norm, fit = True)
+ax2.set_title('Personal Freedom Score Q-Q plot')
+
+plt.tight_layout()
+plt.show()
+```
+
+::: fragment
+**Moderate negative skew, no zeros or negative values**
+:::
+
+## Square-root
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-13|1|2,7,10
+hfi_clean['pf_score_sqrt'] = np.sqrt(hfi_clean['pf_score'])
+
+col = hfi_clean['pf_score_sqrt']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Square-root Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Square-root Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+
+## Log
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-13|1
+hfi_clean['pf_score_log'] = np.log(hfi_clean['pf_score'] + 1)
+
+col = hfi_clean['pf_score_log']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Log Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Log Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+
+## Inverse
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-13|1
+hfi_clean['pf_score_inv'] = 1/hfi_clean.pf_score
+
+col = hfi_clean['pf_score_inv']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Inverse Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Inverse Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+
+## Squared
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-13|1
+hfi_clean['pf_score_square'] = pow(hfi_clean.pf_score, 2)
+
+col = hfi_clean['pf_score_square']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Squared Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Squared Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+
+## Cubed
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-13|1
+hfi_clean['pf_score_cube'] = pow(hfi_clean.pf_score, 3)
+
+col = hfi_clean['pf_score_cube']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Cubed Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Cubed Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+:::
+
+## What did we learn?
+
+::: incremental
+-   Negative skew excluded all but **Squared** and **Cubed** transformations
+
+-   **Squared** transformation was the best
+
+-   The data is **bimodal**, so no transformation is perfect
+:::
+
+## Dealing with multimodality
+
+::: incremental
+-   K-Means Clustering
+
+    -   We will learn this later
+
+-   Gaussian Mixture Models
+
+    -   Also later
+
+-   Thresholding
+
+    -   No obvious valley
+
+-   Domain knowledge
+
+    -   None that is applicable
+
+-   [**Kernel Density Estimation (KDE)**](https://en.wikipedia.org/wiki/Kernel_density_estimation)
+:::
+
+## Kernel Density Estimation (KDE) {.smaller}
+
+**Finding valleys in multimodal data, then splitting**
+
+$$\hat{f}(x) = \frac{1}{n h} \sum_{i=1}^{n} K\left(\frac{x - x_i}{h}\right)$$
+
+::: incremental
+-   $\hat{f}(x)$ is the estimated probability density function at point $x$.
+
+-   $n$ is the number of data points.
+
+-   $x_i$ are the observed data points.
+
+-   $h$ is the bandwidth.
+
+-   $K$ is the kernel function, which is a non-negative function that integrates to one and is symmetric around zero.
+:::
+
+::: fragment
+The choice of $h$ and $K$ can significantly affect the resulting estimate.
+:::
+
+::: fragment
+Common choices for the kernel function $K$ include the [**Gaussian kernel**](https://en.wikipedia.org/wiki/Kernel_smoother#Gaussian_kernel_smoother) and [Epanechnikov kernel](https://www.gabormelli.com/RKB/Epanechnikov_Kernel#:~:text=An%20Epanechnikov%20Kernel%20is%20a%20kernel%20function%20that,be%20optimal%20with%20respect%20to%20Mean%20Square%20Error.)
+:::
+
+## KDE: bandwidth method {.smaller}
+
+**In density estimations, there is a smoothing parameter**
+
+::: fragment
+**Scott's Rule**
+
+::: incremental
+-   Rule of thumb for choosing kernal bandwidth
+-   Proportional to the standard deviation of the data and inversely proportional to the cube root of the sample size (n).
+-   Formula: $h = \sigma \cdot n^{-\frac{1}{3}}$
+-   Tends to produce a smoother density estimation
+-   Suitable for data that is roughly normally distributed
+:::
+:::
+
+::: fragment
+**Silverman's Rule**
+
+::: incremental
+-   Another popular rule of thumb
+-   Similar to Scott's rule but potentially leading to a smaller bandwidth.
+-   Formula: $h = \left( \frac{4\hat{\sigma}^5}{3n} \right)^{\frac{1}{5}}$
+-   Can be better for data with outliers or heavy tails
+:::
+:::
+
+## KDE: our data {.smaller}
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-16|1-4|6,7|12|16
+values = hfi_clean['pf_score_square']
+kde = gaussian_kde(values, bw_method = 'scott')
+x_eval = np.linspace(values.min(), values.max(), num = 500) 
+kde_values = kde(x_eval)
+
+minima_indices = argrelextrema(kde_values, np.less)[0]
+valleys = x_eval[minima_indices]
+
+plt.figure(figsize = (7, 5))
+plt.title('KDE and Valleys')
+sns.lineplot(x = x_eval, y = kde_values, label = 'KDE')
+plt.scatter(x = valleys, y = kde(valleys), color = 'r', zorder = 5, label = 'Valleys')
+plt.legend()
+plt.show()
+
+print("Valley x-values:", valleys)
+```
+
+## Split the data {.smaller}
+
+```{python}
+#| code-line-numbers: 1-5|1,2|4
+valley = 68.39968248
+hfi_clean['group'] = np.where(hfi_clean['pf_score_square'] < valley, 'group1', 'group2')
+
+data = hfi_clean[['group', 'pf_score_square']].sort_values(by = 'pf_score_square')
+data.head()
+```
+
+```{python}
+data.tail()
+```
+
+## Plot the grouped data
+
+```{python}
+#| code-fold: true
+sns.histplot(data = hfi_clean, x = "pf_score_square", 
+            hue = "group", kde = True, stat = "density", common_norm = False)
+
+plt.show()
+```
+
+## Dimensional reduction {.smaller}
+
+> **Dimension reduction**, is the transformation of data from a high-dimensional space into a low-dimensional space so that the low-dimensional representation retains some meaningful properties of the original data, ideally close to its [intrinsic dimension](https://en.wikipedia.org/wiki/Intrinsic_dimension "Intrinsic dimension").
+
+::: fragment
+**Principal component analysis (PCA)** - Unsupervised
+
+::: incremental
+-   Maximizes variance in the dataset.
+
+-   Finds orthogonal principal components.
+
+-   Useful for feature extraction and data visualization.
+:::
+:::
+
+::: fragment
+**t-Distributed Stochastic Neighbor Embedding (t-SNE)** - Unsupervised
+
+::: incremental
+-   Preserves local structures and relationships
+
+-   Maximizes the ratio of between-class variance to within-class variance.
+
+-   Stochastic and iterative process (probabilistic), iteratively minimizing the divergence between distributions
+
+-   Ideal for complex data visualization
+:::
+:::
+
+## Dimensional reduction: applied {.smaller}
+
+::: panel-tabset
+## Prep
+
+```{python}
+numeric_cols = hfi.select_dtypes(include = [np.number]).columns
+
+# Applying mean imputation only to numeric columns
+hfi[numeric_cols] = hfi[numeric_cols].fillna(hfi[numeric_cols].mean())
+
+features = ['pf_rol_procedural', 'pf_rol_civil', 'pf_rol_criminal', 'pf_rol', 'hf_score', 'hf_rank', 'hf_quartile']
+
+x = hfi.loc[:, features].values
+y = hfi.loc[:, 'region'].values
+x = StandardScaler().fit_transform(x)
+```
+
+## PCA: variance
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-5|1|2|3|4|5 
+pca = PCA(n_components = 2)
+principalComponents = pca.fit_transform(x)
+principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
+pca_variance_explained = pca.explained_variance_ratio_
+print("Variance explained:", pca_variance_explained, "\n", principalDf)
+```
+
+## PCA: scree plot
+
+```{python}
+#| code-fold: true
+# Combining the scatterplot of principal components with the scree plot using the correct column names
+fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 5))
+
+# Scatterplot of Principal Components
+axes[0].scatter(principalDf['principal component 1'], principalDf['principal component 2'])
+for i in range(len(pca.components_)):
+    axes[0].arrow(0, 0, pca.components_[i, 0], pca.components_[i, 1], head_width = 0.1, head_length = 0.15, fc = 'r', ec = 'r', linewidth = 2)
+    axes[0].text(pca.components_[i, 0] * 1.2, pca.components_[i, 1] * 1.2, f'Eigenvector {i+1}', color = 'r', fontsize = 12)
+axes[0].set_xlabel('Principal Component 1')
+axes[0].set_ylabel('Principal Component 2')
+axes[0].set_title('Scatterplot of Principal Components with Eigenvectors')
+axes[0].grid()
+
+# Scree Plot for PCA
+axes[1].bar(range(1, len(pca_variance_explained) + 1), pca_variance_explained, alpha = 0.6, color = 'g', label = 'Individual Explained Variance')
+axes[1].set_ylabel('Explained variance ratio')
+axes[1].set_xlabel('Principal components')
+axes[1].set_title('Scree Plot for PCA')
+axes[1].legend(loc='best')
+
+plt.tight_layout()
+plt.show()
+```
+
+## t-SNE: components
+
+```{python}
+#| code-fold: true
+#| code-line-numbers: 1-5|1|2|4 
+tsne = TSNE(n_components = 2, random_state = 42)
+tsne_results = tsne.fit_transform(x)
+
+tsne_df = pd.DataFrame(data = tsne_results, columns = ['tsne-2d-one', 'tsne-2d-two'])
+tsne_df
+```
+
+## t-SNE: plot
+
+```{python}
+#| code-fold: true
+tsne_df['region'] = y
+
+plt.figure(figsize = (7, 5))
+plt.scatter(tsne_df['tsne-2d-one'], tsne_df['tsne-2d-two'], c = pd.factorize(tsne_df['region'])[0], alpha=0.5)
+plt.colorbar(ticks = range(len(np.unique(y))))
+plt.xlabel('TSNE Dimension 1')
+plt.ylabel('TSNE Dimension 2')
+plt.title('t-SNE Results with Region Color Coding')
+plt.show()
+```
+:::
+
+## Dimensional reduction: what now? {.smaller}
+
+::: incremental
+1.  **Feature Selection:** Choose the most informative components.
+
+2.  **Visualization:** Graph the reduced dimensions to identify patterns.
+
+3.  **Clustering:** Group similar data points using clustering algorithms.
+
+4.  **Classification:** Predict categories using classifiers on reduced features.
+
+5.  **Model Evaluation:** Assess model performance with metrics like accuracy.
+
+6.  **Cross-Validation:** Validate model stability with cross-validation.
+
+7.  **Hyperparameter Tuning:** Optimize model settings for better performance.
+
+8.  **Model Interpretation:** Understand feature influence in the models.
+
+9.  **Ensemble Methods:** Improve predictions by combining multiple models.
+
+10. **Deployment:** Deploy the model for real-world predictions.
+
+11. **Iterative Refinement:** Refine analysis based on initial results.
+
+12. **Reporting:** Summarize findings for stakeholders.
+:::
+
+# Back to our question
+
+## Question
+
+How does **environmental stability** [correlate]{.underline} with **human freedom indices** in [different countries]{.underline}, and what [trends]{.underline} can be observed over [recent years]{.underline}?
+
+::: fragment
+::: incremental
+-   We can use the **`pf_score`** from the `hfi` dataset that we've been using.
+
+-   ...but we need an environmental stability index score.
+:::
+:::
+
+## Dataset #2: Environmental Stability {.smaller}
+
+```{python}
+esi = pd.read_csv("data/esi.csv")
+esi.head()
+```
+
+::: fragment
+::: incremental
+-   Looks like the `esi` column will work!
+
+-   But there's a problem...
+
+-   We only have one year in this dataset
+
+-   P.S. there's no missing values
+:::
+:::
+
+## Grouping and aggregating {.smaller}
+
+```{python}
+#| code-line-numbers: 1-4|1-2|3
+grouped_hfi = hfi.groupby('countries').agg({'region': 'first', 
+                                            'pf_score': 'mean'
+                                           }).reset_index()
+grouped_hfi.head()
+```
+
+## Joining the data {.smaller}
+
+```{python}
+#| code-line-numbers: 1-5|1-2|4
+grouped_hfi['country'] = grouped_hfi['countries']
+merged_data = esi.merge(grouped_hfi, how = 'left', on = 'country')
+
+esi_hfi = merged_data[['esi', 'pf_score', 'region', 'country']]
+esi_hfi.head()
+```
+
+::: incremental
+-   ...but what's the new problem?
+
+-   We need to **standardize** the data.
+
+-   Lucky for us this will also help control outliers!
+:::
+
+## Back to missing values
+
+We are going to drop them, since they are also present in `region`
+
+```{python}
+esi_hfi_red = esi_hfi.dropna()
+esi_hfi_red.isna().sum()
+```
+
+# Transformations
+
+## Normality test: Q-Q plot {.smaller}
+
+::: panel-tabset
+## `pf_score`
+
+```{python}
+#| code-fold: true
+sns.set_style("white")
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(data = esi_hfi_red, x = "pf_score", linewidth = 5, ax = ax1)
+ax1.set_title('Personal Freedom Score')
+
+sm.qqplot(esi_hfi_red['pf_score'], line = 's', ax = ax2, dist = stats.norm, fit = True)
+ax2.set_title('Personal Freedom Score Q-Q plot')
+
+plt.tight_layout()
+plt.show()
+```
+
+## `esi`
+
+```{python}
+#| code-fold: true
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(data = esi_hfi_red, x = "esi", linewidth = 5, ax = ax1)
+ax1.set_title('Environmental Stability Score')
+
+sm.qqplot(esi_hfi_red['esi'], line = 's', ax = ax2, dist = stats.norm, fit = True)
+ax2.set_title('Environmental Stability Score Q-Q plot')
+
+plt.tight_layout()
+plt.show()
+```
+:::
+
+## Correcting skew {.smaller}
+
+::: panel-tabset
+## `pf_score`
+
+```{python}
+#| code-fold: true
+esi_hfi_red['pf_score_square'] = pow(esi_hfi_red.pf_score, 2)
+
+col = esi_hfi_red['pf_score_square']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Squared Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Squared Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+
+## `esi`
+
+```{python}
+#| code-fold: true
+esi_hfi_red['esi_log'] = np.log(esi_hfi_red.esi + 1)
+
+col = esi_hfi_red['esi_log']
+
+fig, (ax1, ax2) = plt.subplots(ncols = 2, nrows = 1)
+
+sns.kdeplot(col, linewidth = 5, ax = ax1)
+ax1.set_title('Log Density plot')    
+
+sm.qqplot(col, line = 's', ax = ax2)
+ax2.set_title('Log Q-Q plot')    
+plt.tight_layout()
+plt.show()
+```
+:::
+
+## Normalizing {.smaller}
+
+```{python}
+scaler = StandardScaler()
+esi_hfi_red[['esi_log', 'pf_score_square']] = scaler.fit_transform(esi_hfi_red[['esi_log', 'pf_score_square']])
+
+esi_hfi_red.describe().round(3)
+```
+
+## Correlations {.smaller}
+
+::: panel-tabset
+## Correlation
+
+```{python}
+esi_hfi_num = esi_hfi_red.select_dtypes(include = 'number')
+
+corr = esi_hfi_num.corr()
+corr
+```
+
+## Plot
+
+```{python}
+#| code-fold: true
+plt.figure(figsize = (7, 5))
+ax = sns.scatterplot(data = esi_hfi_red, x = "pf_score_square", y = "esi_log",
+                hue = "region", palette = "colorblind")
+ax.legend(title = "Region",
+          bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0)
+ax.set(xlabel = "Personal Freedom Log-Normal ")
+ax.set(ylabel = "Environmental Stability Squared-Normal")
+ax.set(title = "Human Freedom Index vs. Environmental Stability")
+plt.show()
+```
+:::
+
+## Correlations: p-value {.smaller}
+
+::: panel-tabset
+## p-value
+
+```{python}
+x = esi_hfi_red['pf_score_square']
+y = esi_hfi_red['esi_log']
+corr_coefficient, p_value = pearsonr(x, y)
+
+print("Pearson correlation coefficient:", corr_coefficient.round(3))
+print("P-value:", p_value.round(5))
+```
+
+## Trend line
+
+```{python}
+#| code-fold: true
+sns.lmplot(data = esi_hfi_red, x = "pf_score_square", y = "esi_log", height = 5, aspect = 7/5)
+
+plt.xlabel("Personal Freedom Log-Normal")
+plt.ylabel("Environmental Stability Squared-Normal")
+plt.title("Human Freedom Index vs. Environmental Stability")
+
+plt.show()
+```
+:::
+
+## Conclusions: question
+
+How does **environmental stability** [correlate]{.underline} with **human freedom indices** in [different countries]{.underline}, and what [trends]{.underline} can be observed over [recent years]{.underline}?
+
+::: incremental
+1.  We can't make inferences about [recent years]{.underline}...
+2.  **Moderate positive correlation** between **human freedom index** and **environmental stability**
+3.  We cannot find a relationship between countries either
+4.  We need a **linear regression** next ([later]{.underline})
+:::
+
+## Conclusions: data preprocessing
+
+**There are multiple steps:**
+
+::: incremental
+1.  Check the **distribution** for **normality**
+
+2.  Likely will need a **transformation** based on the **severity** and **direction of skew**
+
+3.  **Normalize** the data with different units
+
+4.  **Correlations** are a good start, but **regressions** are more definitive
+
+5.  It's "as needed", ergo we didn't cover everything...
+:::

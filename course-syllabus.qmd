@@ -221,7 +221,7 @@ Large language models (LLMs) like ChatGPT are a type of artificial intelligenc
 
 *See my policies on this subject above.*
 
-### Late work & extensions
+### Late work & extensions {#late-work-extensions}
 
 The due dates for assignments are there to help you keep up with the course material and to ensure the teaching team can provide feedback within a timely manner. We understand that things come up periodically that could make it difficult to submit an assignment by the deadline.
 
@@ -231,9 +231,9 @@ Policy on late work depends on the particular course component:
 
 -   Homework assignments: GitHub repositories will be closed to contributions at the deadline. If you need to submit your work late, send a DM on Slack to me to reopen your repository.
 
-    -   Late, but next day (before noon): -10% of available points
+    -   Late, within 24 hours of deadline: -10% of available points
 
-    -   Late, but next day (after noon): -20% of available points
+    -   Late, within 24-48 hours of deadline: -20% of available points
 
     -   Two days late or later: No credit, and we will not provide written feedback
 
@@ -243,9 +243,9 @@ Policy on late work depends on the particular course component:
 
     -   Write up: GitHub repositories will be closed to contributions at the deadline. If you need to submit your work late, Slack/email me to reopen your repository.
 
-        -   Late, but next day (before noon): -10% of available points
+        -   Late, within 24 hours of deadline: -10% of available points
 
-        -   Late, but next day (after noon): -20% of available points
+        -   Late, within 24-48 hours of deadline: -20% of available points
 
         -   Two days late or later: No credit, and we will not provide written feedback
 

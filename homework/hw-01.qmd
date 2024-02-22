@@ -76,11 +76,27 @@ For any exercise where you're writing code, insert a code chunk and make sure to
 
 ------------------------------------------------------------------------
 
-**Deliverables:** - A Quarto Notebook containing all code and visualizations. - A written report summarizing your findings from the EDA, the decisions you made during preprocessing, and the rationale behind your choices.
+**Deliverables:**
 
-**Submission Guidelines:** - Push your Quarto Notebook to your GitHub repository. - Ensure your commit messages are descriptive. - Submit the link to your GitHub repository on the course submission page.
+-   A Quarto Notebook containing all code and visualizations.
 
-**Grading Rubric:** Your work will be evaluated based on the following criteria: - Correctness and completeness of the code. - Quality and clarity of the visualizations and summary report. - Proper use of comments and documentation in the code. - Adherence to the submission guidelines.
+-   A written report summarizing your findings from the EDA, the decisions you made during preprocessing, and the rationale behind your choices.
+
+**Submission Guidelines:**
+
+-   Push your Quarto Notebook to your GitHub repository.
+
+-   Ensure your commit messages are descriptive.
+
+**Grading Rubric:** Your work will be evaluated based on the following criteria:
+
+-   Correctness and completeness of the code.
+
+-   Quality and clarity of the visualizations and summary report.
+
+-   Proper use of comments and documentation in the code.
+
+-   Adherence to the submission guidelines.
 
 **Points Distribution:** Each task is allocated a specific number of points. Points will be awarded based on the completeness and correctness of the work submitted. Be sure to follow best practices in data analysis and provide interpretations for your findings and decisions during preprocessing.
 

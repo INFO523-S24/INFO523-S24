@@ -57,11 +57,11 @@ d |>
     columns = c(topic, prepare, due)
   ) |>
   cols_width(
-    week ~ px(20),
+    week ~ px(15),
     date ~ px(150), 
     topic ~ px(550),
     prepare ~ px(400),
-    due ~ px(190)
+    due ~ px(150)
   ) |>
   cols_label(
     what = "",

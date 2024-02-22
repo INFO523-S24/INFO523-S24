@@ -1,0 +1,1054 @@
+---
+title: Unsupervised<br>Learning I
+subtitle: Lecture 11
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+execute: 
+  warning: false
+  message: false
+  error: false
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   HW 05 is due Fri Apr 26, 11:59pm
+
+## Setup {.smaller}
+
+```{python}
+#| label: setup
+#| message: false
+
+# Data Handling and Manipulation
+import pandas as pd
+import numpy as np
+
+# Data Preprocessing
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.decomposition import PCA
+
+# Model Selection and Evaluation
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from sklearn.mixture import GaussianMixture
+
+# Machine Learning Models
+from sklearn.cluster import KMeans
+from sklearn_extra.cluster import KMedoids
+
+# Data Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set the default style for visualization
+sns.set_theme(style = "white", palette = "colorblind")
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+```
+
+# Unsupervised Learning
+
+## 
+
+<br>
+
+![Credit: [Recro](https://recro.io/blog/supervised-vs-unsupervised-learning-key-differences/)](images/unsupervised.jpeg){fig-align="center" width="1528"}
+
+## Clustering
+
+![](images/clustering-1.png){fig-align="center"}
+
+## Clustering {.smaller}
+
+Some use cases for clustering include:
+
+::: incremental
+-   [**Recommender systems**](https://pages.dataiku.com/recommendation-engines):
+
+    -   Grouping together users with similar viewing patterns on Netflix, in order to recommend similar content
+
+-   [**Anomaly detection**](https://pages.dataiku.com/anomaly-detection-at-scale-guidebook):
+
+    -   Fraud detection, detecting defective mechanical parts
+
+-   **Genetics**:
+
+    -   Clustering DNA patterns to analyze evolutionary biology
+
+-   **Customer segmentation**:
+
+    -   Understanding different customer segments to devise marketing strategies
+:::
+
+## Question:
+
+Can we [identify distinct customer segments]{.underline} based on their **purchasing behavior** and **demographic** **details** during the Diwali sales period?
+
+## Our data: Diwali Sales {.smaller}
+
+::: panel-tabset
+## Read + Head
+
+```{python}
+from skimpy import clean_columns
+
+mlb_players_18 = pd.read_csv("data/mlb_players_18.csv", encoding = 'iso-8859-1')
+
+mlb_players_18.head()
+```
+
+## Metadata
+
+::: {style="text-align: center;"}
+```{=html}
+<iframe width="1200" height="400" src="https://openintrostat.github.io/openintro/reference/mlb_players_18.html" frameborder="1" style="background:white;"></iframe>
+```
+:::
+
+## Info
+
+```{python}
+mlb_players_18.info()
+```
+
+## Categories
+
+```{python}
+#| code-fold: true
+
+# Assign data
+df = mlb_players_18
+
+# Select categorical columns
+categorical_cols = df.columns
+
+# Initialize a dictionary to store results
+category_analysis = {}
+
+# Loop through each categorical column
+for col in categorical_cols:
+    counts = df[col].value_counts()
+    proportions = df[col].value_counts(normalize=True)
+    unique_levels = df[col].unique()
+    
+    # Store results in dictionary
+    category_analysis[col] = {
+        'Unique Levels': unique_levels,
+        'Counts': counts,
+        'Proportions': proportions
+    }
+
+# Print results
+for col, data in category_analysis.items():
+    print(f"Analysis for {col}:\n")
+    print("Unique Levels:", data['Unique Levels'])
+    print("\nCounts:\n", data['Counts'])
+    print("\nProportions:\n", data['Proportions'])
+    print("\n" + "-"*50 + "\n")
+```
+
+## Describe
+
+```{python}
+mlb_players_18.describe()
+```
+:::
+
+## Preprocessing {.smaller}
+
+::: panel-tabset
+## Define columns
+
+```{python}
+# Define the columns based on their type for preprocessing
+categorical_features = ['team', 'position']
+numerical_features = ['games', 'AB', 'R', 'H', 'doubles', 'triples', 'HR', 'RBI', 'walks', 'strike_outs', 'stolen_bases', 'caught_stealing_base', 'AVG', 'OBP', 'SLG', 'OPS']
+```
+
+## Prepare steps
+
+```{python}
+# Handling missing values: Impute missing values if any
+# For numerical features, replace missing values with the median of the column
+# For categorical features, replace missing values with the most frequent value of the column
+numerical_transformer = Pipeline(steps = [
+    ('imputer', SimpleImputer(strategy = 'median')),
+    ('scaler', StandardScaler())])
+
+categorical_transformer = Pipeline(steps = [
+    ('onehot', OneHotEncoder(handle_unknown = 'ignore'))])
+
+preprocessor = ColumnTransformer(transformers = [
+    ('num', numerical_transformer, numerical_features),
+    ('cat', categorical_transformer, categorical_features)])
+```
+
+## Transformations
+
+```{python}
+# Apply the transformations to the dataset
+mlb_preprocessed = preprocessor.fit_transform(mlb_players_18)
+
+# The result is a NumPy array. To convert it back to a DataFrame:
+# Update the method to get_feature_names_out for compatibility with newer versions of scikit-learn
+feature_names = list(preprocessor.named_transformers_['cat'].named_steps['onehot'].get_feature_names_out(categorical_features))
+new_columns = numerical_features + feature_names
+
+mlb_preprocessed_df = pd.DataFrame(mlb_preprocessed, columns = new_columns)
+mlb_preprocessed_df.head()
+```
+:::
+
+# Before moving on: <br> Similarity / Dissimilarity
+
+## Similarity + Dissimilarity {style="text-align: center;"}
+
+![](images/sim-dissim.webp){fig-align="center" width="567"}
+
+## Similarity {.smaller}
+
+::: panel-tabset
+## Cosine
+
+![](images/cosine.jpg){fig-align="center" width="795"}
+
+$\cos(\theta) = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \sqrt{\sum_{i=1}^{n} B_i^2}}$
+
+::: incremental
+-   Best for text data or any high-dimensional data.
+
+-   Useful when the magnitude of the data vector is not important.
+
+-   [Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html)
+:::
+
+## Jaccard
+
+![](images/jaccard.jpg){fig-align="center" width="712"}
+
+$J(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+
+::: incremental
+-   Suitable for sets or binary data.
+
+-   Ideal for comparing the similarity between two sample sets.
+
+-   [Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.jaccard_score.html)
+:::
+
+## Pearson $r$
+
+![](images/pearson.png){fig-align="center" width="657"}
+
+$r = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum (X_i - \bar{X})^2 \sum (Y_i - \bar{Y})^2}}$
+
+::: incremental
+-   Use when measuring the linear relationship between two continuous variables.
+
+-   Appropriate for data with a normal distribution.
+
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html)
+:::
+
+## Spearman $\rho$
+
+::: columns
+::: {.column width="33.33%"}
+![](images/spearman-1.png){fig-align="center" width="370"}
+:::
+
+::: {.column width="33.33%"}
+![](images/spearman-2.png){fig-align="center" width="370"}
+:::
+
+::: {.column width="33.33%"}
+![](images/spearman-3.png){fig-align="center" width="370"}
+:::
+:::
+
+$\rho = 1 - \frac{6 \sum d_i^2}{n(n^2 - 1)}$
+
+::: incremental
+-   Ordinal data or when data do not meet the assumptions of Pearson's correlation.
+
+-   Monotonic relationships between two continuous or ordinal variables.
+
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.html)
+:::
+:::
+
+## Dissimilarity {.smaller}
+
+::: panel-tabset
+## Euclidean
+
+![](images/euclidean.png){fig-align="center" width="363"}
+
+$d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum_{i=1}^{n} (p_i - q_i)^2}$
+
+::: incremental
+-   Use for continuous data to measure the "straight line" distance between points in Euclidean space.
+-   Most common in clustering and classification where simple distance measurement is required.
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.euclidean.html)
+:::
+
+## Manhattan
+
+![](images/manhattan.png){fig-align="center" width="250"}
+
+$d(\mathbf{p}, \mathbf{q}) = \sum_{i=1}^{n} |p_i - q_i|$
+
+::: incremental
+-   Suitable for continuous or ordinal data where you want to measure the distance as if navigating a grid-like path (like city blocks).
+-   Useful when the difference across dimensions is important regardless of the path taken.
+-   [Python](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.manhattan_distances.html)
+:::
+
+## Hamming
+
+![](images/hamming.jpeg){fig-align="center" width="362"}
+
+$d(\mathbf{p}, \mathbf{q}) = \sum_{i=1}^{n} \delta(p_i, q_i) \quad \text{where} \quad \delta(a, b) = \begin{cases} 1 & \text{if } a \neq b \\ 0 & \text{otherwise} \end{cases}$
+
+::: incremental
+-   Use for categorical or binary data.
+-   Ideal for comparing two strings of equal length or binary feature vectors.
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.hamming.html)
+:::
+
+## Minkowski
+
+![](images/minkowski.png){fig-align="center" width="1209"}
+
+$d(\mathbf{p}, \mathbf{q}) = \left( \sum_{i=1}^{n} |p_i - q_i|^p \right)^{\frac{1}{p}}$
+
+::: incremental
+-   A generalization of Euclidean and Manhattan distances. Use when you need to fine-tune the distance calculation by emphasizing different dimensions.
+-   Parameterizable for different applications; adjust the parameter to control the impact of different dimensions.
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.minkowski.html)
+:::
+
+## Mahalanobis
+
+::: columns
+::: {.column width="50%"}
+```{python}
+#| echo: false
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial.distance import mahalanobis
+from scipy.stats import chi2
+
+# Generating synthetic multivariate data with a covariance
+np.random.seed(0)
+mean = [0, 0]
+cov = [[1, 0.5], [0.5, 1]]  # diagonal covariance, indicating variable x and y are correlated
+X = np.random.multivariate_normal(mean, cov, 300)
+
+# Mahalanobis Distance calculation
+S_inv = np.linalg.inv(np.cov(X.T))  # Inverse covariance matrix
+mean_vec = np.mean(X, axis=0)
+
+# Computing Mahalanobis distance for each point in the dataset
+mahalanobis_distances = np.array([mahalanobis(x, mean_vec, S_inv) for x in X])
+
+# Plotting
+plt.figure(figsize=(6, 4))
+sns.set_theme(style = "white", palette = "colorblind")
+# Colors based on Mahalanobis distance
+colors = mahalanobis_distances
+
+# Scatter plot of the synthetic data
+scatter = plt.scatter(X[:, 0], X[:, 1], c=colors, cmap='viridis', marker='o', edgecolor='k', alpha=0.7)
+plt.colorbar(scatter, label='Mahalanobis Distance to Mean')
+plt.xlabel('X1')
+plt.ylabel('X2')
+plt.title('Mahalanobis Distance of 2D Data Points')
+plt.grid(True)
+
+# Highlighting the mean
+plt.plot(mean_vec[0], mean_vec[1], 'rx', label='Mean', markersize=12)
+
+# 95% confidence ellipse based on chi-square distribution
+theta = np.linspace(0, 2*np.pi, 100)
+ellipse_radius = np.sqrt(chi2.ppf(0.95, df=2))  # 95% quantile of the Chi-square distribution
+ellipse = [np.sqrt(S_inv[i, i]) * ellipse_radius for i in range(2)]
+
+plt.plot(mean_vec[0] + ellipse[0] * np.cos(theta), mean_vec[1] + ellipse[1] * np.sin(theta), 'r--', linewidth=2, label='95% Confidence Ellipse')
+
+plt.legend()
+plt.show()
+```
+:::
+
+::: {.column width="50%"}
+$$d(\mathbf{x}, \mathbf{y}) = \sqrt{(\mathbf{x} - \mathbf{y})^T S^{-1} (\mathbf{x} - \mathbf{y})}$$
+
+::: incremental
+-   Best for multivariate data where variables are correlated or scales differ.
+
+-   Useful in identifying outliers or in clustering when data is not isotropic.
+
+-   [Python](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.mahalanobis.html)
+:::
+:::
+:::
+:::
+
+# Clustering
+
+## Clustering methods
+
+::: {style="text-align: center;"}
+```{=html}
+<iframe width="1200" height="400" src="https://datamineaz.org/tables/model-cheatsheet.html" frameborder="1" style="background:white;"></iframe>
+```
+:::
+
+## K-Means Clustering {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_blobs
+sns.set_theme(style = "white", palette = "colorblind")
+
+# Generating simulated data with 3 clusters
+X, _ = make_blobs(n_samples = 300, centers = 3, cluster_std = 0.60, random_state = 0)
+
+# Applying K-Means clustering
+kmeans = KMeans(n_clusters = 3)
+kmeans.fit(X)
+y_kmeans = kmeans.predict(X)
+
+# Plotting the clusters and their centroids
+sns.scatterplot(x = X[:, 0], y = X[:, 1], hue = y_kmeans, s = 50, alpha = 0.6, palette = "colorblind")
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s = 300, c = 'red', alpha = 0.5, label = 'Centroids')
+plt.title('K-Means Clustering with 3 Clusters')
+plt.legend()
+plt.show()
+```
+
+## Formula
+
+> The goal of K-Means is to minimize the variance within each cluster. The variance is measured as the sum of squared distances between each point and its corresponding cluster centroid. The objective function, which K-Means aims to minimize, can be defined as:
+
+$J = \sum_{i=1}^{k} \sum_{x \in C_i} ||x - \mu_i||^2$
+
+**Where**:
+
+::: incremental
+-   $J$ is the objective function
+
+-   $k$ is the number of clusters
+
+-   $C_i$ is the set of points belonging to a cluster $i$.
+
+-   $x$ is a point in the cluster $C_i$
+
+-   $||x - \mu_i||^2$ is the squared Euclidean distance between a point $x$ and the centroid $\mu_i$​, which measures the dissimilarity between them.
+:::
+
+## Key points
+:::
+
+## K-Medians Clustering {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_blobs
+
+sns.set_theme(style="white", palette="colorblind")
+
+# Generating simulated data with 3 clusters
+X, _ = make_blobs(n_samples=300, centers=3, cluster_std=0.60, random_state=0)
+
+# Applying K-Medians clustering
+kmedians = KMedoids(n_clusters=3, random_state=0)
+kmedians.fit(X)
+y_kmedians = kmedians.predict(X)
+
+# Plotting the clusters and their medians
+sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=y_kmedians, s=50, alpha=0.6, palette="colorblind")
+plt.scatter(kmedians.cluster_centers_[:, 0], kmedians.cluster_centers_[:, 1], s=300, c='red', alpha=0.5, label='Medians')
+plt.title('K-Medians Clustering with 3 Clusters')
+plt.legend()
+plt.show()
+```
+
+## Formula
+
+$\min \sum_{i=1}^{k} \sum_{x \in C_i} ||x - m_i||_1$
+
+-   $k$ is the number of clusters.
+
+-   $C_i$​ represents the data points in cluster $i$.
+
+-   $x$ is a point within cluster $C_i$​.
+
+-   $m_i$​ is the median of the data points in cluster $i$, replacing the mean from K-Means.
+
+-   $||x - \mu_i||_1$ denotes the Manhattan distance (L1 norm) between point $x$ and median $m_i$​.
+
+## Key points
+
+::: incremental
+-   **Initialization**: Randomly selects $k$ initial medians.
+
+-   **Assignment Step**: Assigns each data point to the closest median based on some distance metric, typically Manhattan distance.
+
+-   **Update Step**: Recalculates medians as the median of assigned points in each cluster.
+
+-   **Convergence**: Iterates until the medians stabilize (minimal change from one iteration to the next).
+
+-   **Objective**: Minimizes the within-cluster sum of absolute deviations (WSAD), the sum of absolute differences between points and their corresponding median.
+
+-   **Optimal** $k$: Determined experimentally, often using methods like the Elbow Method.
+
+-   **Sensitivity**: Results can vary based on initial median selection; techniques like "k-medians++" may improve initial choices.
+
+-   **Efficiency**: Generally good, but can worsen with increasing $k$ and data dimensionality; often more robust to outliers compared to k-means.
+:::
+:::
+
+## K-Means vs. K-Medians clustering {.smaller}
+
+**K-Means Clustering**:
+
+::: incremental
+-   Groups data by minimizing the variance within clusters.
+
+-   Adopts the mean as the cluster center.
+
+-   Prone to the impact of outliers.
+
+-   Effective for locations in high-dimensional spaces and for "spherical" cluster shapes.
+:::
+
+**K-Median Clustering**:
+
+::: incremental
+-   Prioritizes the minimization of the sum of absolute deviations.
+
+-   Adopts the median as the cluster center.
+
+-   More robust to outliers than K-Means.
+
+-   Bets for non-spherical data, and effectively manages the distortion in distributions.
+:::
+
+## Choosing the right number of clusters {.smaller}
+
+**Four main methods:**
+
+::: incremental
+-   **Elbow Method**
+
+    -   Identifies the $k$ at which the within-cluster sum of squares (WCSS) starts to diminish more slowly.
+
+-   **Silhouette Score**
+
+    -   Measures how similar an object is to its own cluster compared to other clusters.
+
+-   **Davies-Bouldin Index**
+
+    -   Evaluates intra-cluster similarity and inter-cluster differences.
+
+-   **Calinski-Harabasz Index (Variance Ratio Criterion)**
+
+    -   Measures the ratio of the sum of between-clusters dispersion and of intra-cluster dispersion for all clusters.
+
+-   **BIC**
+
+    -   Identifies the optimal number of clusters by penalizing models for excessive parameters, striking a balance between simplicity and accuracy.
+:::
+
+## Elbow Method {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+# Generating synthetic data
+X, _ = make_blobs(n_samples = 300, centers = 4, cluster_std = 0.60, random_state = 0)
+
+# Calculating WCSS for a range of number of clusters
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters = i, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 0)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+
+# Creating the plot
+sns.set(style = "white")
+plt.figure(figsize = (10, 6))
+plt.plot(range(1, 11), wcss, marker='o', linestyle='-')
+plt.title('Elbow Method For Optimal k')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('WCSS')
+plt.xticks(range(1, 11))
+plt.show()
+```
+
+## Pros + Cons
+
+**Pros:**
+
+::: incremental
+-   **Simple and easy to understand**: Requires minimal statistical knowledge.
+
+-   **Clear graphical representation**: Helps intuitively identify the optimal number of clusters.
+
+-   **Versatile**: Applicable to various clustering algorithms.
+:::
+
+**Cons:**
+
+::: incremental
+-   **Subjective**: The "elbow" point can be ambiguous, leading to different interpretations.
+
+-   **Not ideal for all datasets**: Difficulty in identifying a clear elbow in datasets with gradual variance reduction.
+
+-   **Computationally expensive**: For large datasets, calculating WCSS for many values of $k$ can be resource-intensive.
+
+-   **Sensitive to initialization**: The initial placement of centroids can influence the identification of the elbow point.
+:::
+:::
+
+## Silhouette Score {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+from sklearn import datasets
+from sklearn.cluster import KMeans
+
+# Load IRIS dataset
+iris = datasets.load_iris()
+
+X = iris.data
+y = iris.target
+
+# Instantiate the KMeans models
+km = KMeans(n_clusters = 3, random_state = 42)
+
+# Fit the KMeans model
+km.fit_predict(X)
+
+# Calculate Silhoutte Score
+score = silhouette_score(X, km.labels_, metric='euclidean')
+
+# Print the score
+print("For 3 clusters", 'Silhouetter Score: %.3f' % score)
+
+from yellowbrick.cluster import SilhouetteVisualizer
+
+fig, ax = plt.subplots(2, 2)
+for i in [2, 3, 4, 5]:
+    '''
+    Create KMeans instance for different number of clusters
+    '''
+    km = KMeans(n_clusters = i, init = 'k-means++', n_init = 10, max_iter = 100, random_state = 42)
+    q, mod = divmod(i, 2)
+    '''
+    Create SilhouetteVisualizer instance with KMeans instance
+    Fit the visualizer
+    '''
+    visualizer = SilhouetteVisualizer(km, colors = 'yellowbrick', ax = ax[q-1][mod])
+    visualizer.fit(X)
+```
+
+## Formula
+
+$s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}$
+
+::: incremental
+-   $a$ is the mean distance between a sample and all other points in the same class.
+
+-   $b$ is the mean distance between a sample and all other points in the next nearest cluster.
+:::
+
+## Pros + Cons
+
+**Pros:**
+
+::: incremental
+-   The score provides insight into the distance between the resulting clusters.
+
+-   Values range from -1 to 1, where a high value indicates that the object is well matched to its own cluster and poorly matched to neighboring clusters.
+:::
+
+**Cons:**
+
+::: incremental
+-   Computationally expensive for large datasets.
+
+-   Does not perform well with clusters of varying densities.
+:::
+:::
+
+## Davies-Bouldin Index {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+# Sample data for DBI across different cluster numbers
+data = {
+    "Cluster Number": [2, 3, 4, 5, 6, 7],
+    "Davies-Bouldin Index": [2.54, 1.87, 2.12, 1.75, 1.98, 2.31]
+}
+
+df = pd.DataFrame(data)
+
+# Line plot with minimum DBI highlighted
+plt.figure(figsize = (10, 6))
+sns.set_theme(style = "white", palette = "colorblind")
+sns.lineplot(x = "Cluster Number", y = "Davies-Bouldin Index", data = df)
+plt.axvline(df[df["Davies-Bouldin Index"] == df["Davies-Bouldin Index"].min()]["Cluster Number"].values[0], linestyle = "--", color = "red", label = "Optimal Cluster Number")
+plt.xlabel("Cluster Number")
+plt.ylabel("Davies-Bouldin Index")
+plt.title("Davies-Bouldin Index Across Different Cluster Numbers")
+plt.legend()
+plt.show()
+```
+
+## Formula
+
+$DBI = \frac{1}{k} \sum_{i=1}^{k} \max_{j \neq i} \left( \frac{\sigma_i + \sigma_j}{d(c_i, c_j)} \right)$
+
+**Where**:
+
+::: incremental
+-   $k$ is the number of clusters
+
+-   $\sigma_i$ is the average distance of all points in cluster $i$ to the centroid of cluster $i$ (intra-cluster distance)
+
+-   $d(c_i, c_j)$ is the distance between centroids $i$ and $j$
+
+-   The ratio $\frac{\sigma_i + \sigma_j}{d(c_i, c_j)}$ reflects the similarity between clusters $i$ and $j$, with lower values indicating clusters are well-separated and compact.
+:::
+
+## Pros + Cons
+
+**Pros:**
+
+::: incremental
+-   **Intuitive**: Easy to understand and interpret. A lower DBI value means better clustering.
+
+-   **Versatile**: Applicable to any distance metric used within the clustering algorithm.
+
+-   **Useful for Comparing Models**: Effective for comparing the performance of different clustering models on the same dataset.
+:::
+
+**Cons:**
+
+::: incremental
+-   **Sensitivity to Cluster Density**: May not perform well with clusters of varying densities, as it relies on the mean distances within clusters.
+
+-   **Does Not Scale Well**: Computationally expensive for large datasets due to the calculation of distances between all pairs of clusters.
+
+-   **Ambiguity in Interpretation**: While lower values are better, there's no clear threshold below which clusters are considered 'good' or 'optimal'.
+:::
+:::
+
+## Calinski-Harabasz Index {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+# Generating synthetic data
+X, _ = make_blobs(n_samples = 300, centers = 4, cluster_std = 0.60, random_state = 0)
+
+# Calculating Calinski-Harabasz Index for different numbers of clusters
+ch_scores = []
+for i in range(2, 11):  # CH index is not defined for i=1 (single cluster)
+    kmeans = KMeans(n_clusters = i, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 0)
+    kmeans.fit(X)
+    labels = kmeans.labels_
+    ch_score = calinski_harabasz_score(X, labels)
+    ch_scores.append(ch_score)
+
+# Plotting the Calinski-Harabasz Index
+sns.set_style("white")
+plt.figure(figsize = (10, 6))
+plt.plot(range(2, 11), ch_scores, marker = 'o', linestyle = '-', color = 'purple')
+plt.title('Calinski-Harabasz Index For Different k Values')
+plt.xlabel('Number of Clusters')
+plt.ylabel('Calinski-Harabasz Index')
+plt.show()
+
+```
+
+## Formula
+
+$CH = \frac{SS_B / (k - 1)}{SS_W / (n - k)}$
+
+**where**:
+
+::: incremental
+-   $CH$ is the Calinski-Harabasz score.
+
+-   $SS_B$​ is the between-cluster variance.
+
+-   $SS_W$​ is the within-cluster variance.
+
+-   $k$ is the number of clusters.
+
+-   $n$ is the number of data points.
+:::
+
+## Pros + cons
+
+**Pros**:
+
+::: incremental
+-   **Clear Interpretation**: High values indicate better-defined clusters.
+
+-   **Computationally Efficient**: Less resource-intensive than many alternatives.
+
+-   **Scale-Invariant**: Effective across datasets of varying sizes.
+
+-   **No Labeled Data Required**: Useful for unsupervised learning scenarios.
+:::
+
+**Cons**:
+
+::: incremental
+-   **Cluster Structure Bias**: Prefers convex clusters of similar sizes.
+
+-   **Sample Size Sensitivity**: Can favor more clusters in larger datasets.
+
+-   **Not Ideal for Overlapping Clusters**: Assumes distinct, non-overlapping clusters.
+:::
+:::
+
+## BIC {.smaller}
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+# Generating synthetic data
+X, _ = make_blobs(n_samples = 300, centers = 4, cluster_std = 0.60, random_state = 0)
+
+# Calculating BIC for different numbers of clusters using Gaussian Mixture Models
+n_components = np.arange(1, 11)
+bics = []
+for n in n_components:
+    gmm = GaussianMixture(n_components = n, random_state = 0)
+    gmm.fit(X)
+    bics.append(gmm.bic(X))
+
+# Visualizing the BIC scores
+sns.set(style = "white")
+plt.figure(figsize = (10, 6))
+sns.lineplot(x = n_components, y = bics, marker = 'o', linestyle = '-', color = 'orange')  # Adjusted line
+plt.title('BIC Scores for Different Numbers of Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('BIC Score')
+plt.show()
+```
+
+## Formula
+
+$\text{BIC} = -2 \ln(\hat{L}) + k \ln(n)$
+
+**where**:
+
+::: incremental
+-   $\hat{L}$ is the maximized value of the likelihood function of the model,
+
+-   $k$ is the number of parameters in the model,
+
+-   $n$ is the number of observations.
+:::
+
+## Pros + cons
+
+**Pros**:
+
+-   **Penalizes Complexity**: Helps avoid overfitting by penalizing models with more parameters.
+
+-   **Objective Selection**: Facilitates choosing the model with the best balance between fit and simplicity.
+
+-   **Applicability**: Useful across various model types, including clustering and regression.
+
+**Cons**:
+
+-   **Computationally Intensive**: Requires fitting multiple models to calculate, which can be resource-heavy.
+
+-   **Sensitivity to Model Assumptions**: Performance depends on the underlying assumptions of the model being correct.
+
+-   **Not Always Intuitive**: Determining the absolute best model may still require domain knowledge and additional diagnostics.
+:::
+
+## Systematic comparison: Equal clusters {.smaller}
+
+::: panel-tabset
+## Elbow
+
+![](images/equally-sized-elbow.png){fig-align="center" width="896"}
+
+## Davies-Boulin
+
+![](images/equally-sized-davies-bouldin.png){fig-align="center" width="896"}
+
+## Silhouette
+
+![](images/equally-sized-silhouette.png){fig-align="center" width="896"}
+
+## Calinski-Harabasz
+
+![](images/equally-sized-calinski-harabasz.png){fig-align="center" width="896"}
+
+## BIC
+
+![](images/equally-sized-bic.png){fig-align="center" width="896"}
+:::
+
+## Systematic comparison: Unequal clusters {.smaller}
+
+::: panel-tabset
+## Elbow
+
+![](images/unequally-sized-elbow.png){fig-align="center" width="896"}
+
+## Davies-Boulin
+
+![](images/unequally-sized-davies-bouldin.png){fig-align="center" width="896"}
+
+## Silhouette
+
+![](images/unequally-sized-silhouette.png){fig-align="center" width="896"}
+
+## Calinski-Harabasz
+
+![](images/unequally-sized-calinski-harabasz.png){fig-align="center" width="896"}
+
+## BIC
+
+![](images/unequally-sized-bic.png){fig-align="center" width="896"}
+:::
+
+## Systematic comparison - accuracy
+
+![](images/systematic-comparison.png){fig-align="center" width="692"}
+
+## K-Means Clustering: applied {.smaller}
+
+::: panel-tabset
+## Model summary
+
+```{python}
+#| code-fold: true
+# K-Means Clustering
+kmeans = KMeans(n_clusters = 5, random_state = 0)  # Adjust n_clusters as needed
+kmeans.fit(mlb_preprocessed_df)
+clusters = kmeans.predict(mlb_preprocessed_df)
+
+# Adding cluster labels to the DataFrame
+mlb_preprocessed_df['Cluster'] = clusters
+
+# Evaluate clustering performance
+silhouette_avg = silhouette_score(mlb_preprocessed, clusters)
+print("For n_clusters =", 5, f"The average silhouette_score is : {silhouette_avg:.3f}")
+print("")
+
+# Model Summary
+print("Cluster Centers:\n", kmeans.cluster_centers_)
+```
+
+## Visualize results
+
+```{python}
+#| code-fold: true
+pca = PCA(n_components = 2)
+mlb_pca = pca.fit_transform(mlb_preprocessed)
+sns.scatterplot(x = mlb_pca[:, 0], y = mlb_pca[:, 1], hue = clusters, alpha = 0.75, palette = "colorblind")
+plt.title('MLB Players Clustered (PCA-reduced Features)')
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+plt.legend(title = 'Cluster')
+plt.show()
+```
+:::
+
+## In-class activity:<br>apply K-Medians Clustering {.smaller}
+
+```{python}
+from pyclustering.cluster.kmedians import kmedians
+from pyclustering.cluster import cluster_visualizer
+from pyclustering.utils.metric import distance_metric, type_metric
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+```
+
+```{python}
+#| code-fold: true
+#| eval: false
+# Assuming 'mlb_preprocessed_df' is your DataFrame after preprocessing
+# Convert DataFrame to list of lists for pyclustering compatibility
+data = mlb_preprocessed_df.to_numpy().tolist()
+
+# Select initial medians for clusters
+initial_medians = np.random.randint(0, len(data), size=5).tolist()
+initial_medians = [data[index] for index in initial_medians]
+
+# Create K-Medians instance
+kmedians_instance = kmedians(data, initial_medians, metric=distance_metric(type_metric.MANHATTAN))
+
+# Run cluster analysis and obtain results
+kmedians_instance.process()
+clusters = kmedians_instance.get_clusters()
+medians = kmedians_instance.get_medians()
+
+# Assign cluster labels to each record in DataFrame
+cluster_labels = np.zeros(len(data))
+for cluster_id, cluster in enumerate(clusters):
+    for index in cluster:
+        cluster_labels[index] = cluster_id
+mlb_preprocessed_df['Cluster'] = cluster_labels
+
+# Evaluate clustering performance using silhouette score
+silhouette_avg = silhouette_score(mlb_preprocessed_df.drop('Cluster', axis = 1), cluster_labels)
+print(f"For n_clusters = 5, The average silhouette_score is : {silhouette_avg:.3f}")
+
+# Displaying the medians of the clusters
+print("Cluster Medians:\n", medians)
+
+# Visualize
+pca = PCA(n_components = 2)
+mlb_pca = pca.fit_transform(mlb_preprocessed_df.drop('Cluster', axis = 1))
+sns.scatterplot(x = mlb_pca[:, 0], y = mlb_pca[:, 1], hue = cluster_labels, alpha = 0.75, palette = "colorblind")
+plt.title('MLB Players Clustered (PCA-reduced Features)')
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+plt.legend(title = 'Cluster')
+plt.show()
+```

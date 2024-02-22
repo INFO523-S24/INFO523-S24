@@ -24,14 +24,14 @@ Each of the two questions you come up with should involve more than two variable
 
 -   Week 3 of project (week of February 13): Review feedback from me on your proposal and close any remaining issues. Work on your presentation in `presentation.qmd` and write-up in `index.qmd`.
 
--   Week 4 of project (week of February 20): Finalize your write-up, presentation, and your project website. Present in lab on the Wednesday of this week.
+-   Weeks 4-5 of project (week of February 19, 26): Finalize your write-up, presentation, and your project website. Present in class on the Wednesday after Spring Break (March 13th).
 
 ## Due dates
 
 -   Proposals for peer review: due on Wednesday, February 7 at noon.
 -   Revised proposals for teaching team review: due Monday, February 12 at 5pm.
--   Presentation: due Wednesday, February 22 at the **beginning** of class.
--   Write-up: due Wednesday, February 22 at 11:59pm.
+-   Presentation: due Wednesday, March 13 at the **beginning** of class.
+-   Write-up: due Wednesday, March 13 at 11:59pm.
 
 ## Deliverables
 
@@ -48,14 +48,13 @@ Your proposal should include:
 
 #### Reviewer tasks {.unnumbered}
 
-Each team will review the proposals of two other teams. The peer review will be completed during the lab session on Wednesday, February 7. On that day teams will have access to the project repos of the two teams whose work they're reviewing. Reviews should start by cloning the team's repo, re-rendering it locally to make sure you can reproduce their work, and then adding an issue to their repo with your peer review feedback.
+Each team will review the proposals of two other teams. The peer review will be completed during class on Wednesday, February 7. On that day teams will have access to the project repos of the two teams whose work they're reviewing. Reviews should start by cloning the team's repo, re-rendering it locally to make sure you can reproduce their work, and then adding an issue to their repo with your peer review feedback.
 
-The reviewer / reviewee assignments can be found below (TBD):
+The reviewer / reviewee assignments are as follows:
 
 ```{r}
 #| message: false
 #| echo: false
-#| eval: false
 library(tidyverse)
 library(gt)
 p1_pr <- read_csv("project-1-peer-review.csv")

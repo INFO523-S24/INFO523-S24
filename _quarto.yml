@@ -90,6 +90,10 @@ website:
           #- href: homework/hw-06.qmd
             #text: HW 06
       #- section: "Student work"
+      - section: Exercises
+        contents:
+          - href: exercises/ex-07.qmd
+            text: ex 07
 
             
   page-footer:
