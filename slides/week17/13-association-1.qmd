@@ -1,0 +1,971 @@
+---
+title: Association
+subtitle: Lecture 13
+title-slide-attributes:
+  data-background-image: ../minedata-bg.png
+  data-background-size: 600px, cover
+  data-slide-number: none
+format: revealjs
+execute: 
+  warning: false
+  message: false
+  error: false
+auto-stretch: false
+---
+
+# Warm up
+
+## Announcements
+
+-   RQ 05 is due Today, 11:59pm
+-   Final Project Presentations are Mon May 06, 1pm
+
+## Setup {.smaller}
+
+```{python}
+#| label: setup
+#| message: false
+
+# Data Handling and Manipulation
+import pandas as pd
+import numpy as np
+
+# Data Preprocessing
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from mlxtend.preprocessing import TransactionEncoder
+
+# Model Selection and Evaluation
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from sklearn.mixture import GaussianMixture
+
+# Machine Learning Models
+from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
+from mlxtend.preprocessing import TransactionEncoder
+
+# Stats
+from scipy.stats import pearsonr
+import statsmodels.api as sm
+
+# Data Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set the default style for visualization
+sns.set_theme(style = "white", palette = "colorblind")
+
+# Increase font size of all Seaborn plot elements
+sns.set(font_scale = 1.25)
+```
+
+## Market Basket Analysis {.smaller}
+
+> Market Basket Analysis (MBA) is a data mining technique used to discover associations between items within large datasets, typically used in retail to find associations between products purchased together.
+
+```{python}
+#| echo: false
+from itertools import chain, combinations
+
+record = ['apple', 'banana', 'milk']
+record2 = ['apple', 'eggs', 'bread']
+record3 = ['eggs', 'milk']
+
+items = ['apple', 'banana', 'milk', 'eggs', 'bread']
+
+
+# code from https://docs.python.org/2/library/itertools.html
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+print("Itemsets from records:")
+print(set(list(powerset(record))+list(powerset(record2))+list(powerset(record3))))
+print("")
+print("")
+print("Itemsets from items:")
+print(list(powerset(items)))
+```
+
+## Association rules
+
+To build an association rule, we should have at least one **antecedent** and one **consequent**:
+
+::: incremental
+-   One antecedent and one consequent: if { 🍪 } then { ☕️ }
+
+-   Multi antecedent: if { 🍪, 🍰 } then { ☕️}
+
+-   Multi consequent: if { 🍪 } then { ☕️, 🥛 }
+:::
+
+## Frequency of events {.smaller}
+
+```{python}
+#| echo: false
+import collections
+
+record = ['apple', 'banana', 'milk']
+record2 = ['apple', 'eggs', 'bread']
+record3 = ['eggs', 'milk']
+
+
+# code from https://docs.python.org/2/library/itertools.html
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+
+itemsets = list(powerset(record)) + list(powerset(record2)) + list(powerset(record3))
+
+ctr = collections.Counter(itemsets)
+print("Frequency of the itemsets:")
+for itemset, count in ctr.items():
+    if len(itemset) > 0:
+        print("{}, {:0.2f}".format(itemset, count/3))
+```
+
+## Example data {.smaller}
+
+::: panel-tabset
+## Read + Head
+
+> "[The Bread Basket](https://www.kaggle.com/datasets/mittalvasu95/the-bread-basket)" data set that belongs to a bakery located in Edinburgh and includes over 9000 transactions. You can download it from Kaggle.
+
+```{python}
+basket = pd.read_csv("data/breadBasket.csv")
+basket.head()
+```
+
+## Transaction \#
+
+```{python}
+basket.loc[basket['Transaction']==3]
+```
+
+## Wrangle
+
+```{python}
+# Groupby by the Transaction Ids and count items
+basket = basket.groupby(
+              by = ['Transaction', 
+                  'Item'])['Item'].count().reset_index(name = 'Item_Count')
+
+# Pivot table by the transaction and convert item count to boolean 
+basket = basket.pivot_table(
+              index = 'Transaction', 
+              columns = 'Item', 
+              values = 'Item_Count', 
+              aggfunc = 'sum').fillna(0).astype(bool)
+
+basket.head()
+
+```
+:::
+
+## Association rule metrics {.smaller}
+
+::: incremental
+-   **Support:** Proportion of transactions including a specific itemset.
+
+-   **Confidence:** Probability that buying item A leads to buying item B.
+
+-   **Lift:** Ratio of observed to expected frequency of A and B together.
+
+-   **Leverage:** Difference in observed versus expected frequency of A and B together.
+
+-   **Conviction:** Ratio indicating dependency of B on A, based on their co-occurrence versus independence.
+:::
+
+## Support {.smaller}
+
+$\text{Support}(A \rightarrow B) = \frac{Freq(A,B)}{N}$
+
+**Pros:**
+
+::: incremental
+-   Easy to understand and calculate.
+
+-   Helps identify the most common itemsets in the dataset, which can be crucial for decision-making.
+:::
+
+**Cons:**
+
+::: incremental
+-   High support may not always imply a useful or interesting rule, as it does not account for the strength or significance of the association.
+
+-   Can miss interesting rules with lower support but high confidence or lift.
+:::
+
+## Confidence {.smaller}
+
+$\text{Confidence}(A \rightarrow B) = \frac{Support(A \rightarrow B)}{Support(A)}$
+
+**Pros:**
+
+::: incremental
+-   Directly measures the reliability of an association rule.
+
+-   Intuitive interpretation as the conditional probability of occurrence.
+:::
+
+**Cons:**
+
+::: incremental
+-   Can be misleading if the consequent is very common in the dataset, leading to high confidence values that are not necessarily due to a strong association.
+
+-   Does not account for the base popularity of the consequent item.
+:::
+
+## Lift {.smaller}
+
+$\text{Lift}(A \rightarrow B) = \frac{Support(A \rightarrow B)}{Support(A) \times Support(B)}$
+
+**Pros:**
+
+::: incremental
+-   Accounts for the base popularity of both antecedent and consequent, providing a more accurate measure of association strength.
+
+-   A lift value greater than 1 indicates a positive association.
+:::
+
+**Cons:**
+
+::: incremental
+-   Can be harder to interpret compared to support and confidence.
+
+-   Does not provide directionality of the rule (i.e., which item is driving the association).
+:::
+
+## Leverage {.smaller}
+
+$\text{Leverage}(A \rightarrow B) = Support(A \rightarrow B) - (Support(A) \times Support(B))$
+
+**Pros:**
+
+::: incremental
+-   Measures the difference in occurrence frequency of itemsets, providing insight into their co-occurrence beyond chance.
+
+-   Easy to calculate and interpret.
+:::
+
+**Cons:**
+
+::: incremental
+-   Similar to lift, does not indicate the direction of the association.
+
+-   May not differentiate well between items with very high or very low support.
+:::
+
+## Conviction {.smaller}
+
+$\text{Conviction}(A \rightarrow B) = \frac{1 - Support(B)}{1 - Confidence(A \rightarrow B)}$
+
+**Pros:**
+
+::: incremental
+-   Captures the degree of dependency between antecedent and consequent, with higher values indicating stronger association.
+
+-   Provides a measure of rule interest by comparing the observed frequency of the rule to the frequency expected if the items were independent.
+:::
+
+**Cons:**
+
+::: incremental
+-   Less intuitive to understand and interpret for those new to association mining.
+
+-   Like lift, does not directly indicate the direction of the association.
+:::
+
+# Frequent itemsets mining
+
+## Association rule mining task {.smaller}
+
+::: incremental
+-   Given a set of transactions $T$, the goal of association rule mining is to find all rules having
+
+    -   support ≥ *minsup* threshold
+
+    -   confidence ≥ *minconf* threshold
+
+-   **Brute-force approach**:
+
+    -   List all possible association rules
+
+    -   Compute the support and confidence for each rule
+
+    -   Prune rules that fail the *minsup* and *minconf* thresholds
+
+    -   $\rightarrow$ Computationally prohibitive!
+:::
+
+## Mining association rules {.smaller}
+
+::: columns
+::: {.column width="50%"}
+| **TID** | **Items**                 |
+|---------|---------------------------|
+| 1       | Bread, Milk               |
+| 2       | Bread, Diaper, Beer, Eggs |
+| 3       | Milk, Diaper, Beer, Coke  |
+| 4       | Bread, Milk, Diaper, Beer |
+| 5       | Bread, Milk, Diaper, Coke |
+:::
+
+::: {.column width="50%"}
+::: fragment
+{Milk,Diaper} $\rightarrow$ {Beer} (s=0.4, c=0.67)
+
+{Milk,Beer} $\rightarrow$ {Diaper} (s=0.4, c=1.0)
+
+{Diaper,Beer} $\rightarrow$ {Milk} (s=0.4, c=0.67)
+
+{Beer} $\rightarrow$ {Milk,Diaper} (s=0.4, c=0.67)
+
+{Diaper} $\rightarrow$ {Milk,Beer} (s=0.4, c=0.5)
+
+{Milk} $\rightarrow$ {Diaper,Beer} (s=0.4, c=0.5)
+:::
+:::
+:::
+
+**Observations**:
+
+::: incremental
+-   All rules are binary partitions of the itemset {Milk, Diaper, Beer}.
+
+-   Rules from the same itemset share support but differ in confidence.
+
+-   Support and confidence requirements can be separated.
+:::
+
+## Mining association rules {.smaller}
+
+**Two-step approach:**
+
+1.  Frequent Itemset Generation
+    -   Generate all itemsets whose support ≥ minsup
+2.  Rule Generation
+    -   Generate high confidence rules from each frequent itemset
+    -   Each rule is a binary partitioning of a frequent itemset
+
+::: fragment
+Frequent itemset generation is still computationally expensive...
+:::
+
+## Frequent itemset generation {.smaller}
+
+Given $d$ items, there are $2^d$ itemsets:
+
+![](images/chart-tabset-card.png){fig-align="center" width="727"}
+
+## Apriori method {.smaller}
+
+::: panel-tabset
+## Visual
+
+All subsets of a frequent itemset must also be frequent.
+
+![](images/apriori.png){width="675"}
+
+## Formula
+
+**Rule generation**
+
+::: incremental
+1.  Calculate support for each itemset to determine which meet the threshold.
+2.  Generate association rules.
+:::
+
+$\text{Support}(A \rightarrow B) = \frac{Freq(A,B)}{N}$
+
+**Evaluate rule strength**
+
+::: incremental
+1.  Assess the likelihood that consequent item is purchased with antecedent.
+2.  Filtering based on a confidence threshold.
+:::
+
+$\text{Confidence}(A \rightarrow B) = \frac{Support(A \rightarrow B)}{Support(A)}$
+
+**Contribute to decision making**
+
+::: incremental
+1.  Identify strong associations
+2.  Improving predictive accuracy
+:::
+
+## Pros + Cons
+
+**\
+Pros:**
+
+::: incremental
+-   **Simplicity:** Straightforward and easy to understand.
+
+-   **Generality:** Applicable to any transaction dataset without needing domain-specific knowledge.
+
+-   **Widely Used:** A foundational technique that informs many other algorithms.
+:::
+
+**Cons:**
+
+::: incremental
+-   **Performance Issues:** Computationally expensive for large datasets with many items.
+
+-   **Memory Intensive:** Requires significant memory for storing candidates at lower support thresholds.
+
+-   **Redundant Computations:** Generates many candidates, leading to unnecessary computations.
+:::
+:::
+
+## Apriori method: applied {.smaller}
+
+```{python}
+#| code-fold: true
+# Apply Apriori to find frequent itemsets
+frequent_itemsets_apriori = apriori(basket, min_support = 0.01, use_colnames = True)
+
+# Generate association rules from Apriori itemsets
+rules_apriori = association_rules(frequent_itemsets_apriori, metric = "confidence", min_threshold = 0.5)
+print("Association Rules from Apriori:\n", rules_apriori.head())
+```
+
+## Factors affecting complexity {.smaller}
+
+1.  **Choice of Minimum Support Threshold:**
+
+    -   Lowering the support threshold $\rightarrow$ a larger number of frequent itemsets
+
+    -   $\rightarrow$ increase in candidate itemsets & the maximal length of frequent itemsets
+
+2.  **Dimensionality (Number of Items) of the Dataset:**
+
+    -   Greater storage space needed to keep track of each item's support count
+
+    -   If the dataset has a higher number of frequent items, both computational and input/output costs may increase.
+
+3.  **Size of Database:**
+
+    -   The runtime of the Apriori algorithm may increase with the number of transactions since it makes multiple passes over the database.
+
+4.  **Average Transaction Width:**
+
+    -   Wider transactions are typical in denser datasets.
+
+    -   May lead to an increase in the maximal length of frequent itemsets and more traversals of the hash tree, as the number of subsets in a transaction increases with its width.
+
+## Frequent itemset generation: ECLAT {.smaller}
+
+ECLAT uses vertical data layout to store a list of transaction ids for each item:
+
+::: columns
+::: {.column width="60%"}
+![](images/eclat.png){width="561"}
+:::
+
+::: {.column width="40%"}
+::: incremental
+-   **Advantage**: very fast support counting
+
+-   **Disadvantage**: intermediate tid-lists may become too large for memory
+:::
+:::
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+::: incremental
+1.  Create the root node (null)
+
+2.  Scan the database, get the frequent itemsets of length 1, and sort these 1-itemsets in decreasing support count.
+
+3.  Read a transaction at a time. Sort items in the transaction acoording to the last step.
+
+4.  For each transaction, insert items to the FP-Tree from the root node and increment occurence record at every inserted node.
+
+5.  Create a new child node if reaching the leaf node before the insersion completes.
+
+6.  If a new child node is created, link it from the last node consisting of the same item.
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 1:** Calculate The Support Count of Each Item in The Dataset
+
+::: panel-tabset
+## Original
+
+|          |                   |
+|----------|-------------------|
+| **Item** | **Support Count** |
+| I1       | 3                 |
+| I2       | 3                 |
+| I3       | 4                 |
+| I4       | 1                 |
+| I5       | 4                 |
+| I6       | 1                 |
+
+## Sorted
+
+|          |                   |
+|----------|-------------------|
+| **Item** | **Support Count** |
+| I3       | 4                 |
+| I5       | 4                 |
+| I1       | 3                 |
+| I2       | 3                 |
+| I4       | 1                 |
+| I6       | 1                 |
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 2:** Reorganize The Items in The Transaction Dataset
+
+|                    |                  |
+|--------------------|------------------|
+| **Transaction ID** | **Items**        |
+| T1                 | `I3, I1, I4`     |
+| T2                 | `I3, I5, I2, I6` |
+| T3                 | `I3, I5, I1, I2` |
+| T4                 | `I5, I2`         |
+| T5                 | `I3, I5, I1`     |
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 3:** Create FP Tree Using the Transaction Dataset
+
+To construct an FP-Tree for the FP-growth algorithm, perform these steps:
+
+::: incremental
+1.  Initialize a root node labeled as Null.
+
+2.  For each transaction, sorted by item support in descending order:
+
+    -   Start from the root node.
+
+    -   For each item in the transaction:
+
+        -   If a child node with the item exists, increment its count by 1 and proceed to this child.
+
+        -   Otherwise, create a new child node for the item, set its count to 1, and proceed to the new node.
+
+3.  Repeat for all transactions in the dataset.
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T1 to the FP Tree**
+
+::: incremental
+-   Initialize Null root node for the FP-tree.
+
+-   Select first transaction T1: sorted items \[I3, I1, I4\].
+
+-   At root, no child for I3 exists; create child node for I3 with count 1.
+:::
+
+::: fragment
+![](images/fp1.png){width="361"}
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T1 to the FP Tree**
+
+::: incremental
+-   Move to node I3 and proceed to next item I1 in transaction.
+
+-   No child node for I1 under I3; create child node for I1 with count 1.
+:::
+
+![](images/fp2.png){width="361"}
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T1 to the FP Tree**
+
+::: incremental
+-   Move to node I1 and next item I4 in transaction.
+
+-   No child node for I4 under I1; create child node for I4 with count 1.
+:::
+
+![](images/fp3.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T2 to the FP Tree**
+
+::: incremental
+-   Complete traversal of T1; move to T2 with items \[I3, I5, I2, I6\].
+
+-   At root, find child node with I3; increment its count by 1.
+:::
+
+![](images/fp5.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T2 to the FP Tree**
+
+::: incremental
+-   Move to modified I3 node and next item I5 in T2.
+
+-   No child node for I5 under I3; create child node for I5 with count 1.
+:::
+
+![](images/fp6.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T2 to the FP Tree**
+
+::: incremental
+-   Move to newly created I5 node and next item I2 in transaction.
+
+-   No child node for I2 under I5; create child node for I2 with count 1.
+:::
+
+![](images/fp7.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T2 to the FP Tree**
+
+::: incremental
+-   Move to newly created I2 node and next item I6 in transaction.
+
+-   No child node for I6 under I2; create child node for I6 with count 1.
+:::
+
+![](images/fp8.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T3 to the FP Tree**
+
+::: incremental
+-   Finished traversing T2; start T3 with items \[I3, I5, I1, I2\].
+
+-   At root, find I3; increment its count by 1 since it exists.
+:::
+
+![](images/fp9.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T3 to the FP Tree**
+
+::: incremental
+-   Move to modified I3 node and next item I5 in transaction.
+
+-   Find existing child node for I5 under I3; increment I5's count by 1.
+:::
+
+![](images/fp10.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T3 to the FP Tree**
+
+::: incremental
+-   Move to modified I5 node and next item I1 in transaction.
+
+-   No child node for I1 under I5; create child node for I1 with count 1.
+:::
+
+![](images/fp11.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items from Transaction T3 to the FP Tree**
+
+::: incremental
+-   Move to newly created I1 node and next item I2 in transaction.
+
+-   No child node for I2 under I1; create child node for I2 with count 1.
+:::
+
+![](images/fp12.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items From Transaction T4 to the FP Tree**
+
+::: incremental
+-   Starting with I5 at root, check for child node with I5.
+
+-   No child node for I5; create new child node for I5 with count 1 at root.
+:::
+
+![](images/fp13.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Add Items From Transaction T4 to the FP Tree**
+
+::: incremental
+-   Starting with I5 at root, check for child node with I5.
+
+-   No child node for I5; create new child node for I5 with count 1 at root.
+:::
+
+![](images/fp14.png)
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 4**: Create a Pattern Base For All The Items Using The FP-Tree
+
+To construct pattern bases using the FP-growth algorithm, we analyze the FP-tree to track paths leading to each item, summarizing the findings:
+
+::: incremental
+-   **Pattern Base for I1:** **`{I3}:1`**, **`{I3, I5}:2`**. This reflects paths from I3 to I1 (count 1) and I3 through I5 to I1 (count 2).
+
+-   **Pattern Base for I2:** **`{I3, I5}:1`**, **`{I3, I5, I1}:1`**, **`{I5}:1`**. Represents paths I3-\>I5-\>I2, I3-\>I5-\>I1-\>I2 (each with count 1), and directly I5-\>I2 (count 1).
+
+-   **Pattern Base for I3:** None, as I3 is directly connected to the root.
+
+-   **Pattern Base for I5:** **`{I3}:3`**, indicating the path I3-\>I5 with count 3.
+
+-   **Pattern Base for I4 and I6:** Not applicable, as their support does not meet the threshold for inclusion in this analysis.
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 4**: Create a Pattern Base For All The Items Using The FP-Tree
+
+The pattern base for each item in the dataset is tabulated below.
+
+|          |                                    |
+|----------|------------------------------------|
+| **Item** | **Pattern Base**                   |
+| `I1`     | `{I3}:1,{I3, I5}:2`                |
+| `I2`     | `{I3, I5}:1,{I3, I5, I1}:1,{I5}:1` |
+| `I3`     | `{}`                               |
+| `I5`     | `{I3}:3`                           |
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 5:** Create a Conditional FP Tree For Each Frequent Item
+
+-   **Item I1**: In its pattern base, I3 appears with total count 3 ({I3} with count 1 and {I3,I5} with count 2); I5 appears in {I3, I5} with count 2. Conditional FP-tree: {I3:3, I5:2}.
+
+-   **Item I2**: Pattern base shows I3 (total count 2) and I5 (total count 3); I1 (count 1) is dropped for being below minimum support. Conditional FP-tree: {I3:2, I5:3}.
+
+-   **Item I5**: Pattern base shows I3 with count 3. Conditional FP-tree: {I3:3}.
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 5:** Create a Conditional FP Tree For Each Frequent Item
+
+The conditional fp-tree for each item is tabulated below.
+
+|          |                                    |                         |
+|----------|------------------------------------|-------------------------|
+| **Item** | **Pattern Base**                   | **Conditional FP Tree** |
+| `I1`     | `{I3}:1,{I3, I5}:2`                | `{I3:3, I5:2}`          |
+| `I2`     | `{I3, I5}:1,{I3, I5, I1}:1,{I5}:1` | `{I3:2, I5:3}`          |
+| `I3`     | `{}`                               |                         |
+| `I5`     | `{I3}:3`                           | `{I3:3}`                |
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 6:** Generate Frequent Itemsets From Conditional FP-Trees
+
+After constructing the conditional FP-tree, we generate frequent itemsets for each item by combining items in the conditional FP-tree with their counts:
+
+::: incremental
+-   **For I1:** Frequent itemsets are `{I1, I3}:3`, `{I1, I5}:2`, and `{I1, I3, I5}:2`. The support counts are determined by the maximum support of items in the conditional FP-tree, with `{I1, I5}` and `{I1, I3, I5}` limited to 2 due to `I5`'s maximum support count.
+
+-   **For I2:** Frequent itemsets include `{I2, I3}:2`, `{I2, I5}:3`, and `{I2, I3, I5}:2`. Here, the support count of `{I2, I3}` and `{I2, I3, I5}` is restricted to 2 due to `I3`'s support count, while `{I2, I5}` reaches 3, reflecting `I5`'s maximum support in the conditional FP-tree.
+
+-   **For I5:** The only frequent itemset is `{I3, I5}` with a count of 3, as derived from the conditional FP-tree's support counts.
+:::
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+#### **Step 6:** Generate Frequent Itemsets From Conditional FP-Trees
+
+All the frequent itemsets derived from the conditional fp-trees have been tabulated below.
+
+|          |                                    |                         |                                         |
+|----------|------------------------------------|-------------------------|-----------------------------------------|
+| **Item** | **Pattern Base**                   | **Conditional FP Tree** | **Frequent itemsets**                   |
+| `I1`     | `{I3}:1,{I3, I5}:2`                | `{I3:3, I5:2}`          | `{I1, I3}:3,{I1, I5}:2,{I1, I3, I5}:2`  |
+| `I2`     | `{I3, I5}:1,{I3, I5, I1}:1,{I5}:1` | `{I3:2, I5:3}`          | `{I2, I3}:2, {I2, I5}:3,{I2, I3, I5}:2` |
+| `I5`     | `{I3}:3`                           | `{I3:3}`                | `{I3, I5}:3`                            |
+
+## Frequent itemset generation: FP-Growth {.smaller}
+
+**Step 7:** Generate Association Rules, e.g.:
+
+|                |                                                                                                  |
+|----------------|--------------------------------------------------------------------------------------------------|
+| **Itemset**    | **Association Rules**                                                                            |
+| `{I1}`         | `x`                                                                                              |
+| `{I2}`         | `x`                                                                                              |
+| `{I3}`         | `x`                                                                                              |
+| `{I5}`         | `x`                                                                                              |
+| `{I1,I3}`      | `{I1}->{I3}, {I3}->{I1}`                                                                         |
+| `{I1,I5}`      | `{I1}->{I5}, {I5}->{I1}`                                                                         |
+| `{I2,I3}`      | `{I2}->{I3}, {I3}->{I2}`                                                                         |
+| `{I2,I5}`      | `{I2}->{I5}, {I5}->{I2}`                                                                         |
+| `{I3,I5}`      | `{I3}->{I5}, {I5}->{I3}`                                                                         |
+| `{I2, I3, I5}` | `{I2}->{I3, I5}, {I3}->{I2, I5}, {I5}->{I2, I3}, {I2, I3}->{I5}, {I2, I5}->{I3}, {I3, I5}->{I2}` |
+| `{I1, I3, I5}` | `{I1}->{I3, I5}, {I3}->{I1, I5}, {I5}->{I1, I3}, {I1, I3}->{I5}, {I1, I5}->{I3}, {I3, I5}->{I1}` |
+
+## FP-Growth: applied {.smaller}
+
+```{python}
+#| code-fold: true
+# Apply FP-Growth to find frequent itemsets
+frequent_itemsets_fpgrowth = fpgrowth(basket, min_support = 0.01, use_colnames = True)
+
+# The frequent itemsets found by FP-Growth will be the same as those found by Apriori
+# but potentially in a different order and possibly faster depending on the dataset
+print("\nFrequent Itemsets from FP-Growth:\n", frequent_itemsets_fpgrowth.head())
+```
+
+## Maximal frequent itemsets {.smaller}
+
+An itemset is maximal frequent if none of its immediate supersets is frequent:
+
+![](images/max-frequent.png){width="712"}
+
+## Closed itemsets {.smaller}
+
+None of an itemset's its immediate supersets has the same support as the itemset
+
+-   Can only have smaller support $\rightarrow$ *see APRIORI principle above*
+
+![](images/closed.png)
+
+## Closed vs. maximal itemsets
+
+![](images/closed-max.png){width="980"}
+
+## Closed & maximal itemsets: applied {.smaller}
+
+::: panel-tabset
+## Setup
+
+```{python}
+#| code-fold: true
+
+import time
+
+# Task 1: Compute Frequent Item Set using mlxtend.frequent_patterns
+start_time = time.time()
+frequent_itemsets = fpgrowth(basket, min_support = 0.001, use_colnames = True)
+print('Time to find frequent itemset:', time.time() - start_time, 'seconds')
+
+# Task 2 & 3: Find closed/max frequent itemset using the frequent itemset found in Task 1
+# Initialize lists to store closed and max itemsets
+closed_itemsets = []
+max_itemsets = []
+
+# Get all unique support counts
+unique_supports = frequent_itemsets['support'].unique()
+```
+
+## Closed itemsets
+
+```{python}
+#| code-fold: true
+# Find closed itemsets
+for support in unique_supports:
+    itemsets_at_support = frequent_itemsets[frequent_itemsets['support'] == support]['itemsets']
+    for itemset in itemsets_at_support:
+        is_closed = not any((itemset < other_itemset) and (itemset != other_itemset) for other_itemset in itemsets_at_support)
+        if is_closed:
+            closed_itemsets.append(itemset)
+            
+print(f'Found {len(closed_itemsets)} closed itemsets')
+```
+
+## Maximal itemsets
+
+```{python}
+#| code-fold: true
+# Find max itemsets
+for support in sorted(unique_supports, reverse=True):
+    itemsets_at_or_above_support = frequent_itemsets[frequent_itemsets['support'] >= support]['itemsets']
+    for itemset in itemsets_at_or_above_support:
+        is_max = not any(itemset < other_itemset for other_itemset in itemsets_at_or_above_support if itemset != other_itemset)
+        if is_max and itemset not in max_itemsets:
+            max_itemsets.append(itemset)
+
+print(f'Found {len(max_itemsets)} max itemsets')
+```
+:::
+
+## Correlations from association {.smaller}
+
+```{python}
+# Convert boolean values to integers for correlation analysis
+df_numeric = basket.astype(int)
+
+# Example calculation (assuming you want to compare 'Cake' and 'Coffee')
+corr_coefficient, p_value = pearsonr(df_numeric['Cake'], df_numeric['Coffee'])
+
+print(f"Pearson Correlation Coefficient between Cake and Coffee: {corr_coefficient:.3f}")
+print(f"P-Value: {p_value:.3f}")
+```
+
+## Regression analysis {.smaller}
+
+```{python}
+#| code-fold: true
+# Prepare the data
+X = df_numeric['Cake']
+y = df_numeric['Coffee']
+X = sm.add_constant(X)  # Adds a constant term to the predictor
+
+# Fit a logistic regression model
+model = sm.Logit(y, X).fit()
+
+# Print the model summary
+print(model.summary())
+
+```
+
+## Conclusions {.smaller}
+
+::: incremental
+1.  **Association Rule Mining's Versatility**: It uncovers relationships in datasets, useful across retail, bioinformatics, and web mining.
+
+2.  **Strength ≠ Usefulness**: High support and confidence don't guarantee an association rule's relevance; evaluation of novelty and usefulness is critical.
+
+3.  **Advanced Measures for Depth**: Beyond support and confidence, lift, leverage, and conviction offer deeper insights into rule significance.
+
+4.  **Reducing Redundancy**: Mining closed and maximal itemsets streamlines pattern discovery, highlighting the most pertinent itemsets.
+
+5.  **Beyond Co-occurrence**: Correlation analysis reveals the influence between items, adding a layer of understanding to association rules.
+
+6.  **Crucial Data Preparation**: Effective data format and preparation are key to successful mining and statistical analysis.
+
+7.  **Significance vs. Usefulness**: Distinguishing statistical from practical significance is essential; not all statistically significant rules are practically useful.
+
+8.  **Interdisciplinary Insights**: Combining data mining, statistics, and domain knowledge enhances the interpretation and application of findings.
+:::
+
+## Conclusions cont...
+
+The semester is over!!! 😭
+
+::: fragment
+...but actually 🥳
+:::
+
+::: fragment
+✌🏻
+:::
+
+## In-class Exercise
+
+::: task
+Go to [ex-13](https://datamineaz.org/exercises/ex-13.html) and perform the tasks
+:::

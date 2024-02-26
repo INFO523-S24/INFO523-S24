@@ -1,0 +1,201 @@
+---
+title: "Homework 3"
+---
+
+For any exercise where you're writing code, insert a code chunk and make sure to label the chunk. Use a short and informative label. For any exercise where you're creating a plot, make sure to label all axes, legends, etc. and give it an informative title. For any exercise where you're including a description and/or interpretation, use full sentences. Make a commit at least after finishing each exercise, or better yet, more frequently. Push your work regularly to GitHub, and make sure all checks pass.
+
+For this Homework, find the types of classification, their pros and cons, and implementation [here](https://datamineaz.org/tables/model-cheatsheet.html).
+
+------------------------------------------------------------------------
+
+## Classification Methods
+
+Welcome to this week's data mining challenge! Your mission is to dive into the world of machine learning with a focus on classification algorithms. Using a dataset from #TidyTuesday, a project that presents a new dataset to the R for Data Science community every week, you will explore how to categorize data into distinct classes.
+
+**Objective**: You will apply a variety of classification methods to the dataset, fine-tune models, and interpret the results to gain insights. This exercise aims to enhance your understanding of classification techniques and prepare you to tackle real-world data science problems.
+
+### Datasets & question
+
+Based on a county's demographic, employment, and household data, can we predict whether the median price for center-based childcare for preschoolers (mc_preschool) will be above or below the state's average? - [**Childcare costs**](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-05-09)
+
+------------------------------------------------------------------------
+
+## Part 1: Data Preparation and Exploration
+
+### Task 1: Data Retrieval
+
+-   Download the dataset provided for the week from the TidyTuesday repository.
+-   Load the dataset into a Python environment using pandas.
+
+### Task 2: Exploratory Data Analysis (EDA)
+
+-   Perform EDA to understand the features of the dataset.
+-   Visualize the distribution of the classes (target variable).
+-   Identify and visualize relationships between features and the target variable.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Use `matplotlib` and `seaborn` for visualizations to understand data distributions.
+-   `pandas.DataFrame.describe()` can give you descriptive statistics.
+-   Use `seaborn.pairplot()` or `pandas.scatter_matrix()` to visualize possible correlations.
+
+</details>
+
+### Task 3: Data Cleaning
+
+-   Handle missing values and remove or impute where appropriate.
+-   Convert categorical data to numerical data using one-hot encoding or label encoding.
+-   Merge if appropriate.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Check for missing values using `pandas.DataFrame.isnull().sum()`.
+-   Consider using `pandas.DataFrame.dropna()` to remove rows with missing values or `pandas.DataFrame.fillna()` to impute them.
+-   For encoding categorical variables, look into `pandas.get_dummies()` for one-hot encoding or `sklearn.preprocessing.LabelEncoder` for label encoding.
+
+</details>
+
+## Part 2: Feature Engineering and Selection
+
+In this section, you will perform date preparation and exploration on your chosen dataset. You will retrieve and load the data, clean the data, and perform a concise exploratory data analysis.
+
+### Task 1: Feature Engineering
+
+-   Create new features if necessary from existing data.
+-   Normalize or standardize features if needed.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Think about what additional information might be useful that's not directly provided in the features.
+-   Standardize features with `sklearn.preprocessing.StandardScaler` or normalize them with `sklearn.preprocessing.MinMaxScaler`.
+
+</details>
+
+### Task 2: Feature Selection
+
+-   Use statistical tests, selection methods, or model-based methods to select a subset of features for the classification.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Use methods like `SelectKBest` from `sklearn.feature_selection` to select features based on univariate statistical tests.
+-   Consider using `feature_importances_` from tree-based models like RandomForest to evaluate feature importance.
+-   Consider removing correlated pairs like we did in class
+
+</details>
+
+## Part 3: Model Implementation
+
+This section will focus on cleaning and preparing the dataset for modeling. You will correct any issues you found during the EDA phase.
+
+### Task 1: Data Splitting
+
+-   Split the dataset into a training set and a test set.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Use `sklearn.model_selection.train_test_split` to separate your data into training and testing sets.
+-   Consider using PCA for dimensional reduction, picking the optimal components like we did in class.
+
+</details>
+
+### Task 2: Model Training
+
+-   Train at least three of the following classification models:
+    -   Logistic Regression (3 points)
+    -   Decision Tree Classifier (3 points)
+    -   Random Forest Classifier (3 points)
+    -   K-Nearest Neighbors (3 points)
+-   For each model, briefly explain the working principle.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   For each algorithm, ensure you understand the basic principle; logistic regression is about probabilities, decision trees make hierarchical decisions, etc.
+-   Consult the scikit-learn documentation for details on parameters and usage of different classifiers.
+
+</details>
+
+### Task 3: Model Validation
+
+-   Use cross-validation to estimate the effectiveness of each model.
+-   Report the accuracy, precision, recall, F1-score, and ROC-AUC for each model.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Implement cross-validation using `sklearn.model_selection.cross_val_score` or `sklearn.model_selection.cross_validate`.
+-   For metrics, explore `sklearn.metrics` for functions like `accuracy_score`, `precision_score`, `recall_score`, `f1_score`, and `roc_auc_score`.
+
+</details>
+
+## Part 4: Model Evaluation and Interpretation
+
+### Task 1: Model Comparison + Result Interpretation
+
+-   Interpret the results of the best performing model.
+-   Discuss the importance of feature contributions to the model's predictions.
+-   Reflect on the potential real-world implications of the model's performance (e.g., overfitting, misclassification costs).
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   When interpreting the ROC curve, recall that a curve closer to the top-left corner indicates a better performance.
+
+</details>
+
+------------------------------------------------------------------------
+
+**Deliverables:** - A Quarto Notebook containing all code and visualizations. - A written report summarizing your findings from the EDA, the decisions you made during preprocessing, and the rationale behind your choices.
+
+**Submission Guidelines:** - Push your Quarto Notebook to your GitHub repository. - Ensure your commit messages are descriptive.
+
+**Grading Rubric:** Your work will be evaluated based on the following criteria: - Correctness and completeness of the code. - Quality and clarity of the visualizations and summary report. - Proper use of comments and documentation in the code. - Adherence to the submission guidelines.
+
+**Points Distribution:** Each task is allocated a specific number of points. Points will be awarded based on the completeness and correctness of the work submitted. Be sure to follow best practices in data analysis and provide interpretations for your findings and decisions during preprocessing.
+
+Good luck, and may your insights be profound!

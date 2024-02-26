@@ -92,16 +92,14 @@ Some use cases for clustering include:
 
 ## Question:
 
-Can we [identify distinct customer segments]{.underline} based on their **purchasing behavior** and **demographic** **details** during the Diwali sales period?
+Can we [identify distinct baseball player groupings]{.underline} based on their **player stats** in 2018?
 
-## Our data: Diwali Sales {.smaller}
+## Our data: MLB player stats {.smaller}
 
 ::: panel-tabset
 ## Read + Head
 
 ```{python}
-from skimpy import clean_columns
-
 mlb_players_18 = pd.read_csv("data/mlb_players_18.csv", encoding = 'iso-8859-1')
 
 mlb_players_18.head()
@@ -462,6 +460,22 @@ $J = \sum_{i=1}^{k} \sum_{x \in C_i} ||x - \mu_i||^2$
 :::
 
 ## Key points
+
+-   **Initialization**: Randomly selects $k$ initial centroids.
+
+-   **Assignment Step**: Assigns each data point to the closest centroid based on Euclidean distance.
+
+-   **Update Step**: Recalculates centroids as the mean of assigned points in each cluster.
+
+-   **Convergence**: Iterates until the centroids stabilize (minimal change from one iteration to the next).
+
+-   **Objective**: Minimizes the within-cluster sum of squares (WCSS), the sum of squared distances between points and their corresponding centroid.
+
+-   **Optimal** $k$: Determined experimentally, often using methods like the Elbow Method.
+
+-   **Sensitivity**: Results can vary based on initial centroid selection; techniques like "k-means++" improve initial centroid choices.
+
+-   **Efficiency**: Generally good, but worsens with increasing $k$ and data dimensionality; sensitive to outliers.
 :::
 
 ## K-Medians Clustering {.smaller}
@@ -1052,3 +1066,19 @@ plt.ylabel('PCA 2')
 plt.legend(title = 'Cluster')
 plt.show()
 ```
+
+## Conclusions {.smaller}
+
+::: incremental
+-   **Unsupervised Learning**: Explores data to find structure in the form of clusters without predefined labels or outcomes.
+
+-   **Clustering Use Cases**: Includes recommender systems, anomaly detection, genetics, and customer segmentation.
+
+-   **Clustering Algorithms**: K-Means and K-Medians are highlighted for their utility in grouping data based on similarity measures.
+
+-   **Choosing the Right Number of Clusters**: Techniques like the Elbow Method, Silhouette Score, Davies-Bouldin Index, Calinski-Harabasz Index, and BIC are critical for determining the optimal cluster count.
+
+-   **Similarity and Dissimilarity Measures**: Essential in clustering, with methods including Euclidean, Manhattan, Cosine, Jaccard, and Mahalanobis distances.
+
+-   **Evaluation Metrics**: Silhouette Score, Davies-Bouldin Index, and Calinski-Harabasz Index help assess clustering quality, focusing on intra-cluster cohesion and inter-cluster separation.
+:::
