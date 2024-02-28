@@ -22,7 +22,7 @@ We'll use two datasets: **`egg-production.csv`** and **`cage-free-percentages.cs
 ### Metadata for **`egg-production.csv`:**
 
 | Variable             | Class     | Description                                                          |
-|--------------|-----------|-------------------------------------------|
+|---------------|---------------|-----------------------------------------|
 | **`observed_month`** | double    | Month in which observations were collected                           |
 | **`prod_type`**      | character | Type of egg product: hatching, table eggs                            |
 | **`prod_process`**   | character | Production process and housing: cage-free (organic/non-organic), all |
@@ -33,7 +33,7 @@ We'll use two datasets: **`egg-production.csv`** and **`cage-free-percentages.cs
 ### **Metadata for `cage-free-percentages.csv`:**
 
 | **Variable**         | **Class** | **Description**                                                    |
-|--------------|----------|------------------------------------------------|
+|---------------|---------------|-------------------------------------------|
 | **`observed_month`** | double    | Month in which observations were collected                         |
 | **`percent_hens`**   | double    | Percentage of cage-free hens relative to all table-egg-laying hens |
 | **`percent_eggs`**   | double    | Percentage of cage-free eggs relative to all table eggs            |
@@ -47,35 +47,35 @@ How do cage-free production practices influence overall egg production?
 
 ## **Step 1: Setup and Data Preprocessing**
 
--   Begin by importing necessary libraries and loading the datasets.
+1.  Begin by importing necessary libraries and loading the datasets.
 
--   Merge the datasets on the **`observed_month`** variable and preprocess the data by encoding categorical variables and handling missing values if any.
+2.  Merge the datasets on the **`observed_month`** variable and preprocess the data by encoding categorical variables and handling missing values if any.
 
 ## **Step 2: Exploratory Data Analysis (EDA)**
 
--   Conduct EDA to understand the distribution of cage-free percentages and their relationship with egg production volumes.
+1.  Conduct EDA to understand the distribution of cage-free percentages and their relationship with egg production volumes.
 
--   Utilize visualizations like scatter plots and histograms to illustrate these relationships.
+2.  Utilize visualizations like scatter plots and histograms to illustrate these relationships.
 
 ## **Step 3: Model Training**
 
--   Train regression models to predict **`n_eggs`** using **`percent_hens`** and other relevant variables as predictors.
+1.  Train regression models to predict **`n_eggs`** using **`percent_hens`** and other relevant variables as predictors.
 
--   Consider linear regression, ridge regression, and lasso regression for this task. Evaluate the models based on training data.
+2.  Consider linear regression, ridge regression, and lasso regression for this task. Evaluate the models based on training data.
 
 ## **Step 4: Model Evaluation and Interpretation**
 
--   Use metrics such as R-squared, Mean Squared Error (MSE), and coefficients analysis to evaluate the performance of your models.
+1.  Use metrics such as R-squared, Mean Squared Error (MSE), and coefficients analysis to evaluate the performance of your models.
 
--   Discuss the significance of cage-free percentages in predicting egg production volumes.
+2.  Discuss the significance of cage-free percentages in predicting egg production volumes.
 
 ## **Assignment:**
 
--   Implement the data preprocessing, model training, and evaluation steps.
+1.  Implement the data preprocessing, model training, and evaluation steps.
 
--   Explore the relationship between cage-free percentages and egg production, utilizing the models trained.
+2.  Explore the relationship between cage-free percentages and egg production, utilizing the models trained.
 
--   Reflect on the implications of your findings for the poultry industry, particularly concerning cage-free housing practices.
+3.  Reflect on the implications of your findings for the poultry industry, particularly concerning cage-free housing practices.
 
 ## **Submission:**
 

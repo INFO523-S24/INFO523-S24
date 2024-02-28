@@ -920,5 +920,5 @@ print(f"Average F1-Score for Decision Tree: {dtree_f1_average:.2f}")
 ## In-class Exercise
 
 ::: task
-Go to [ex-07](https://datamineaz.org/exercises/ex-07.html) and perform the tasks
+Go to [ex-06](https://datamineaz.org/exercises/ex-06.html) and perform the tasks
 :::

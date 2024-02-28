@@ -411,7 +411,7 @@ plt.scatter(X[:, 0], X[:, 1], c = probs[:, 0], cmap = 'coolwarm', marker = 'o', 
 plt.title('Soft Clustering with Gaussian Mixture Model')
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
-plt.colorbar(label='Probability of Cluster 1')
+plt.colorbar(label = 'Probability of Cluster 1')
 plt.show()
 ```
 
@@ -486,10 +486,6 @@ plt.show()
 ```
 :::
 
-## In-class exercise
-
-TBD
-
 ## Conclusions {.smaller}
 
 **Identifying Baseball Player Groupings:**
@@ -514,4 +510,20 @@ TBD
     -   Distance metric chosen
 
     -   Computational resources available
+:::
+
+## In-class activity {.smaller}
+
+::: panel-tabset
+## Intro
+
+::: task
+Go to [ex-12](https://datamineaz.org/exercises/ex-12.html) and perform the tasks
+:::
+
+![](images/tSwift.jpeg){fig-align="center" width="630"}
+
+## Visual
+
+![](images/20231017.png){fig-align="center"}
 :::

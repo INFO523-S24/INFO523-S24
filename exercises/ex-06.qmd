@@ -1,5 +1,5 @@
 ---
-title: "Ex-07: Classifying Spam Emails"
+title: "Ex-06: Classifying Spam Emails"
 jupyter: python3
 ---
 
@@ -8,6 +8,8 @@ jupyter: python3
 Apply and evaluate different classification models to predict high-risk credit individuals using financial traits, focusing on understanding model performance through various evaluation metrics.
 
 **Prerequisites:** Ensure you have Python, Jupyter Notebook, and the required libraries (**`pandas`**, **`numpy`**, **`scikit-learn`**, **`matplotlib`**, **`seaborn`**, **`mord`**) installed. The dataset **`spam.csv`** should be available in the **`data`** directory.
+
+Find the template GitHub repo [**HERE**](https://github.com/INFO523-S24/ex-06).
 
 ## Dataset:
 
@@ -22,7 +24,7 @@ This is a dataset collected at Hewlett-Packard Labs by Mark Hopkins, Erik Reeber
 ### Metadata
 
 | Variable  | Class     | Description                                                              |
-|-----------|-----------|--------------------------------------------------------------------------|
+|------------|------------|------------------------------------------------|
 | `crl.tot` | double    | Total length of uninterrupted sequences of capitals                      |
 | `dollar`  | double    | Occurrences of the dollar sign, as percent of total number of characters |
 | `bang`    | double    | Occurrences of `!`, as percent of total number of characters             |

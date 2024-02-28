@@ -81,8 +81,8 @@ website:
             text: HW 01
           - href: homework/hw-02.qmd
             text: HW 02
-          #- href: homework/hw-03.qmd
-            #text: HW 03
+          - href: homework/hw-03.qmd
+            text: HW 03
           #- href: homework/hw-04.qmd
             #text: HW 04
           #- href: homework/hw-05.qmd
@@ -93,7 +93,9 @@ website:
       - section: Exercises
         contents:
           - href: exercises/ex-06.qmd
-          - href: exercises/ex-08.qmd
+          #- href: exercises/ex-08.qmd
+          #- href: exercises/ex-09.qmd
+          #- href: exercises/ex-12.qmd
 
             
   page-footer:

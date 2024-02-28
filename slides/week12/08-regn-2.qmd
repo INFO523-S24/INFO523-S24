@@ -1045,3 +1045,9 @@ plt.show()
 -   **Error Patterns**: Models with **evenly distributed errors** tend to have **higher Adjusted R-squared** [even if MSE is slightly higher]{.underline}, compared to those with uneven error distribution.
 :::
 :::
+
+## In-class Exercise 
+
+::: task
+Go to [ex-08](https://datamineaz.org/exercises/ex-08.html) and perform the tasks
+:::

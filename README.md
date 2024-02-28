@@ -19,7 +19,7 @@ The website is live at [datamineaz.org](http://datamineaz.org/).
 
 ### Disclosure
 
-This content is derived from the course website for STA 313 - Advanced Data Visualization at Duke University, taught by Dr. Mine Çetinkaya-Rundel. The website has a new logo, color scheme, fonts, etc.
+This website is derived from the course website for [STA 313 - Advanced Data Visualization at Duke University](https://vizdata.org/), taught by Dr. Mine Çetinkaya-Rundel. The website has a new logo, color scheme, fonts, etc.
 
 [![](https://licensebuttons.net/l/by-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-sa/4.0/)
 

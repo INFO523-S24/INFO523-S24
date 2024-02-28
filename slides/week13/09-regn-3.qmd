@@ -1192,3 +1192,10 @@ Pretty advanced, so we will skip this one.
 ::: fragment
 **Occam's Razor loses!..**
 :::
+
+## In-class exercise 
+
+::: task
+Go to [ex-09](https://datamineaz.org/exercises/ex-09.html) and perform the tasks
+:::
+
