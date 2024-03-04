@@ -16,7 +16,9 @@ Welcome to this week's data mining challenge! Your mission is to dive into the w
 
 ### Datasets & question
 
-Based on a county's demographic, employment, and household data, can we predict whether the median price for center-based childcare for preschoolers (mc_preschool) will be above or below the state's average? - [**Childcare costs**](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-05-09)
+Based on a county's demographic, employment, and household data, can we predict whether the median price for center-based childcare for preschoolers (mc_preschool) will be above or below the state's average?
+
+-   [**Childcare costs**](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-05-09)
 
 ------------------------------------------------------------------------
 

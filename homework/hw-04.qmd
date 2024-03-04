@@ -1,0 +1,152 @@
+---
+title: "Homework 4"
+---
+
+For any exercise where you're writing code, insert a code chunk and make sure to label the chunk. Use a short and informative label. For any exercise where you're creating a plot, make sure to label all axes, legends, etc. and give it an informative title. For any exercise where you're including a description and/or interpretation, use full sentences. Make a commit at least after finishing each exercise, or better yet, more frequently. Push your work regularly to GitHub, and make sure all checks pass.
+
+For this Homework, find the types of classification, their pros and cons, and implementation [here](https://datamineaz.org/tables/model-cheatsheet.html).
+
+# Regression Methods
+
+Greetings and welcome to this week's analytical deep dive! In this segment, we pivot our attention to the foundational machine learning domain of regression techniques. Harnessing the power of #TidyTuesday's weekly datasets, your quest is to unravel the subtle nuances of continuous data prediction.
+
+Objective: Your task is to deploy a suite of regression methodologies on the chosen dataset, refine your models, and extract meaningful interpretations from the outcomes. This exercise is designed to bolster your comprehension of regression analytics, equipping you with the knowledge to confront practical data science challenges head-on.
+
+### Dataset
+
+-   [**Alone**](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-24)
+-   Use the datasets `survivalists.csv` and `seasons.csv`.
+
+------------------------------------------------------------------------
+
+## Part 1: Data Exploration
+
+You are tasked with using a dataset from the #tidytuesday repository relevant for regression analysis, including data exploration and interpretation of these results.
+
+### Task 1: Dataset Selection
+
+-   Download the dataset provided for the week from the TidyTuesday repository.
+-   Load the dataset into a Python environment using pandas.
+
+### Task 2: Exploratory Data Analysis (EDA)
+
+-   Perform EDA to understand the features of the dataset.
+-   Visualize the distribution of the target variable.
+-   Identify and visualize relationships between features and the target variable.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   **Describe Columns**: Use `df.info()` and `df.describe()` in Python to get an overview of your columns, data types, and statistical summaries.
+-   **Missing Values & Outliers**: Use visualizations and statistical summaries to identify outliers. For missing values, consider if imputation or removal is more appropriate based on the percentage and the importance of the data.
+-   **Data Shape & Transformation**: Check the distribution of your features. Use transformations if the data is heavily skewed or if the relationships between variables are not linear.
+-   **Relationships Identification**: Use scatter plots and correlation matrices to visualize relationships. Look for patterns and potential interactions that may be relevant for your regression question.
+
+</details>
+
+### Task 3: Question Formulation
+
+-   Come up with a question to solve from the data that will be relevant for a regression analysis.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Your question should be clear, measurable, and suitable for regression analysis. It should aim to predict a continuous outcome based on one or more variables.
+
+</details>
+
+## Part 2: Data Preprocessing
+
+Data preprocessing is a critical step in the pipeline of a regression analysis. It involves preparing and cleaning the data to ensure that the regression model is accurate, efficient, and relevant.
+
+### Task 1: Data Cleaning
+
+-   **Handling Missing Values**: Fill in missing data using techniques like mean or median imputation, model-based methods, or drop rows/columns with missing values.
+-   **Removing Outliers**: Identify and remove anomalies that can skew the results.
+
+### Task 2: Data Transformation
+
+-   **Feature Scaling**: Standardize or normalize features to ensure they're on the same scale.
+-   **Variable Transformation**: Apply transformations (e.g., log, square root) to deal with skewness and to satisfy model assumptions.
+
+### Task 3: Data Reduction
+
+-   **Dimensionality Reduction**: Use techniques like PCA to reduce the number of features while retaining most of the variance.
+-   **Binning/Discretization**: Convert continuous variables into categorical bins if necessary.
+
+### Task 4: Feature Engineering
+
+-   **Creating Polynomial Features**: Add polynomial or interaction terms to model non-linear relationships.
+-   **Domain-specific Features**: Engineer new features based on domain knowledge.
+
+### Task 5: Coding Categorical Variables
+
+-   **Label Encoding**: Transform categorical values into numerical labels.
+
+## Part 3: Ordinary Least Squares (OLS) Regression
+
+Conducting an OLS regression with resampling and evaluating the model performance involves a sequence of steps.
+
+### Task 1: Assumption Checks
+
+-   Verify OLS assumptions such as linearity, independence, homoscedasticity, and normality of residuals.
+
+### Task 2: Splitting the Dataset
+
+-   Divide the dataset into training (0.8) and testing (0.2) sets.
+
+### Task 3: Resampling
+
+-   Apply resampling techniques if your data is imbalanced or to improve the robustness of your model.
+
+### Task 4: Model Building
+
+-   Construct an OLS regression model using the training data.
+
+### Task 5: Model Diagnostics
+
+-   Analyze the regression diagnostics from the OLS model to check for any violations of regression assumptions.
+
+### Task 6: Evaluate Model Performance
+
+-   Apply the model to the test set to predict the outcomes and use appropriate performance metrics to evaluate accuracy.
+
+### Task 7: Interpret Results
+
+-   Interpret the coefficients of the model, and assess the overall fit and predictive power.
+
+### Task 8: Review and Conclusion
+
+-   Summarize the process and findings, and suggest steps for further improvement.
+
+## Part 4: Alternative Regressions
+
+When selecting two other regression methods beyond OLS, consider the nature of your data and the specifics of your question.
+
+### Task 1: Feature Scaling
+
+-   Standardize or normalize features especially for methods sensitive to the scale of input variables.
+
+### Task 2: Hyperparameter Tuning
+
+-   Use cross-validation to find optimal parameters for models like Ridge regression.
+
+### Task 3: Model Evaluation
+
+-   Evaluate the model using appropriate performance metrics and interpret the coefficients.
+
+**Deliverables:** - A Jupyter Notebook (with Quarto configuration) containing all code and visualizations. - A written report summarizing your findings from the EDA, the decisions you made during preprocessing, and the rationale behind your choices.
+
+**Submission Guidelines:** - Push your Jupyter Notebook to your GitHub repository. - Ensure your commit messages are descriptive.
+
+**Grading Rubric:** Your work will be evaluated based on the completeness and correctness of the code, quality and clarity of visualizations and summary report, proper use of comments and documentation, and adherence to submission guidelines.

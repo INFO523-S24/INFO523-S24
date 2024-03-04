@@ -1,0 +1,82 @@
+---
+title: "Homework 5"
+---
+
+For any exercise where you're writing code, insert a code chunk and make sure to label the chunk. Use a short and informative label. For any exercise where you're creating a plot, make sure to label all axes, legends, etc. and give it an informative title. For any exercise where you're including a description and/or interpretation, use full sentences. Make a commit at least after finishing each exercise, or better yet, more frequently. Push your work regularly to GitHub, and make sure all checks pass.
+
+For this Homework, find the types of clustering, their pros and cons, and implementation [here](https://datamineaz.org/tables/model-cheatsheet.html).
+
+# Clustering Techniques on Energy Data
+
+Welcome to this analytical exploration using unsupervised machine learning, specifically clustering algorithms, on a dataset related to energy production and consumption. This assignment, leveraging the #TidyTuesday `owid-energy.csv` dataset, aims to uncover hidden structures within the energy sector data.
+
+### Objective:
+
+Implement various clustering methods to reveal patterns in energy production, consumption, and their environmental impacts. Optimize clustering parameters and analyze the clusters to extract actionable insights.
+
+### Dataset:
+
+-   [**Energy Data**](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-06-06) focusing on global energy metrics.
+
+## Part 1: Data Preparation
+
+### Task 1: Data Preprocessing
+
+-   Import and initially explore the dataset.
+-   Clean the data by handling missing values and duplicates.
+-   Standardize data types for analysis.
+-   Conduct a preliminary analysis to understand the features related to energy metrics.
+
+### Task 2: Exploratory Data Analysis (EDA)
+
+-   Visualize potential clusters within the energy data.
+-   Select features for clustering based on energy consumption types, production sources, and environmental impacts.
+
+<details>
+
+<summary>
+
+<h3><b>Hint</b></h3>
+
+</summary>
+
+-   Use visualization libraries to explore distributions and relationships. Consider creating scatter plots or pair plots to identify potential clusters.
+-   Perform correlation analysis to aid in feature selection, focusing on variables that represent different aspects of energy data.
+
+</details>
+
+## Part 2: Clustering Methods Implementation and Analysis
+
+### Task 1: K-Means Clustering
+
+-   Use the Elbow Method and Silhouette Score to determine the optimal number of clusters.
+-   Implement the K-Means algorithm and visualize the resulting clusters.
+-   Interpret the clusters focusing on energy production and consumption patterns.
+
+### Task 2: Hierarchical Clustering
+
+-   Perform hierarchical clustering and create a dendrogram to visualize the cluster hierarchy.
+-   Compare the clusters obtained with K-Means and interpret their relevance to energy data.
+
+### Task 3: DBSCAN
+
+-   Implement the DBSCAN algorithm to identify dense clusters within the energy data.
+-   Analyze the sensitivity of DBSCAN parameters and their impact on cluster formation.
+-   Interpret the clusters, especially focusing on outliers and anomalies in energy patterns.
+
+## Part 3: Cluster Characterization and Comparative Analysis
+
+### Task 1: Cluster Interpretation and Analysis
+
+-   Characterize each cluster based on key features such as types of energy sources, consumption per capita, and carbon intensity.
+-   Detect outliers and anomalies within the energy data, discussing their potential implications.
+
+------------------------------------------------------------------------
+
+**Deliverables:** - A comprehensive Jupyter Notebook containing all code, visualizations, and analyses. - A detailed report summarizing the exploratory data analysis, clustering techniques used, and insights derived from the clusters.
+
+**Submission Guidelines:** - Submit your Jupyter Notebook and report via GitHub, ensuring that your repository is well-organized and your commit messages are informative.
+
+**Grading Rubric:** Your submission will be evaluated based on the completeness and correctness of the analysis, the quality of visualizations, the thoroughness of the documentation, and adherence to submission guidelines.
+
+Best of luck! May your analysis shed light on significant patterns within the energy sector.
