@@ -48,6 +48,8 @@ from sklearn.cluster import KMeans
 from sklearn_extra.cluster import KMedoids
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.cluster.hierarchy import fcluster
+from sklearn.neighbors import NearestNeighbors
+from sklearn.cluster import DBSCAN
 
 # Data Visualization
 import matplotlib.pyplot as plt
@@ -236,6 +238,112 @@ mlb_pca = pca.fit_transform(mlb_preprocessed)
 plt.figure(figsize = (9, 5))
 sns.scatterplot(x = mlb_pca[:, 0], y = mlb_pca[:, 1], hue = clusters_hc, alpha = 0.75, palette = "colorblind")
 plt.title('MLB Players Clustered (Hierarchical Clustering with PCA-reduced Features)')
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+plt.legend(title = 'Cluster')
+plt.show()
+```
+:::
+
+## DBSCAN {.smaller}
+
+Density-Based Spatial Clustering of Applications with Noise
+
+::: panel-tabset
+## Visual
+
+```{python}
+#| echo: false
+from sklearn.datasets import make_moons
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+
+# Generate a synthetic dataset
+X, _ = make_moons(n_samples = 300, noise = 0.1, random_state = 42)
+X_scaled = StandardScaler().fit_transform(X)  # Standardize features by removing the mean and scaling to unit variance
+
+# Apply DBSCAN
+dbscan = DBSCAN(eps=0.3, min_samples=5)  # eps and min_samples chosen based on dataset characteristics
+clusters = dbscan.fit_predict(X_scaled)
+
+# Visualize the clusters
+plt.figure(figsize = (8, 6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c = clusters, cmap = 'viridis', marker = 'o', edgecolor = 'k', s = 50)
+plt.title('DBSCAN Clustering')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.colorbar(label='Cluster ID')
+plt.show()
+
+```
+
+## Key points
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is a clustering algorithm with the following key points:
+
+1.  **Density-Based:** Identifies clusters based on the density of data points, effectively handling clusters of various shapes and sizes.
+2.  **Noise Sensitivity:** Capable of distinguishing noise (outlier points) from clusters, enhancing its robustness to outliers.
+3.  **Parameters:** Primarily governed by `eps` (the maximum distance between two points for them to be considered as in the same neighborhood) and `min_samples` (the minimum number of points to form a dense region).
+4.  **No Need for Cluster Count:** Unlike K-means, DBSCAN does not require the number of clusters to be specified in advance.
+5.  **Versatility:** Works well on datasets with complex structures and varying densities.
+:::
+
+## DBSCAN: applied {.smaller}
+
+::: panel-tabset
+## Optimal parameters
+
+```{python}
+#| code-fold: true
+# Selecting relevant features for clustering
+features = mlb_players_18[['AVG', 'OBP', 'SLG', 'OPS']]
+
+# Scaling the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(features)
+
+# Finding an optimal eps value using the nearest neighbors
+neighbors = NearestNeighbors(n_neighbors=4)
+neighbors_fit = neighbors.fit(X_scaled)
+distances, indices = neighbors_fit.kneighbors(X_scaled)
+distances = np.sort(distances, axis=0)
+distances = distances[:,1]
+
+plt.figure(figsize = (9, 5))
+plt.plot(distances)
+plt.title('K-Nearest Neighbors: Finding Optimal Epsilon')
+plt.xlabel('Points sorted by distance')
+plt.ylabel('Epsilon distance')
+plt.show()
+```
+
+## Model summary
+
+```{python}
+# Based on the elbow method from the plot, let's pick an eps value and apply DBSCAN
+eps_value = 0.5  # This value should be adjusted based on the elbow point observed in the plot
+dbscan = DBSCAN(eps = eps_value, min_samples = 5)
+clusters_dbscan = dbscan.fit_predict(X_scaled)
+
+# Evaluate clustering performance using silhouette score
+silhouette_avg_dbscan = silhouette_score(X_scaled, clusters_dbscan)
+print(f"The average silhouette_score for DBSCAN is : {silhouette_avg_dbscan:.3f}")
+
+```
+
+## Visualize results
+
+```{python}
+#| code-fold: true
+
+# PCA for dimensionality reduction
+pca = PCA(n_components = 2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Visualize the clusters
+plt.figure(figsize = (9, 5))
+sns.scatterplot(x = X_pca[:, 0], y = X_pca[:, 1], hue = clusters_dbscan, palette = "colorblind", alpha = 0.75, legend = "full")
+plt.title('DBSCAN Clustering of MLB Players with PCA-reduced Features')
 plt.xlabel('PCA 1')
 plt.ylabel('PCA 2')
 plt.legend(title = 'Cluster')
@@ -440,7 +548,7 @@ plt.show()
 ```{python}
 #| code-fold: true
 # Fit a Gaussian Mixture Model
-gmm = GaussianMixture(n_components=3, covariance_type='full', random_state=0)
+gmm = GaussianMixture(n_components = 3, covariance_type = 'full', random_state = 0)
 gmm.fit(mlb_preprocessed)
 
 # Predict soft assignments
